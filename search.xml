@@ -1,0 +1,1099 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+    
+    <entry>
+      <title><![CDATA[Most Vexing Parsing(C++)]]></title>
+      <url>/2016/02/03/most-vexing-parsingc/</url>
+      <content type="html"><![CDATA[<p>我在寫Daemonizer(註一)的時候，碰到了一個很奇怪的語法錯誤</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">ifstream f(this-&gt;pid_file_name());</div><div class="line">string content(istreambuf_iterator&lt;char&gt;(f), istreambuf_iterator&lt;char&gt;());</div><div class="line">pid_t pid = stoi(content);</div></pre></td></tr></table></figure>
+<p>他會跑出error，聲稱content是一個function所以無法當做stoi的引數。然而，要是這種傳法就能work </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="built_in">string</span> <span class="title">content</span><span class="params">(<span class="string">"123"</span>)</span></span>;</div><div class="line"><span class="comment">// OR</span></div><div class="line"><span class="built_in">string</span> content = <span class="built_in">string</span>(istreambuf_iterator&lt;<span class="keyword">char</span>&gt;(f), istreambuf_iterator&lt;<span class="keyword">char</span>&gt;());</div></pre></td></tr></table></figure>
+<p>這錯誤的主要成因是，第一個例子中的<code>string content(istreambuf_iterator&lt;char&gt;(f), istreambuf_iterator&lt;char&gt;());</code>被錯誤的當成了function prototype（話說，哪個use case會要在函數本體內宣告另外一個函數的prototype?）。這種情況叫做<a href="https://en.wikipedia.org/wiki/Most_vexing_parse" target="_blank" rel="external">Most vexing parse</a></p>
+<p>C++11提供了一個<a href="https://mbevin.wordpress.com/2012/11/16/uniform-initialization" target="_blank" rel="external">統一初始化方法</a>，也就是說，你用一個大括號把它包起來，他就一定會被認為是個物件初始化，而不是一個function prototype。C++11以前的話，只能再多一組括號把它包起來。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//C++11</div><div class="line">string content&#123;istreambuf_iterator&lt;char&gt;(f), istreambuf_iterator&lt;char&gt;()&#125;;</div><div class="line">//C++11以前的方法</div><div class="line">string content( (istreambuf_iterator&lt;char&gt;(f), istreambuf_iterator&lt;char&gt;()) );</div></pre></td></tr></table></figure>
+<p>真是個討人厭的慣例啊（抓頭）….</p>
+<p>(註一) 一個類似daemon的linux application，但是他是code層級，你只要繼承他，他就會幫你搞定所有Daemonize的事情</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Markdown文字色彩支援]]></title>
+      <url>/2015/08/23/markdown-text-color-support/</url>
+      <content type="html"><![CDATA[<p>Markdown一個最麻煩的地方就是缺乏文字色彩的原生支援。之前查了網頁，10個裡面有8個說沒有，兩個說用css。但是後來我想起來Markdown本身就有原生支援html語法，那就簡單了…</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">我們要把<span class="tag">&lt;<span class="name">font</span> <span class="attr">color</span>=<span class="string">"red"</span>&gt;</span>文字<span class="tag">&lt;/<span class="name">font</span>&gt;</span><span class="tag">&lt;<span class="name">font</span> <span class="attr">color</span>=<span class="string">"blue"</span>&gt;</span>變成<span class="tag">&lt;/<span class="name">font</span>&gt;</span><span class="tag">&lt;<span class="name">font</span> <span class="attr">color</span>=<span class="string">"green"</span>&gt;</span>彩色<span class="tag">&lt;/<span class="name">font</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>我們要把<font color="red">文字</font><font color="blue">變成</font><font color="green">彩色</font></p>
+<p>恩，其實滿直覺的，怎麼一開始沒想到這招囧…</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[創造一個自己的PGP電子簽章]]></title>
+      <url>/2015/07/26/create-your-own-pgp-digital-signature/</url>
+      <content type="html"><![CDATA[<p>##為什麼要電子簽章</p>
+<p>電子簽章是用來確認這封信真的是你發的。以目前的電子郵件來講，尤其是企業內部，我們有時候會碰到以下這種</p>
+<p>##建立PGP電子簽章</p>
+<p>指令其實滿簡單的，就是<code>gpg --gen-key</code>。不過強烈建議不要在遠端server做這件事情，尤其是沒啥人用的遠端server(比方說自己租用的VPS)。當然，真的要做也不是不行，下面會有一些註解。</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[SourceForge綑綁第三方軟體引發嚴重爭議]]></title>
+      <url>/2015/06/15/sourceforge-bundled-third-party-software-causes-serious-disputes/</url>
+      <content type="html"><![CDATA[<p>在幾天以前，<a href="http://sf.net" target="_blank" rel="external">SourceForge</a>啟動了一項頗具爭議性的政策 : 他們擅自「接管」了一些他們認為「被遺棄」的，本來在SourceForge host的軟體，重新包裝了installer並且植入了第三方軟體，比方說惡名昭彰的MacKeeper等等。</p>
+<p>在GitHub崛起以前，SourceForge一直是大多數開源軟體首選的host地點，就好像我們的OpenFoundary一樣。然而在GitHub等等免費託管服務越來越盛行的同時，SourceForge也有越來越多的使用者改用GitHub，而SourceForge上面的軟體就比較沒有在更新了。</p>
+<p>在幾天前，SourceForge擅自對「被認定遺棄」的軟體做了一些調整，他們重新包裝了這些專案的installer，暗地在裡面放入了臃腫或者廣告軟體。最早發現這事情的專案擁有者是Gimp for Windows，這引發了開源社群的全面…暴怒(該用這個形容詞嗎)，比分說NotePad++作者就憤怒地把專案完全從SourceFor遷出去。</p>
+<blockquote>
+<p>Obviously, the paid component per installation system is one of their important income generating scams. I would be fine with that, if they were the actual owners of the legitimate software. The real problem is, they are polluting these open source software installations for the purpose of filling their pockets by this scam, and worst of all, without even notifying the authors/creators of this software, while the creators are struggling against such parasitic software in order to keep their installers cleaner and safer.</p>
+</blockquote>
+<p>顯然這些付費嵌入的程式，是他們一個很重要的收入 - 以及詐騙的來源。老實講，如果嵌入者是這些專案的擁有者，我還不會那麼在意。真正的問題是，他們正在污染整個open source的軟體，靠這些根本是詐欺的手段去填滿他們的錢包，而且更糟糕的是，甚至連致力於對抗以及清除問題軟體，讓專案installer更安全的專案擁有者都不通知一聲。</p>
+<blockquote>
+<p>Such a shameless policy should be condemned, and the Notepad++ project will move entirely out of SourceForge.</p>
+</blockquote>
+<p>這種無恥的行徑應該要被強烈譴責，我宣布Notepad++將完全移出SourceForge。</p>
+<p>其實SourceForge做這種事也不是第一天了，以前他們會在某些Windows Installer在有知會開發者的前提下綑綁軟體。不過，明目張膽的「接管」他們認定「被遺棄」的軟體來玩這套，倒是真正的引發了眾怒。</p>
+<p>SourceForge知道了這事情的嚴重性，在6/3宣告停止這種行為(除非開發者允許)。不過看起來這次SourceForge對開發者來講，損失的信心恐怕很難再回來了。</p>
+<p>延伸閱讀：<a href="http://arstechnica.com/information-technology/2015/06/black-mirror-sourceforge-has-now-siezed-nmap-audit-tool-project/" target="_blank" rel="external">他連NMAP都敢動耶!</a></p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[舊文回收:OAuth with Android]]></title>
+      <url>/2015/04/12/oauth-with-android/</url>
+      <content type="html"><![CDATA[<p>這篇是我兩三年前寫在Levitation的blogspot，由於排版很爛，所以回收到這裏重新用Markdown寫一次</p>
+<p>###淺談OAuth in Android – 以Plurk為例子<br>OAuth是目前比較熱門的認證機制之一，他有個最大的好處就在於完全不需要在client端輸入賬號密碼，這部分完全會由web端完成。不過，他機制非常的複雜，有些地方做的讓人覺得很龜毛，所以我們在這篇只要淺談就好，其他的部分我會介紹一個函式庫來把它完成。</p>
+<p>這邊有一篇非常不錯的<a href="http://cire.pixnet.net/blog/post/30810748-漫談oauth認證協定與運作流程" target="_blank" rel="external">OAuth機制介紹</a>，有興趣的朋友可以看看。太細節部分的工作原理我們就不涉足了，我們專心看看最基本的認證步驟</p>
+<ol>
+<li>app開發者跟網站註冊取得API Key跟API Secret</li>
+<li>開始認證的時候，用這組key/secret/callback(<em>1)跟網站要一個Request Token(</em>2)</li>
+<li>用這組Request Token, callback組合成一個網址，讓使用者進入該網址認證。</li>
+<li>認證成功以後會傳回一個oauth_verifier，通常是一個很好閱讀的字串或者數字</li>
+<li>app端把這組verifier，以及request key跟網站取得半永久性的Access Token(*2)</li>
+<li>往後對這個網站任何要求（比方說，plurk來講，取得時間軸）使用這個Token即可，app把它存起來備用，就不需要重新跟網站申請認證了。</li>
+</ol>
+<p>這幾個步驟其實相當的繁瑣，尤其是對網站要求每次都要做一個全面性的Parameter Sign的動作，裡面牽涉的東西對一個初學者來講真是煩人到爆炸。當然，就會有人會寫一組library來解決這問題:我們今天介紹的就是oauth-signpost library。</p>
+<p>基本的取得jar，放進project，設定buildpath這些基礎到爆的東西我們就不討論了。首先，我們要先去Plurk申請一組API Key來作為我們的開發用途。所以我們就有了API Key/Secret了。接下來，回到Plurk API介紹的頁面，他提供了幾個網址供OAuth使用。基本上這些分別是幹嘛的我們就不予深究了，我們只要知道她是要怎麼用。</p>
+<p>signpost我們會用到根OAuth有關的一共有兩個部分：OAuthConsumer代表的是我們APP端的所有資料，包含Access Token等等（不過她好像沒幫你存，你要自己存），而OAuthProvider則是代表網站的OAuth認證部分。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> String PLURK_REQUEST_URL = <span class="string">"http://www.plurk.com/OAuth/request_token"</span>;</div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> String PLURK_AUTHORIZATION_URL = <span class="string">"http://www.plurk.com/m/authorize"</span>;</div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> String PLURK_ACCESS_URL = <span class="string">"http://www.plurk.com/OAuth/access_token"</span>;</div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> String PLURK_CALLBACK_URL = <span class="string">"myplurk:///"</span>;</div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> String PLURK_CONSUMER_KEY = <span class="string">"你的API Key"</span>;</div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> String PLURK_CONSUMER_SECRET = <span class="string">"你的API Secret"</span>;</div></pre></td></tr></table></figure>
+<p>我們先把這些東西設定變數，等等會用到。接下來我們設定Provider跟Consumer</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mainConsumer = <span class="keyword">new</span> DefaultOAuthConsumer(PLURK_CONSUMER_KEY, PLURK_CONSUMER_SECRET);</div><div class="line">mainProvider = <span class="keyword">new</span> DefaultOAuthProvider(PLURK_REQUEST_URL, PLURK_ACCESS_URL, PLURK_AUTHORIZATION_URL);</div></pre></td></tr></table></figure>
+<p>ok，那所有東西差不多就完成了。我們要讓使用者認證的時候，只要開一個url，載入provider提供的url :</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">String url = mainProvider.retrieveRequestToken(mainConsumer, PLURK_CALLBACK_URL);</div></pre></td></tr></table></figure>
+<p>利用webview打開這個以後，把webview設定一個WebViewClient，然後override它的link click</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">AuthClient</span> <span class="keyword">extends</span> <span class="title">WebViewClient</span> </span>&#123;</div><div class="line"> </div><div class="line"> </div><div class="line">  <span class="meta">@Override</span></div><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPageStarted</span><span class="params">(WebView view, String url, Bitmap favicon)</span> </span>&#123;</div><div class="line">  <span class="keyword">super</span>.onPageStarted(view, url, favicon);</div><div class="line"> &#125;</div><div class="line">  <span class="meta">@Override</span></div><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPageFinished</span><span class="params">(WebView view, String url)</span> </span>&#123;</div><div class="line">  <span class="keyword">super</span>.onPageFinished(view, url);</div><div class="line"> &#125;</div><div class="line">  <span class="meta">@Override</span></div><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">shouldOverrideUrlLoading</span><span class="params">(WebView view, String urlString)</span> </span>&#123;</div><div class="line"> </div><div class="line"> Log.d(<span class="string">"SubPlurkV2"</span>, <span class="string">"url : "</span> + urlString);</div><div class="line"> <span class="keyword">if</span>(urlString.contains(<span class="string">"subplurkv2"</span>)) &#123;</div><div class="line"> Uri url = Uri.parse(urlString);</div><div class="line"> String verifier = url.getQueryParameter(<span class="string">"oauth_verifier"</span>);</div><div class="line"> <span class="keyword">try</span> &#123;</div><div class="line"> SystemManager.getInst().getAuthManager().aquireAccessToken(verifier);</div><div class="line"> &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line"> <span class="comment">// TODO Auto-generated catch block</span></div><div class="line"> e.printStackTrace();</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> finish();</div><div class="line"> &#125;</div><div class="line">  <span class="keyword">return</span> <span class="keyword">super</span>.shouldOverrideUrlLoading(view, urlString);</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>然後我們可以取得verifier，利用這個取得Access Token</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mainProvider.retrieveAccessToken(mainConsumer, verifier);</div><div class="line">Log.d(<span class="string">"SubPlurkV2"</span>, <span class="string">"Token = "</span> + mainConsumer.getToken() + <span class="string">" and secret = "</span> + mainConsumer.getTokenSecret());</div></pre></td></tr></table></figure>
+<p>把這祖Token記錄起來，以後會用到。最後，我們來試試看最簡單地拿取時間軸吧</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mainConsumer.setAccessToken(<span class="string">"U5GNYyH6wVGS"</span>, <span class="string">"aCtJ9XVgNTeIpigq3qxsLi70Sv0HbA6h"</span>);</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">URL url = <span class="keyword">new</span> URL(<span class="string">"http://www.plurk.com/APP/Timeline/getPlurks"</span>);</div><div class="line">HttpURLConnection request = (HttpURLConnection) url.openConnection();</div><div class="line">request.setDoOutput(<span class="keyword">true</span>);</div><div class="line">request.setRequestMethod(<span class="string">"POST"</span>);</div><div class="line">mainConsumer.sign(request);</div><div class="line">request.connect();</div><div class="line">String context = StreamUtil.InputStreamToString(request.getInputStream());</div><div class="line">Log.d(<span class="string">"SubPlurkV2"</span>, <span class="string">""</span> + context);</div></pre></td></tr></table></figure>
+<p>have fun! 參考plunk api list繼續實做其他的api吧!</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Redmine設定(Digital Ocean, Docker)]]></title>
+      <url>/2015/03/30/redmine-settings/</url>
+      <content type="html"><![CDATA[<p>花了一點時間搞定了Redmine，眉眉角角還挺多的。</p>
+<p>首先我省麻煩，直接從Digital Ocean租一個最便宜的5USD/mo的instance應該是夠的(Digital Ocean的Redmine image似乎有最佳化過，我在Linode的1G instance都build不起來，但是在DO不用Build，直接在0.5G可以裝起來的)<br><img src="http://user-image.logdown.io/user/2167/blog/2169/post/258922/Ugiaden4Qiy80YGdlJ31_Screen%20Shot%202015-03-31%20at%204.15.18%20AM.png" alt="Screen Shot 2015-03-31 at 4.15.18 AM.png"></p>
+<p>選他的Redmine image，其實熟手的話直接用Docker裝也是可以的。<br><img src="http://user-image.logdown.io/user/2167/blog/2169/post/258922/4gYyX1QPq3aJsqWlWtDA_Screen%20Shot%202015-03-31%20at%204.18.43%20AM.png" alt="Screen Shot 2015-03-31 at 4.18.43 AM.png"></p>
+<p>接下來大家都很熟，DO會寄信給你告訴你Root帳號密碼。Login以後還會多一行字</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">-------------------------------------------------------------------------------------</div><div class="line">These instructions are stored in /root/REDMINE for your review.</div><div class="line">-------------------------------------------------------------------------------------</div><div class="line">To finish installing Redmine, navigate to your droplet&apos;s IP: http://123.456.22.11 and use credentials from below.</div><div class="line">-------------------------------------------------------------------------------------</div><div class="line">User: admin</div><div class="line">Pass: CIdAcEEkcC(當然這是改過的)</div><div class="line">-------------------------------------------------------------------------------------</div><div class="line">Make sure to specify hostname from DO panel to your droplet before creating it (for example: &apos;project.mydomain.com&apos; or &apos;myproject.com&apos;)</div><div class="line">This will create the necessary Nginx configs based on hostname and Nginx will respond based on hostname.</div><div class="line">-------------------------------------------------------------------------------------</div></pre></td></tr></table></figure>
+<p>基本上已Redmine來講這樣就好了。但是如果我們自己有DNS用CNAME連過去的話會發現，他永遠處於「沒裝好」的狀態。這時候就得改<code>/etc/nginx/sites-enabled/redmine</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">        listen 80;</div><div class="line">        server_name 104.236.144.91 redmine.rayer.idv.tw;</div><div class="line"></div><div class="line">        root /srv/redmine/public;</div><div class="line">        passenger_enabled on;</div><div class="line"></div><div class="line">        client_max_body_size 10m;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>server_name要放入正確的CNAME，這樣redmine才能夠正確的讀取到。</p>
+<p>接下來就是安裝git。先在本機端把git裝起來<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo apt-get install git</div></pre></td></tr></table></figure></p>
+<p>然後要去redmine的設定檔裡面更新git路徑。我們可以從上面的redmine nginx設定檔看到，他root在<code>/srv/redmine/public</code>，不過我們要去他的設定目錄<code>/srv/redmine/config/</code>改他的configuration.yml。不過，沒這檔案…請<code>cp configuration.yml.example configuration.yml</code>，幫他把git路徑補起來<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">scm_git_command:	/usr/bin/git</div></pre></td></tr></table></figure></p>
+<p>最後重開nginx，收工。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo service nginx restart</div></pre></td></tr></table></figure></p>
+<p>基本上用Docker就更簡單了，我本來還在想要不要包一個docker image來用，不過網路上已經有人包好了 (<a href="https://github.com/sameersbn/docker-redmine" target="_blank" rel="external">https://github.com/sameersbn/docker-redmine</a> )</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[一段白爛往事]]></title>
+      <url>/2014/12/02/for-some-stupid-memories/</url>
+      <content type="html"><![CDATA[<p>今天看到有人在討論版上討論，關於一個雙層for迴圈該怎麼最佳化的問題。我每次看到這個問題都會想到這個往事….</p>
+<p>「誒某R，我把某段Code最佳化了，我把時間複雜度從O(n^2)降成O(n)」<br>「喔喔，這還真是滿大的突破，那段還滿吃緊的呢。你是怎麼做到的？」<br>「簡單啊，看我的code」</p>
+<p>before :</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; m; ++i)</div><div class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; n; ++i) &#123;</div><div class="line">  	process(target[i][j]);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>after :</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; m * n; ++i) &#123;</div><div class="line"> 	process(*((target*)(&amp;target) + i));</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>我整個下午都在一直在想，我應該要尻他腦袋尻多少下才能讓他醒過來，然後下班時間就到了。</p>
+<p>我把這個「最佳化」寫成一個範例給大家參考一下</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">process</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</div><div class="line">	<span class="built_in">cout</span> &lt;&lt; <span class="string">"value = "</span> &lt;&lt; i &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span> </span>&#123;</div><div class="line">	</div><div class="line">	<span class="keyword">const</span> <span class="keyword">int</span> row = <span class="number">5</span>;</div><div class="line">	<span class="keyword">const</span> <span class="keyword">int</span> col = <span class="number">6</span>;</div><div class="line">	<span class="keyword">int</span> var[row][col];</div><div class="line">	</div><div class="line">	<span class="keyword">int</span> value = <span class="number">0</span>;</div><div class="line"></div><div class="line">	<span class="comment">//for initialization propose, not part of demo</span></div><div class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span> ; i &lt; row; ++i)</div><div class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; col; ++j)</div><div class="line">			var[i][j] = value++;</div><div class="line">			</div><div class="line">	<span class="comment">//這就是他說的before</span></div><div class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span> ; i &lt; row; ++i)</div><div class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; col; ++j)</div><div class="line">			process(var[i][j]);</div><div class="line">      </div><div class="line">	<span class="comment">//這就是他說的 效能增進一個數量級的after</span></div><div class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; row * col; ++i) &#123;</div><div class="line">		process(*((<span class="keyword">int</span>*)(&amp;var) + i));</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Echo Worm]]></title>
+      <url>/2014/09/19/echo-worm/</url>
+      <content type="html"><![CDATA[<p>正好在跟人聊到以前玩過的Open Source專案，有個專案先不提現在叫什麼名字，但是以前這東西第一個實作卻造成了不算小的災難，而這個實作就是當時這專案的名字:<code>Echo Worm</code></p>
+<h2 id="「超小型可程式化Plug-in-based-Server-PBS-計劃」"><a href="#「超小型可程式化Plug-in-based-Server-PBS-計劃」" class="headerlink" title="「超小型可程式化Plug-in based Server(PBS)計劃」"></a>「超小型可程式化Plug-in based Server(PBS)計劃」</h2><p>這計劃其實緣起還挺簡單的，十幾年前有個學長在實作<a href="http://en.wikipedia.org/wiki/Hopfield_network" target="_blank" rel="external">Hopfield Network</a>。這個聽起來很了不起的東西，其實說穿了異常的簡單，就是一個最基本的AI類神經網路而已，缺乏資料檢索的概念，僅僅只是一個模糊演算的實作罷了，也只能對線性方程式做出學習誘導反應：簡單的說，他並沒有高階到能牙牙學語，它的功能僅止於學習怎麼跟著方程式的結果做輸出，也就是說怎麼「拉扯」一狗票渾沌物質讓他們越來越接近一個方程式而已。然而，這東西幾乎是所有類神經AI的基石，以至於還挺…有趣的。</p>
+<p>先不用管Hopfield Network到底是什麼神奇的東西，我們倒是可以先看看PBS最早是為了滿足什麼需求而誕生的：他需要在很多很多的節點，每個節點都有一組獨立運算單元，而這個節點的數量極其龐大到一台電腦可能沒辦法，所以必須要能夠Deploy到很多檯電腦上，而且使的每個節點在跟其他節點溝通的時候毫無窒礙，完全不會知道對方跟自己是不同電腦。每個節點都必須要能夠load一個運算模組，有的運算模組可以共用，有的不行。早期的需求下，我們需要42000個節點，以及800多種不同的運算單元：這個在當年的一台電腦下實在不是一個吃的消的事情。</p>
+<p>現在想想，最近幾年才開始流行的雲端運算，分散演算以及Big Data，我們好像早了將近20年就在玩有點類似的東西了 :P</p>
+<h2 id="設計一個跟同類可以互相溝通的小Server"><a href="#設計一個跟同類可以互相溝通的小Server" class="headerlink" title="設計一個跟同類可以互相溝通的小Server"></a>設計一個跟同類可以互相溝通的小Server</h2><p>在異質網路裏面，通常並不存在「不知道上哪去找server」的問題。每個Server通常都會在主機端開啟一扇門(port)來跟外界溝通，而每種Server開的門，門牌號碼都一樣。比方說，http server通常就會開在80號門(port 80)，ftp server通常就會開在21號門(port 21)。但是在同一台主機裡面並不允許很多個server共用一個門牌：也就是說PBS得開許許多多沒有經過共通協議，亂數生成的門牌。我們要找http server通常就會直接找80，那我們要找特定一個PBS要找哪個port？更何況PBS間有極為大量的互相溝通的需求，這顯然是一個待解的問題。</p>
+<p>初代的做法是最簡單的，既然我們需要有人幫忙找人，那我們就做一個管理者就好了。所有的PBS都會跟該世界(<code>World</code> – 也就是這台電腦 – 注意，這個「世界」定義以後是會改變的)的PBS管理者(PBS Manager, <code>PBSM</code>)註冊以及回報死活(heartbeat，每隔一定時間就回報一次，也容許PBSM主動去探知各個PBS的死活。這其實還不錯，而且我們也需要一個能跨世界溝通的橋樑(其實就是Router切網域的概念)，PBSM正好也能充當自己的World跟其他World的接口，聽起來還不錯。</p>
+<p>最後，PBS自己需要跟其他PBS通訊的時候也不需要知道對方在哪裡了，只要跟PBSM講，PBSM就會幫你找出路徑建立通道。這做法很主流，其實就是Routing Table的概念：<br>PBS&lt;–&gt;PBSM&lt;–&gt;PBSM&lt;–&gt;PBSM&lt;–&gt;PBS<br>聽起來真是不錯的解，初版的通訊機制其實運作的相當不錯，但是總讓人覺得少了些什麼….</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Coder說的跟Coder所想的]]></title>
+      <url>/2014/06/26/coder-said-coder-wants/</url>
+      <content type="html"><![CDATA[<table>
+<thead>
+<tr>
+<th style="text-align:left">我說的</th>
+<th style="text-align:left">我想的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">這code這樣做很髒</td>
+<td style="text-align:left">這段code髒透了，不過不是我寫的</td>
+</tr>
+<tr>
+<td style="text-align:left">這code只是暫時性先這樣做</td>
+<td style="text-align:left">我寫的這段code髒透了</td>
+</tr>
+<tr>
+<td style="text-align:left">這段code壞掉了</td>
+<td style="text-align:left">你寫的這段code有bug</td>
+</tr>
+<tr>
+<td style="text-align:left">這段code還有一點點小問題</td>
+<td style="text-align:left">我寫的這段code有bug</td>
+</tr>
+<tr>
+<td style="text-align:left">這段code很晦澀難懂</td>
+<td style="text-align:left">有人寫這段code居然連個註解都不加</td>
+</tr>
+<tr>
+<td style="text-align:left">這段code自己就夠淺顯易懂</td>
+<td style="text-align:left">我寫這段code沒有註解</td>
+</tr>
+<tr>
+<td style="text-align:left">這是個很棒的語言</td>
+<td style="text-align:left">這是我最喜歡的語言，而且他用起來很方便</td>
+</tr>
+<tr>
+<td style="text-align:left">你要調整你對這語言的認知</td>
+<td style="text-align:left">這是我最喜歡的語言，但是他很難用</td>
+</tr>
+<tr>
+<td style="text-align:left">我看得懂這段Perl Code</td>
+<td style="text-align:left">這段Perl Code是我寫的</td>
+</tr>
+<tr>
+<td style="text-align:left">我看不懂這段Perl Code</td>
+<td style="text-align:left">這段Perl Code不是我寫的</td>
+</tr>
+<tr>
+<td style="text-align:left">這code結構很糟</td>
+<td style="text-align:left">別人寫了一個很糟的結構</td>
+</tr>
+<tr>
+<td style="text-align:left">這code結構複雜了點</td>
+<td style="text-align:left">我寫了一個很糟的結構</td>
+</tr>
+<tr>
+<td style="text-align:left">Bug</td>
+<td style="text-align:left">這程式少了我想要的功能</td>
+</tr>
+<tr>
+<td style="text-align:left">這是不在計劃內的功能</td>
+<td style="text-align:left">這程式少了我不想要的功能</td>
+</tr>
+<tr>
+<td style="text-align:left">漂亮的解法</td>
+<td style="text-align:left">這做法OK，而且我看得懂</td>
+</tr>
+<tr>
+<td style="text-align:left">我們需要重寫這一段</td>
+<td style="text-align:left">這做法OK，但是我看不懂</td>
+</tr>
+<tr>
+<td style="text-align:left">emacs比vi優秀</td>
+<td style="text-align:left">這裡太和平了，我們找點架來吵吧!</td>
+</tr>
+<tr>
+<td style="text-align:left">vi比emacs優秀</td>
+<td style="text-align:left">這邊太和平了，我們找點架來吵吧!</td>
+</tr>
+<tr>
+<td style="text-align:left">「恩…恕我直言…」</td>
+<td style="text-align:left">我想很婉轉地說，你他媽的錯了</td>
+</tr>
+<tr>
+<td style="text-align:left">「舊code」</td>
+<td style="text-align:left">這段code能運作，但沒人知道為什麼</td>
+</tr>
+<tr>
+<td style="text-align:left">^X^Cquit^[ESC][ESC}^C</td>
+<td style="text-align:left">救命，我不知道怎麼退出vi!</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://lh5.googleusercontent.com/-ZEl2v3vcu_8/U4qv-3Jf16I/AAAAAAAA5gE/lE3NqEBj9IY/w506-h633/2014%2B-%2B1" alt=""></p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[[翻譯] 為什麼Java的Thread.stop()不該被使用？]]></title>
+      <url>/2014/06/09/why-are-threadstop-of-java-should-not-be-used/</url>
+      <content type="html"><![CDATA[<p>這篇算是相當詳盡的說明了一些設計原則，包含了為什麼Java不再允許使用者直接中止(kill)掉一個運行中的thread物件，以及有沒有任何的替代方案。相對的，C++的std::thread也有一些行為上需要注意的地方，不過往後再提這點。</p>
+<p><a href="http://docs.oracle.com/javase/7/docs/technotes/guides/concurrency/threadPrimitiveDeprecation.html" target="_blank" rel="external">原文在此</a></p>
+<h2 id="Java-Thread為什麼有些method被廢棄了"><a href="#Java-Thread為什麼有些method被廢棄了" class="headerlink" title="Java Thread為什麼有些method被廢棄了"></a>Java Thread為什麼有些method被廢棄了</h2><h3 id="為什麼Thread-stop不再被支援了？"><a href="#為什麼Thread-stop不再被支援了？" class="headerlink" title="為什麼Thread.stop不再被支援了？"></a>為什麼Thread.stop不再被支援了？</h3><p>理由很簡單：這東西從本質上就不安全。你去.stop()一個thread會造成所有該thread同步資源鎖定(lock)的區段全部都解鎖(unlock)。只要系統抓到ThreadDeath這個exception，該區段的同步鎖定都會被unlock。<br>Because it is inherently unsafe. Stopping a thread causes it to unlock all the monitors that it has locked. (The monitors are unlocked as the ThreadDeath exception propagates up the stack.) If any of the objects previously protected by these monitors were in an inconsistent state, other threads may now view these objects in an inconsistent state. Such objects are said to be damaged. When threads operate on damaged objects, arbitrary behavior can result. This behavior may be subtle and difficult to detect, or it may be pronounced. Unlike other unchecked exceptions, ThreadDeath kills threads silently; thus, the user has no warning that his program may be corrupted. The corruption can manifest itself at any time after the actual damage occurs, even hours or days in the future.</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[C++傳回值想要「暗示」你什麼?]]></title>
+      <url>/2014/06/08/what-function-whats-to-hint-you/</url>
+      <content type="html"><![CDATA[<p>有時候很多class function, global function傳達了一些所謂的「絃外之音」，而這些「絃外之音」有時候稱為「慣例」，不過更多的時候會被默默地忽略掉。拜自動型別判斷所賜，先不考慮複雜的template情況下，這些code是可能額外的要告訴些你什麼？或者說，根本是錯誤的傳回值？</p>
+<p>以下先都不考慮C++11的<code>operator&amp;&amp;</code>以及<code>std::move</code>，但是我們會用到C++11的新關鍵字<code>auto</code>。我們先假設以下四個都是某個class foo的成員函數</p>
+<pre><code>const std::string&amp; getValue();
+const std::string getValue();
+std::string&amp; getValue();
+std::string getValue();
+</code></pre><p>這四個東西我們一個個來看吧</p>
+<ul>
+<li><code>const std::string&amp; getValue();</code><ul>
+<li>他很明顯的是告訴你它會回傳一個不可修改的值，這種傳回值通常代表著兩種意義，要不是這個值並不容許被改，要不就是他會有一個額外的setter來給你改這個值。</li>
+</ul>
+</li>
+<li><code>const std::string getValue();</code><ul>
+<li>這是比較奇怪的設計，他傳回一個複製過的const副本給外界，在大多數情況下這是一種不太合理的做法。我多半在一些有嚴重const hazard(const設計不良以至於很多參數都無法用預期的const/non-const運作)看過這種code</li>
+</ul>
+</li>
+<li><code>std::string&amp; getValue();</code><ul>
+<li>這種則是典型的命名錯誤，這東西其實不太應該叫做getValue，應該要叫做getValueRef比較不會讓人搞混，但是很多人其實就是這樣寫下去了。他給的暗示是：這是一個可以更改的數值，我沒有setter，以及最重要的暗示：「這東西的修改很可能不會立即生效，要等到下一個fetching命令執行才會生效」。因為很顯然的，除非在極少數的情況下特地去override operator&amp;(而且這是100%的危險行為，應該不會有人這樣做)，否則這個class foo應該是沒有什麼機會能夠得知這個value被改了。<ul>
+<li>這也是俗稱的串燒函數，不過多半是用在modifier而非getter。這種串燒可以達到典型的<code>split(&#39;.&#39;).append(&quot;Ass&quot;).erase(2, std::string::npos);</code>這種效果。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>std::string getValue();</code><ul>
+<li>這個很傳統，超傳統，就是很普通的by value取值，拿出去你要怎麼亂搞都行，怎麼搞都不會影響到class。串燒也能這樣寫，不過意義不同而且比較耗效能，正常來講應該是不太會有人拿這種東西去串燒的。</li>
+</ul>
+</li>
+</ul>
+<p>大多數的情況下，我們會提供1/4兩種getter。1很重要，他提供了以下這種能力</p>
+<pre><code>void someFunction(const std::string&amp; a);
+</code></pre><p>  …<br>  …<br>  …<br>  someFunction(foo-&gt;getValue());</p>
+<p>在大多數的情況以及正確的設計下，當參數傳遞可以很大程度的省下deep-copy的成本，如果沒提供的話就會變成普通的copy by value(用於產生暫時性的不具名物件，浪費死了)。而4則可以當作是最普通的「可以安全的拿出來亂玩」的getter。</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[翻譯：即時通大戰（下）]]></title>
+      <url>/2014/04/25/translation-chat-wars-2/</url>
+      <content type="html"><![CDATA[<p>讓我們把場景拉回我們跟AOL的大戰。需要更加理解接下來發生什麼事的話，我們要先理解一下一些基礎知識。</p>
+<p>電腦的計算可以想像成是一層一層的抽象概念，越高層越複雜，因為要合併處理低層的種種處理程序，把他們結合成一些高等的結構體。所有計算的最底層基本上都是來自於一個硬體：一個中央處理器(CPU) <strong>(譯註：這觀念其實不是非常的正確，比方說DMA技術就是繞過大多數的CPU對記憶體存取… 不過我們不要扯技術扯太深比較好 =P)</strong> 。CPU本身有數億個電晶體來執行「組合語言」，這語言在電腦語言裡面是最原始最基本的，其實對CPU來講就是一個口令一個動作。<br>Computers are best seen as a series of abstraction layers, one on top of the other. Each layer is more complicated than the next down, and assembles the previous layer’s pieces into more complex, high-level structures. At the bottom you have the hardware itself: the central processing unit (CPU). The CPU consists of more than a billion transistors arranged to execute a particular “assembly” code that is native to that CPU. Assembly is the lowest layer of coding, where you are telling the CPU exactly what to do. And what you can tell it to do is often pretty limited: store this number here, retrieve this number from there, add or subtract these two numbers, and branch to different bits of code depending on some condition or other. In different contexts, these operations can take on different meanings, such as printing text onto a screen or sending something across a network, but the overall level of structure is very primitive. Analyzing and manipulating data is extremely tedious in Assembler.<br>In the early days of PCs, many programmers did code directly in Assembler. Programs were small enough and performance was critical enough that one needed to micromanage everything at that level. But as computers got larger and more complex, it became unfeasible to code in assembly. And needing to learn a different assembly language for every computer (Apple II, Macintosh, PC) was horrendously inefficient. Better to use a higher-level, CPU-independent language. All the languages you read about today, from C++ to Java to Ruby to Perl, are higher-level languages. They have far more instructional “primitives” that allow you to designate pieces of code as “functions” and abstract over them through “interfaces.” A program called a compiler then takes the code written in these languages and translates it into the assembly code for a particular specified processor, so you can have C++ code that compiles for the PC, or for Linux, or for the Macintosh.<br>Here’s some assembly for a “Hello world!” program (one that just displays “Hello world!” and exits) in MS-DOS PC assembly, which I’ve borrowed from Wikipedia:</p>
+<pre><code>.model small
+.stack 100h
+.data
+msg   db    ‘Hello world!$’
+.code
+start:
+mov   ah, 09h   ; Display the message
+lea   dx, msg
+int   21h
+mov   ax, 4C00h  ; Terminate the executable
+int   21h
+end start
+</code></pre><p>And here it is in C:</p>
+<pre><code>int main() {
+printf(“Hello world!\n”);
+return 0
+}
+</code></pre><p>Having a compiler turn the C into assembly, as you might expect, saves a programmer a vast amount of time. It also allows for far greater levels of code reuse, since you can parameterize functions to take different inputs and handle them accordingly. But you lose some control with a higher-level language. Assembly lets you know exactly where every bit of information is going. As you go up the great chain of languages, you lose more and more control over the management of the guts of the computer, which is taken over by compilers, interpreters, and virtual machines. These programs are exceedingly good at managing things automatically, and they don’t make mistakes (unlike humans), but they have their limits. They do not know the overall intent of a program. If you pile on too many abstraction layers, performance can suffer. The downfall of Microsoft’s Vista operating system, which needed to be restarted almost from scratch in order to ship three years late, came because it was written in a new language of Microsoft’s own design, called C#, that did not offer sufficient micromanagement to make Vista run quickly enough. Like Java, C# was considerably higher level than C or C++, and the code responsible for taking care of the lower-level nastiness just couldn’t perform optimally. So they scrapped the C# code and started over in C++. Lesson learned.<br>A “language” like C++, Java, or Python consists of a certain number of commands, not more than a few hundred, and a certain number of numerical and logical operators, like + and &amp;&amp; (for logical AND). Many languages offer the same basic functionality sets; where they differ is in the methods they provide for structuring programs, as well as the amount of abstraction they provide from the underlying computer fundamentals.</p>
+<p>（上面這些都是在講一些語言方面的基礎知識，以後再翻。老實說這些大概對我們這些工程師來講意義都不大…太基礎啦）</p>
+<p>所以在Messenger裡面是怎麼實作的呢？這是以大約十幾萬行的C++來實作裡面每一個功能，包含著當你朋友上線的時候左下角會彈出的「Rayer已經上線」這種視窗，當人們討厭這程式的時候的反安裝的代碼，把聊天內容存成文字檔的功能，以及跟Messenger Server對話的功能(當然，現在來講還包含AOL Server)。在早期來講，這是個很小，很精實的迷你程式。</p>
+<p>我已經沒辦法再看到Messenger的Code，這東西是微軟的私有智慧財產。所以，我拿了一小段Open Source的即時通軟體(大名鼎鼎的Pidgin)裡面的code來做例子。<br>I no longer have access to the Messenger code, which remains the private intellectual property of Microsoft. So instead, here is a piece of the open-source C code for the chat program Pidgin. This function, update_typing_icon, is called when the program needs to update the “typing indicator” that tells you whether your buddy is currently typing a message or not.</p>
+<pre><code>static void
+update_typing_icon(PidginConversation *gtkconv) {
+  PurpleConvIm *im = NULL;
+  PurpleConversation *conv = gtkconv-&gt;active_conv;
+  char *message = NULL;
+  if (purple_conversation_get_type(conv) PURPLE_CONV_TYPE_IM)
+    im = PURPLE_CONV_IM(conv);
+  if (im NULL)
+    return;
+  if (purple_conv_im_get_typing_state(im) PURPLE_NOT_TYPING) {
+    update_typing_message(gtkconv, NULL);
+      return;
+  }
+
+  if (purple_conv_im_get_typing_state(im) PURPLE_TYPING) {
+    message = g_strdup_printf(_(&quot;\n%s is typing…&quot;),
+    purple_conversation_get_title(conv));
+  } else {
+    assert(purple_conv_im_get_typing_state(im_==PURPLE_TYPED);
+    message = g_strdup_printf(_(&quot;\n%s has stopped typing&quot;),
+    purple_conversation_get_title(conv));
+  }
+    update_typing_message(gtkconv, message);
+    g_free(message);
+}
+</code></pre><p>The function takes a parameter called gtkconv that contains information about the chat session (PidginConversation) being updated. The italicized portion of the code is the most important. It calls a function called purple_conv_im_get_typing_state, passing it to the chat session in question. That function then returns one of three possible values: PURPLE_NOT_TYPING, PURPLE_TYPING, or PURPLE_TYPED. A user interface function, update_typing_message, is then called to change what message is displayed on the screen. In the case of PURPLE_TYPING, a message with “[Buddy name] is typing” is shown. If PURPLE_TYPED, meaning that text has been entered but your buddy hasn’t typed anything for a bit, “[Buddy name] has stopped typing” is shown. And if no text has been entered and the buddy isn’t typing (PURPLE_NOT_TYPING), then no message is shown at all.<br>Most of the other functions that this function calls are also part of the Pidgin program, separated into modular chunks so that each can be isolated, tested, and perhaps reused. One exception is the g_strdup_printf function, which creates the string containing the message to be displayed. g_strdup_printf is part of the open-source GNOME user interface library; because what it does is sufficiently generic, it was considered helpful to include in a popular package of generic user interface code.<br>All this C code is compiled into assembly by a C compiler, which can then run natively on the processor for which the compiler was designed.<br>THE MESSENGER WAR was a rush. Coming in each morning to see whether the client still worked with AOL was thrilling. I’d look through reams of protocol messages to figure out what had changed, fix the client, and try to get an update out the same day. I felt that I was in an Olympic showdown with some unnamed developers over at AOL. I had no idea who my adversaries were, but I had been challenged and I wanted to win.<br>AOL tried different tactics. At one point they seemed to be identifying the Microsoft client because it wasn’t downloading a huge chunk of advertising that the AOL client downloaded. So I changed our client to download it all (and then throw it away). They put in mysterious messages that didn’t seem to affect their client but broke ours because we weren’t expecting them. One day, I came in to see this embedded in a message from the AOL server: “HI. –MARK.” It was a little communication from engineer to engineer, underneath the corporate, media, and PR worlds that were arguing over us. I felt some solidarity with him even though we were on opposing sides.<br>AOL was putting out absurd propaganda about how Microsoft was behaving like an evil hacker by asking for your AOL password. This wasn’t true, but we weren’t allowed to respond except through our PR department. My team was completely sealed off from the outside world—except for our code, of course.<br>And then AOL stopped blocking us. It was strange to encounter sudden silence, and while I wanted to believe we’d won, AOL had been too loud and obstreperous to give up without a word.<br>Maybe a week after the blocks had stopped, I came in to work to find that Messenger had been blocked again, but this time it was different. The AOL server was sending a huge chunk of new gobbledygook that I could not understand. It looked approximately like this:<br>:</p>
+<pre><code>00000040                          2A 02 77 9C 01 28 00 01 ........*.w..(..
+00000050  00 13 00 00 80 0E A6 1B 00 FF 00 0B 01 18 83 C4 ................
+00000060  10 4F 8D 94 24 E4 FE FF FF 8B EC 03 AA F8 00 00 .O..$...........
+00000070  00 90 90 90 90 8B 82 F0 00 00 00 8B 00 89 82 4E ...............N
+00000080  00 00 00 8B 4D 04 03 8A F4 00 00 00 8D 82 42 00 ....M.........B.
+00000090  00 00 89 45 10 B8 10 00 00 00 89 45 0C C9 FF E1 ...E.......E....
+000000A0  00 01 00 20 00 00 00 00 00 00 00 04 00 00 00 00 ................
+000000B0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+000000C0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+000000D0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+000000E0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+000000F0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+00000100  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+00000110  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+00000120  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+00000130  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+00000140  00 00 00 00 00 00 00 00 00 00 00 00 00 00 19 10 ................
+00000150  08 11 29 EC FF FF 44 00 00 00 00 00 00 00 FF 00 ..)...D.........
+00000160  00 00 08 01 00 00 00 00 00 00 90 47 40 00 F8 E9 ...........G@...
+00000170  EA FE FF FF 00 00
+</code></pre><p>The first couple of lines here are the standard AOL instant message protocol header, but starting with that “90 90 90 90” bit, it became incomprehensible, bearing no relation to anything the AOL servers had ever sent their client or our client. The vast expanse of double zeros in the middle was also very mysterious, since a bunch of zeros couldn’t contain much meaning.<br>Our client just ignored it, but the AOL client responded to this gobbledygook with a shorter version of the same gobbledygook. I didn’t know what it was. It was maddening. After staring at it for half a day, I went over to Jonathan, a brilliant server engineer on our team, and asked what he thought. He looked at it for a few minutes and said, “This is code.” As in, actual x86 assembly code. The repeated 90s were what tipped him off: they signify an empty instruction in x86 Assembler.<br>The pieces then came together. Normally, these protocol messages sent from the server to the client are read and understood as data, not as code. But AOL’s client had a security bug in it, called a buffer overflow. The buffer is a place where a program temporarily stores data while running some operation. However, it’s all too easy in lower-level languages to allow in more input than the buffer can actually accommodate. In this case, very large protocol messages could flood it, overwriting the client code and arbitrarily controlling the functioning of the client program—this is why it’s called a buffer overflow, and it’s a huge security hole, since it gives the server control of the client PC. In the wrong hands, the server can choose to shut down or corrupt or do other terrible things to your computer. AOL knew about this bug in their program and now they were exploiting it! That was what all those double zeros were for—they were just filling up space in the program’s buffer until they hit the end of the AOL client’s buffer and started overwriting executable code with the remainder of the protocol message. AOL was causing the client to look up a particular address in memory and send it back to the server. This was tricky, vastly trickier than anything they’d done so far. It was also a bit outside the realm of fair play: exploiting a security hole in their own client that our client didn’t have!<br>IF I COULD GO BACK in time, I wouldn’t have given up, but I was out of my depth, and I told the team that I wasn’t sure how to get around this, at least not without a fair bit more time and resources.<br>Someone had the bright idea of telling the press about the buffer overflow, figuring that if people knew that AOL’s client could and in fact was executing whatever a server sent to it, AOL would be forced to patch their client and could no longer use it to determine that Messenger was an impostor.<br>Here I only know what happened from the outside, since this wasn’t my department. According to security expert Richard M. Smith, a certain “Phil Bucking” of “Bucking Consulting” sent him a message, alerting him to the buffer overflow in the AOL client:<br>Mr. Smith,</p>
+<p>I am a developer who has been working on a revolutionary new instant messaging client that should be released later this year. Because of that, I have followed with interest the battle between AOL and Microsoft and have been trying to understand exactly what AOL is doing to block MS and how MS is getting around the blocks, etc. Up until very recently, it’s been pretty standard stuff, but now I fear AOL has gone too far.</p>
+<p>It appears that the AIM client has a buffer overflow bug. By itself this might not be the end of the world, as MS surely has had its share. But AOL is now <em>exploiting their own buffer overflow bug</em> to help in its efforts to block MS Instant Messenger.</p>
+<p>And so on. Getting the name of MSN Messenger Service wrong was a nice touch, but the rest of it is embarrassingly inept. This developer of a revolutionary new app takes time out from his coding not to promote his app but to take sides in the Microsoft-AOL war? Really? The email also includes a trace of the buffer overflow message itself, which I still remember vividly from the hours I spent staring at it, but the recipient paid more attention to the human language than the protocol messages. And if Phil Bucking’s text wasn’t suspicious enough, he’d also sent the message (via a Yahoo account, ha ha) from one of Microsoft’s computers at a Microsoft IP address, and the IP address showed up in the email headers. In geekspeak, this is what’s called a face-palm.<br>Smith immediately accused Microsoft of sending the email. Microsoft fessed up. So the news story didn’t become the buffer overflow (a tough sell, probably), but Microsoft’s attempt to bad-mouth AOL under a fake identity (an easier sell). People on various security forums ascertained that the buffer overflow was real and inveighed further against AOL, but the press wasn’t paying attention. The buffer overflow persisted into several later versions of AOL’s client.<br>So we gave up. I licked my wounds and proceeded on to far more dreary years on MSN Messenger Service, eventually getting buried so deeply in internal company politics that I was no longer able to do anything resembling useful work. The writing was on the wall when I heard one team manager scream, “I have the worst morale scores in the company and I don’t give a shit, because they can only go up!”<br>Those were the years of Microsoft’s long, slow decline, which continues to this day. The number of things wrong with the company was extraordinary, but they can be summed up by the word bureaucracy. Early on at Microsoft—and even later, when we first started Messenger—you could just do things. You had a good idea, you ran it by your boss, you tried it, and if it worked, in it went. After a while, you had to run everything by a hundred people, and at some point the ball would get dropped—and you’d never hear back. There was the infamous internal review system called “stack rank” that pitted teams against one another and people within each team against one another, too. There was an incredible thirst for “headcount” within a department, so managers would lobby aggressively for independent groups to come under their control. Thus the burgeoning NetDocs, which was intended to be an internet-based document-editing suite, gobbled up a number of small groups in the late ’90s. But NetDocs got eaten by Office, which then proceeded to kill it, thus leaving the door open for Google to debut Google Docs in the mid-2000s. And on it went. Multiyear projects with hundreds of engineers died without the public ever hearing a word. It continues.<br>I left for Google, but not without making one last mistake. I told my boss at Microsoft I was leaving to work for our direct competitor, and he threatened to sue me. I packed up my things in a box and quit the same day, without saying goodbye to my coworkers. At least Steve Ballmer didn’t throw a chair across the room, as he did when Windows architect Mark Lucovsky told Ballmer that he was leaving for Google. Microsoft was hemorrhaging hundreds of top engineers to Google at the time, and the combination of the talent loss plus the insult to the executives’ egos made for very bad blood. Still, they didn’t sue me.<br>Despite my ignominious defeat at the hands of AOL’s diabolical mastermind of chat, Messenger did pretty well. We acquired tens of millions of users, millions online at any one time. At some point we put ads into the client, which made some money. I don’t think we turned a profit, but we weren’t a big group, so we weren’t costing Microsoft much either. I added emoticons to the client in 2000—it was the first American chat program to turn a colon and a close-parenthesis into an actual smiley face (I say first American because the South Koreans, who loved chat more than anyone, may have preceded us)—and people loved it. We added internet phone calls to the client, which was cool and raised a bit of revenue on international calls. After I went over to the server side, I helped redesign the server architecture with a very sharp development lead who taught me a lot, as had my original mentor on the client.<br>Messenger puttered along for many years in limbo. It was unusual in being unkillable (because of all its users) and unassimilable by Windows or Office (because it was part of Microsoft’s internet strategy), which led, I believe, to it never amounting to anything. Taken on its own, it was a success, but a success on which Microsoft was unable to capitalize. Attempts to integrate it with other projects either fell prey to internecine executive warfare or else collapsed into consumer indifference. Despite Microsoft’s purchase of Skype, Messenger is still going today, a little Methuselah wandering in the Microsoft product mausoleum.<br>Years later at a party I met one of the AOL engineers who’d worked against me. We had a huge laugh over it. He’d left AOL just as I’d left Microsoft, and I complimented him on the genius of the buffer-overrun exploit, even as I bemoaned my loss. It had been a great game, I said. He agreed.</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[翻譯:即時通大戰（上）]]></title>
+      <url>/2014/04/23/translation-chat-wars-1/</url>
+      <content type="html"><![CDATA[<p>寫在前面 : 這篇文章主要是在談早期MSN vs AOL的大戰。這場大戰其實結果還滿清楚的，MSN打倒了AOL Instant Messenger(AIM)，成為未來十年內最成功的IM(Instant Messenger)。這篇文章提到的不止是商場策略，而且還提到了許多技術方面的東西，尤其是Microsoft怎麼「破解」AOL Service Server</p>
+<p>David Auerbach，早期的MSN主要開發工程師之一。</p>
+<p>原文網址 : <a href="https://nplusonemag.com/issue-19/essays/chat-wars/" target="_blank" rel="external">n+1 Magazine - Issue 19</a></p>
+<p>#Chat Wars - 即時通大戰 - David Auerbach</p>
+<p>在1998年那年的夏天，我從學校畢業加入了微軟在華盛頓州，雷蒙德市的辦公室。我一進去就被分配到草創時期的MSN Messenger Service的即時通訊軟體開發的行列。老實講，這來自於行銷部門名字真是糟透了，極端的笨拙，杯底朝天的創意，大概就是他們以後常常被嘲笑的形容詞。Buddy List? CUC Me? MSN Messenger?不，我們叫他MSN Messneger Service吧。在之後的文章我們會簡稱這東西為Messenger。</p>
+<p><strong>(譯註 : 其實台灣多半還是叫他MSN，這名字單看縮寫其實是還好啦….)</strong></p>
+<p>在當時即時通三大巨頭是AOL Instant Messenger(AIM)，Yahoo跟ICQ。讓我們看看當年的情勢：AOL當年(1990年代)靠著大量發送，幾乎是把光碟當傳單塞到你信箱的宣傳攻勢，成為了全國最大的撥接服務提供者。而重點是：所有AOL的用戶都自動的成為了AIM的客戶，這數量可是達到了一千萬註冊量。而緊追在後的Yahoo跟ICQ則各有數百萬的客群，哇，這在90年代真的是一個相當巨大的數字概念。</p>
+<p>我隨即意識到了這將會是一個相當龐大的計劃：在用戶端，我們要做一個漂亮美觀的界面，讓使用者能夠看到他們的朋友上下線，讓他們能夠自由更換整個UI上的字形字體顏色，看起來要很酷…等等的功能。這代表著，我們要弄出一個用戶端程式不止要有著其他競爭對手的功能，還要比他們更酷一點！而Server端的開發者則需要弄出一套機制來跟各個用戶端溝通，包含著告訴這些用戶端說你的朋友上下線訊息，這樣你的用戶端才能在適當時間通知你「Gordon上線啦」的視覺效果。Server端要做的事情不止於此，微軟後來為此買下了一家叫做Hotmail的公司(對，就是我們以後熟知的Hotmail)，Server端還得負責把整個Messenger系統跟Hotmail整合起來，而Hotmail本身就擁有數千萬的用戶<strong>(譯註 : 原文是Tens of Millions，不過據我所知當年Hotmail客戶並沒有那麼多，這邊應該有點誇飾了)</strong>，而最迫切最關鍵的地方在於必須把hotmail用戶資料跟Messenger整合起來讓他們可以用email登入。恩，這是一個很不簡單的工作，真的。</p>
+<p>這個Team最早只有十個人，慢慢地這個team成長到了好幾倍的大小。我們在做用戶端的時候總是在討論著哪些功能是一定要做的，哪些功能是我們想要的，哪些功能是我們目前實在是搞不定的。我當年是組裡面最年輕的一個，只有20歲，以當時的講法就是青澀毫無經驗。我一開始被分配去做一個小功能，慢慢的越來越大的責任就落在我身上了。我當時在做的就是那個輸入訊息的視窗，就是夠老的人應該都記得的「在此輸入訊息…」的那個部分。這東西可沒直覺上那麼單純簡單，我在上面花了很大的苦工，我翻修了字體控制的代碼，而且還得讓他相容於非拉丁語系的那些奇怪的字元 : 中文，日文，韓文，印度文，還有左右順序跟普通文字相反的希伯來文以及阿拉伯文。處理著好友上線產生的popup視窗，讓它甚至能四處被拖拉，還有在上面植入惡名昭彰充滿著bug的online-only bars <strong>(譯註：老實講我也不知道什麼是online-only bar，有誰能補充一下嗎？)</strong> 。處理「關閉程式」這段也是個很棘手的工作，要讓每個視窗整齊劃一利落的關閉，能正確的回收占用的系統資源，在這些前提下還得讓程式不當掉 <strong>(譯註：寫過的大概才知道當年的Win16 API在這方面真的是既麻煩且棘手，不是現代人能想像的 =P)</strong> 。</p>
+<p>搞定了客戶端以後，我們可以喘一口氣等Server Team搞定跟Hotmail整合的屎缺。我們除了修好了所有看得到的bug以外，還加上了一些純粹是為了好玩而加上去的小功能。不過，這產品還沒推出以前，微軟其實已經預見到要吸引新用戶的其中一個最大的困難點就是：各種即時通其實彼此是不互通的。AIM跟Yahoo是無法通話的，當然也無法跟ICQ通，所以，自然他們都沒辦法跟Messenger的用戶互相彼此通訊，這對吸引用戶來使用Messenger來講可不是好事，誰想login以後看到上面只有自己孤單一個人？AOL擁有著目前最大的客戶數量，自然我們就會先把腦子動到這上面去：如何讓Messenger的用戶可以同時Login到Messenger跟AOL的Server，用Messenger的客戶端就能跟兩種服務的使用者聊天。這個計劃我們稱之為「橋接」(Interop)</p>
+<p>這真的要幹下去，老實講手法還挺粗暴的，但原理也意外的簡單。一個程式是靠一個預先定義好的Protocol(協定)去跟Server溝通，這個協定就是一種對話的模板，定義著來回「對話」的解釋方法。當年最廣泛被使用的是用於www webpage上的HTTP protocol，這個是架構在TCP/IP(一種Internet最基礎的底層通訊協定)之上的一種通訊協定。網路提供者使用者這些通訊協定來當作互相傳遞訊息的主要工具。有些通訊協定是公開的，有著完整的定義文件的，每個人都在使用的，最著名的例子就是前面提到的HTTP, TCP/IP等等的通訊協定。然而也有些是私有的，有著智慧財產權的，文件不公開的通訊協定，比方說AIM使用的通訊協定”OSCAR”(Open System for CommunicAtion in Realtime， <strong>譯註：說來諷刺，名字有個Open呢</strong> )。這並不是公開的通訊協定，所以事實上我並不知道該怎麼去解讀它。不過，解讀最好的方法就是收集足夠量的資訊。我跟我老闆就註冊了個AIM的帳號，安裝他們的用戶端，然後攔截跟觀察這個用戶端跟AIM的Server怎麼對話的。一個簡單的例子就像下面這樣 </p>
+<pre><code>2A 02 EE FA 00 B0 00 0E 00 06 00 00 9B 7D BD 28  *............}.(
+33 41 35 36 35 43 38 37 00 03 00 03 00 28 0D 52  3A565C87.....(.R
+45 41 4C 52 65 67 72 65 73 73 6F 72 00 00 00 03  EALRegressor....
+00 01 00 02 00 10 00 0F 00 04 00 00 00 18 00 03  ................
+00 04 3E 4C BE 8C 00 01 00 00 00 05 00 68 00 02  ..&gt;L.........h..
+00 08 75 73 2D 61 73 63 69 69 00 03 00 02 65 6E  ..us-ascii....en
+00 01 00 48 69 2E 2E 20 41 6E 79 62 6F 64 79 3F  ...Hi.. Anybody?
+</code></pre><p>大多數的訊息其實都是難以解讀的，不過封包中間倒是有著我們聊天的明碼訊息。”Hi… Anybody?” 當我透過打進這行字的時候，我經由從我的網路封包截取到一段內容，包含著同樣的字串。這通訊協定的封包裡面，某些部分看起來在每次傳送的時候都不太一樣，但是有些地方卻是很明顯的每次都相同。我們嘗試著用開發中的client，把抓取到的封包中間明碼的部分替代為其他的對話，然後把它送回AOL的Server。恩…AOL會發現有些奇怪的Message來自於雷蒙德市？不不不，這不太可能，他們可是有著數以百萬的使用者呢，而我們卻是實實在在的偷用他們的通訊協定在跟他們Server「對話」。我們第一次的簡單嘗試中，我們並沒有發送太多的訊息。老實說，我跟我的主管其實並不認為這個「小花招」會被採用，這功能看起來可疑性真是爆表啊！這功能大概在正式Release以前就會被拿掉吧。但是，我們錯了，上頭還滿喜歡這功能的。所以，就在1999年7月22號，Microsoft正式推出了MSN Messenger Service，也正式宣告加入即時通市場的戰局 – 我們小小的「AOL橋接系統」也包含在裡面呢。</p>
+<p>這東西一推出，勇於嘗鮮的一群人當然迫不及待的試試看這東西。這東西酷斃啦，所有功能都正常，比其他家更棒的國際語言支援(那個還記得那個希伯來文跟阿拉伯文的問題嗎)，這東西跟Hotmail完美的整合，而且我們還可以用這支程式來跟本來就在AOL上的朋友聊天呢！看起來我們的小發想，獲得的成果還挺豐碩的。</p>
+<p>當然，即使沒有人跟AOL通風報信，AOL還是會知道的 - 當然，相當的不高興。AOL在Server端採取了一些行動來防止Messenger連上去，而且會回傳一組訊息：「請使用官方支援的AIM，你可以在這裡下載…(連結)」。但是，想當然耳，AOL一定要知道從通訊協定上，發現使用者用的是Messenger，才有辦法封阻啊。顯然的，如果我們「偽造」的OSCAR通訊協定看起來簡直跟AIM發出的OSCAR協定一模一樣，這樣AOL的Server根本就無從得知這訊息是來自AIM還是Messenger了。我拿了AIM的Client，仔細的研究它跟AOL Server的對話，這次我們找出了封包中某些位元代表的意義以後，讓我們的Messenger可以「偽造」出更相似的OSCAR封包。同樣的攻防來回了幾輪，他們當然對他們家的AIM比我們瞭若指掌，也知道如何去利用混淆的訊息讓Server可以更正確的辨認出AIM的Client。每天這種攻防都持續著，天天有新玩意新花招！他們某天下了一招狠招，他們知道某些訊息是來自於Microsoft的研發中心，他們把所有的Messenger訊息再度成功的阻擋起來 – 唯獨故意放過來自於研發中心IP的訊息，恩，我們完全不知道他們已經成功的再度阻擋了其他使用者的Messenger呢，我們用起來看起來真完全沒有問題啊。這次AOL的防禦讓我們足足困擾了兩三個小時，我們才發現他們有這招。</p>
+<p>微軟跟AOL都是在當年的超級大公司，所以很快的記者的報導就找上門了。就在兩天後的7月24號，紐約時報的頭版上就出現了這則報導：「網路世界的戰爭，正藉由即時通軟體盛大的展開！」。這…其實看起來就很像讀一篇拳擊報導，只是這次我變成了裡面海扁以及被海扁的人。當時的報紙詳實的報導著AOL努力的封鎖住Messenger的入侵，「但是微軟拒絕妥協。禮拜五稍晚，這個巨人再度補強了他們家的MSN Messenger一度突破AOL設下的障礙，但是AOL在一個小時內再度成功的重新防禦了起來！」(當年的<a href="http://www.nytimes.com/1999/07/24/business/in-cyberspace-rivals-skirmish-over-messaging.html" target="_blank" rel="external">報導原文</a>)</p>
+<p>阿，我把這篇新聞紙錶匡起來做紀念。誠然，我名字並沒有被寫在上面，但是沒關係！這可是我幹的好事呢！</p>
+<hr>
+<p>時間來到了1999年，正是Microsoft第一個作業系統MS-DOS發行後的整整20年。微軟當時是世界上最大的公司之一，擁有超過三萬名員工，其中有一萬個在雷蒙德市。恩，用校園比喻的話，這大概跟耶魯大學差不多大。</p>
+<p>這個電腦巨擘有什麼秘密？他們從以前到現在，基本上都是個徹頭徹尾的軟體公司。70年代，是個電腦沙漠的時代，一些業餘愛好者還在想盡辦法把當時還屬於巨無霸等級的電腦，不管是成本還是體積，都縮小到一個家庭可以接受的範圍，而Bill Gates跟Paul Allen - 這兩個人往後創立了Microsoft - 在那段時間也找出了在這種「相對小型」系統開發程式的方法。幾年後的1980年，他們跟IBM合作開始作出了後來有相當名氣的作業系統 - MS-DOS(for MicroSoft Disk Operation System)，搭載在第一組量產的個人電腦上 <strong>(譯註:這點其實是頗有爭議的，因為有人認為是1977年的Apple ][，而非這邊所暗示的IBM PC5100/5150。而當然，Apple ][ 搭載的並非MS-DOS )</strong> 。幾年後他們跟當年的Apple合作，提供當時的Apple一些軟體，包含了最早期的Microsoft Word在內。Gates跟Allen的高瞻遠矚，將個人電腦的發展拉到一個高峰，也讓電腦使用者會去想要替他們的電腦去添購新的軟體。</p>
+<p>IBM當年跟微軟的合作，授權給微軟替IBM出品的PC製作作業系統，這其實是送了一檯印鈔機給當年的微軟。軟體的世界比硬體大得多，而且需要大型資本硬體設備的地方很少，最多最多就是製造個磁碟片，跟微處理器以及其他的硬體週邊設備比起來，實在需要投入的資本有夠低。而且，既然微軟在那個年代幾乎是唯一的家用電腦作業系統製作商，這幾乎是把自己的銷量給綁在當年瘋狂上昇的PC產業上，這可是賺錢的保證！IBM可不是當年唯一的硬體製造商，但是微軟可是唯一的主流作業系統製作商啊。</p>
+<p>微軟的崛起並非惦惦吃三碗公，也絕非一凡風順。在的1984年，Apple首次公開了麥金塔，這是在個人電腦領域的首次挑戰。在1983年研發出的Lisa是很有名氣，可是他很難被稱為個人電腦，因為它要價美金10000大洋。麥金塔有著當時最先進，由Xerox Parc研發出來的作業系統，有一個相當接近我們在十年後才普遍看得到的圖形化界面。這家公司大手筆的買下了超級杯的廣告時段，宣告了次一個世代家庭電腦的新革命，說真的，Apple的宣傳詞絕不誇大。在麥金塔之前的個人電腦幾乎都是純文字界面，而這個讓你能幾乎把一切都給視覺化，幾乎就是我們現在「桌面」的定義了。我七歲的時候看到了這東西，天，這東西真是令人目眩神迷，但是當年的電腦實在不太夠力，所以也不會把這東西當作是電腦的必要界面。我當年用的電腦，也是MS-DOS界面，我還得一行行的從命令列去輸入指令，以當年來講這是再也自然不過的。但是日子到了快要90年代那段時間，家用電腦已經快到可以讓多工(看起來像是同時做兩件事情或者更多)實用化，那很明顯，圖形化界面自然就遠比普通文字命令列更具使用者友好度以及吸引力啦。</p>
+<p>微軟自然也是這樣想的。在1985年他們發表了第一款Windows，有些重點當然不能漏掉，很多部分是從Apple那裡買下專利使用權的。這其實與其說是我們熟知的「視窗」，還不如說比較像是一個檔案管理員，只是你能用滑鼠去操作而已，頂多啦，再加上一些小型的程式會跳出視窗，比方說小算盤。其實這只是一個MS-DOS的改進，還離已經有現代化圖像界面的Mac遠得很。1987年，Windows 2.0發行，這版本仍然很笨拙，但是至少跟1.0版比起來好一點，至少多了可套疊的浮動視窗以及一些有用的功能。Apple當然知道微軟想要幹嘛，在1988年，他們正式對微軟採取了法律戰。</p>
+<p>不過，Apple法律戰並沒有占到上風。的確Windows在很多方面看起來真的很像麥金塔的作業系統 <strong>(譯者註 : <a href="https://en.wikipedia.org/wiki/System_6" target="_blank" rel="external">System 6</a>，各位可以看看<a href="https://en.wikipedia.org/wiki/Windows_2.0" target="_blank" rel="external">Windows2.0</a>跟它有沒有很像XD)</strong> ，但是要說「一樣」或者「抄襲」似乎又有點太牽強。在法院的判決是這樣寫的：「幾乎所有有爭議的相似之處，都是從當初Apple授權來的，或者一些非常明顯的基礎設計概念。所謂的非法抄襲，應該是要看起來完全一樣才是」。</p>
+<p>這個判決結果出爐於1992，Apple當然毫無疑問的上訴，但是1994年上訴也被駁回了。這對Apple來講無疑也是一個暨失去Steve Jobs以後再一記重擊 <strong>(譯註：SJ於1985年離開Apple，回歸則是1996年的事情)</strong> 。整個麥金塔品牌受困於很糟的管理階層，「高貴」定價的電腦，毫無意義的規格封閉以及保護主義以至於不開放其他公司參與製作麥金塔硬體 <strong>(譯註：其實作者這邊沒寫對，Mac Clone麥金塔相容機就是在1986年被Apple授權給其他廠商開發的，而這紙協議反倒是1996年被回歸的Steve Jobs撕毀)</strong>，這家公司眼睜睜的看著市占率在這個10年內快速下降，最後也只好把Steve Jobs再度請回來坐鎮。在Apple這些大風大浪中，毫無疑問最大的受益者就是Windows，在這些年裡面席捲了整個市場。Windows即使沒有Mac OS的典雅以及一致性，但是其實以一個OS來講這已經很OK了，跟麥金塔那貴族般的定價來相比，顯然對消費者的吸引力更加強烈。在這場法律大戰以後，Windows 95出生了。有了先前的判例，Windows這次更進一步的「偷」走Mac OS的檔案回收桶概念，把人家的「垃圾桶」改個名字叫做「資源回收桶」就拿來用在Windows 95身上。往後很長一段時間裡面，這Windows簡直看起來如入無人之境。</p>
+<p>Gates跟Allen都是非常有經驗的程式設計師，但是程式設計的歷史上可是一堆比他們還要聰明許多的人，卻不像他們到最後成為了億萬富翁，他們之所以與眾不同的成功，來自於於商業手腕。他們在很長的一段時間，仍然保持著一個小公司的低姿態，說真的，一個純軟體公司實在不需要太大來製作軟體。寫程式說真的不難，但是他們對電腦來講是個到處都需要的東西，所以靠這個收到驚人的收益並不是什麼難事 <strong>(譯註：這是當年的生態，我們就不要太吐槽這觀點了…)</strong> 。在30年前，一個賣50美金的軟體，所需要投入的人力，遠比我們今天要賣50塊錢的其他東西都來得少 <strong>(這段我懷疑我有翻譯錯誤，原文是The amount of person-hours that goes into a $50 piece of software today dwarfs that of a $50 item of software thirty years ago. 感謝阿寶兄，翻譯應該是「三十年前，價值當時50塊錢的軟體需要的人力，遠比今天賣50塊錢的軟體需要的人力少得多」)</strong> 。在1983年來說，一個超原始的文字處理程式要價289，還需要用戶使用小貼紙去貼在鍵盤上來標示出各個按鍵的特殊功能 <strong>(譯註：可是仔細想想，現在的文字處理程式好像沒高明多少，也是得叫出選單來一個個記啊 XD)</strong> 。在今天來講的話，隨便一個open source或者freeware都能做的比當年這價格的軟體好得多，這世界變化真的很大啊。</p>
+<p>在當年這種環境下，微軟靠著迅速的反應，積極的態度以及謹慎小心的行事快速地在軟體業界崛起。但是我得說，他們強項可不是本身的發明跟創新，而是(把別人的idea)包裝，改進跟整合。他們當初有句耳熟能詳的口號「在同級中最佳」，哎，尖酸點的說的話，就是他們會做一個產品，也許用的還是市場上其他產品的idea，進入市場，把這產品包裝成市面上看起來最ok的，然後想辦法占有這個市場，這造成了一個奇怪的循環：微軟產品好不好用，是取決於市面上其他產品好不好用。</p>
+<p>Lotus的試算表「Lotus 123」是個在80年代到90年早期的殺手級軟體，而界面概念都很類似的微軟的試算表Excel則是在1985年初登場，很快的就成為微軟Office套件裡面最受歡迎的軟體之一，而反倒是Office套件裡的文字處理軟體像是WordPerfect跟WordStar感覺就比較沒那麼好，這使得自家老本業的Word跟Excel比起來相形失色。有趣的是，在當時市場上並沒有任何看起來很棒的email軟體下，Office裡面的Exchange一直都是又慢又容易當機，這情況一直至少維持到了二十一世紀初。微軟總是耗盡心力去加強他們「有競爭對手」的軟體，其他的？放著爛吧。在90年代末期，我有幸參訪了在麻州的傳奇公司Digital Equipment Corporation(就是DEC迪吉多，在往後被Compaq康柏買走了，不過這是後話），他們的文化跟微軟一整個大相徑庭。他們有許多的員工在開發Threading(執行緒，就是讓OS在CPU上同時執行數個程式)技術，他們在這領域已經開發了20年。一半的開發者都是在該領域的博士級專家。他們從來不會為了提早發行產品而對品質有所妥協。</p>
+<p>唉，我想這就是微軟的「成功」祕訣吧。</p>
+<p>微軟強項不在於發明創造，不過並不代表他們沒有這樣做。在Word裡面有個稱為Clippy的小元件，看起來像是個安全別針的玩意，偶爾會從右下角彈起來，這是個發明 <strong>(譯註：我也不知道Clippy是啥，作者也只有講那麼多，我看不太出來是不是諷刺啊 XD)</strong> 。Microsoft Bob是一隻戴著太陽眼鏡的黃狗，他在Windows 95裡面你可能需要幫助的時候，會跳出來當作提示者，這也是個發明。Cairo是個「聲稱是自1990年以來最具革命性的作業系統」，好吧我所知不多，要不是這東西壓根從來沒有真正的釋出過，，也許我會說他是真的「創新」。不過整個公司的氛圍來說，他們比較希望進入一個市場，然後去成為該市場的top 1，而不是去真正的「發明」出什麼東西來。在缺乏一個明確目標下，計劃永遠都是渾沌不明而且跌跌撞撞的。在1990年的這種大家都一心一意的在搞網際網路的情況下，沒人在真正的「創造」出什麼新的市場，那，微軟要去哪「搶奪」市場？這並不是說微軟或者其他人不知道「該開拓新的賺錢的市場」，而是微軟根本，完全的，沒有這種自己開創新市場的機制跟動力。他們只打算繼續在現有的市場搶奪更多，吃得更飽。</p>
+<p>(作者對這段的附註，往後再翻。簡單的說，他認為XBox算是一個對MS來講很少見，開拓新市場的嘗試)<br>Of note is the single major product success of late Microsoft: the Xbox gaming console. While the Xbox has yet to turn more than a tiny overall profit since its introduction in 2001, it has established itself as a stalwart of the gaming world. This could occur for two reasons: first, unlike anything having to do with the internet, it was completely isolated from the Windows and Office empires, and so did not run afoul of those groups; and second, there were clear, existing, profitable models to copy—Nintendo’s and Sony’s—and Microsoft was willing to lose billions of dollars in re-creating that model. For the last time, they caught up to their competitors in short order and equaled them, at the cost of turning no profit themselves. ↩</p>
+<p>時間繼續往下走到1999年，這時候的微軟正處於一種微妙的平衡，平衡于財務上的保守安全以及對未來的不確定性。靠著Windows跟Office這兩頭市場巨獸，微軟一直在家用以及商用市場保持著相當大的主導地位。當年美國跟微軟著名的反托拉斯法律戰在2000年前後來到了高峰，但是即使如此，這個實質上的「壟斷」仍然短期內看不到任何衰退的跡象。當年美國司法部試圖將微軟分切為兩個子公司，一個業務主要是Windows，一個業務主要是Office，但這其實也沒有任何幫助，更何況微軟上訴還推翻了這個裁決，微軟還試圖訴諸語論控訴美國司法部試圖「摧毀」一家公司。整個世間最後落幕，看起來像是個奇怪的政治性表演，我甚至懷疑這場鬧劇，除了讓軟體公司學到「要養一群律師跟國會說客」這件事情以外，對整個軟體工業有任何微乎其微的影響。</p>
+<p>不過，在這段法律明刀暗槍的你一刀我一槍的過程中，我倒是發現了個有趣的事情：在我來到公司以前，公司的最高層級其實就已經有分為鷹派跟鴿派，為了公司未來的發展在激烈的爭執。鴿派主張跟各個網際網路公司合作，比方說Netscape(這是個很早的瀏覽器公司啊)甚至AOL，跟他們技術上的合作來擴展自己的影響力。而鷹派則主張全面制霸，讓微軟想儘辦法成為市場上唯一的網際網路供應者。這問題的核心其實就是在於Windows，這可是史上最賺錢的軟體啊！但是真正理想中的網際網路大未來，是靠著Internet連接各個client，而不是侷限在Windows裡面 - 一個沒有Windows的大世界，這說真的是個很困難的道路。「我可不想在後人的歷史上參上一筆，變成一個破壞史上最成功的專案的人」，一個前鷹派的微軟高階主管在爭論中這樣說道。結論是，鷹派贏了，鴿派出走，但是最後鷹派仍然是輸了這場戰役。</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[在CentOS上架一個IPython Notebook server]]></title>
+      <url>/2014/04/08/centos-a-ipython-notebook-last-server/</url>
+      <content type="html"><![CDATA[<p>以目前的CentOS 6.4來講，由於yum repo裡面的python仍然停留在2.6.x，所以IPython最多只能支援到0.10，無法架設起notebook。</p>
+<p>##如果已經從yum安裝了iPython…<br>反安裝吧，這是鐵定要反安裝的。基本上會這樣做的大概都是因為<a href="http://ipython.org/install.html" target="_blank" rel="external">官方手冊教你的安裝法</a></p>
+<pre><code>sudo yum install python-ipython-notebook
+</code></pre><p>恩，南無XD 這安裝法的問題在於，目前CentOS 6.4以降的repo，能安裝的python只有到2.64，iPython也只有到0.10(要用notebook至少要0.14)，所以我們要先把這些問題都解決掉</p>
+<pre><code>sudo yum remove python-ipython*
+</code></pre><p>所以我們要自己裝一份python 2.7，不過也不需要移除掉2.6，後面會慢慢解釋怎麼做。不過，先至少把該裝的development tools裝回來吧</p>
+<pre><code>yum groupinstall &quot;Development tools&quot;
+</code></pre><p>##get python 2.7 and build this<br>有人已經幫我們<a href="http://toomuchdata.com/2014/02/16/how-to-install-python-on-centos/" target="_blank" rel="external">準備好指令</a>了，不過裡面有一點點需要修改的地方，大概長得像這樣(捏他一下，你可能會想先安裝openssl-devel…)</p>
+<pre><code># Python 2.7.6:
+wget http://python.org/ftp/python/2.7.6/Python-2.7.6.tar.xz
+tar xf Python-2.7.6.tar.xz
+cd Python-2.7.6
+./configure --prefix=/usr/local --enable-unicode=ucs4 --enable-shared LDFLAGS=&quot;-Wl,-rpath /usr/local/lib&quot;
+make &amp;&amp; sudo make altinstall
+</code></pre><p>這會有點久。不過，當你裝好以後，python仍然是2.6，所以<code>pip install ipython</code>仍然不會成功安裝到你需要的版本(應該只能裝到0.10)，沒關係，我們看看怎麼搞定</p>
+<p>##easy_install and pip2.7<br>easy_install其實算是必備的東西了，這邊就稍微提一下就好</p>
+<pre><code>wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
+# Then install it for Python 2.7 and/or Python 3.3:
+</code></pre><h1 id="前面才裝的python2-7上場"><a href="#前面才裝的python2-7上場" class="headerlink" title="前面才裝的python2.7上場"></a>前面才裝的python2.7上場</h1><pre><code>sudo python2.7 ez_setup.py
+sudo /usr/local/lib/python2.7 ez_setup.py
+</code></pre><p>在這裡有可能會碰到一個問題，就是sudo後path路徑就沒了。這其實是一個CentOS安全性上的設計，我們執行這段，並且把它放在rc(看你放.bashrc還是.zshrc)來讓他登入就被執行一次即可</p>
+<pre><code>alias sudo=&quot;sudo env PATH=$PATH&quot;
+</code></pre><p>這樣<code>sudo python2.7</code>應該就不會再碰到什麼問題了才是。現在<code>easy_install</code>就有2.7版了。把該死的pip裝下去吧</p>
+<pre><code>sudo easy_install-2.7 pip
+</code></pre><p>不過，在這邊有很大的機會會碰到https這路徑抓不到的問題，所以得安裝openssl。問題來了，這東西在編譯2.7的時候會自動找看有沒有安裝<code>openssl-devel</code>，如果沒裝的話，請’sudo yum install openssl-devel’以後再重新compile一次python2.7吧….</p>
+<p>##sqlite problem<br> 1084  sudo pip2.7 install sqlite3<br> 1085  sudo pip2.7 install _sqlite3<br> 1086  sudo yum install libsqlite3-dev<br> 1087  sudo yum install sqlite-devel<br> 1088  cd Python-2.7.6<br> 1089  ls<br> 1090  ./config<br> 1091  ./configure</p>
+<p>##start server</p>
+<p>##Server problem<br> 1139  sudo yum remove python-matplotlib<br> 1140  sudo pip2.7 install matplotlib</p>
+<p>##start a external server</p>
+<p>##auto complete… pyreadline</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[在VPS上架設一個WordPress服務 -- 以CentOS為例子]]></title>
+      <url>/2014/03/30/set-up-a-wordpress-on-the-vps-services/</url>
+      <content type="html"><![CDATA[<p>有人說過，有玩具，就要試著去玩弄它（？）。既然我們有了一台VPS，那當然不玩玩個網站說不過去。要架起一個WordPress可以說簡單，也可以說困難，端看你是怎麼架的，以及需不需要額外架設一個前端DNS Server。不過，我們都先以最簡單的方式來做</p>
+<p>##下載必須元件<br>要架起WordPress的話至少需要幾個東西，包含了Apache HTTP Server(其實是可以用<a href="http://nginx.org" target="_blank" rel="external">nginx</a>或者<a href="http://www.lighttpd.net" target="_blank" rel="external">lighttpd</a>代替，不過這邊統一方便用httpd), mysql以及php. 最簡單的安裝法大概就像這樣</p>
+<pre><code>yum -y install httpd php php-mysql mysql mysql-server php-gd
+</code></pre><p>雖然不是必須，但是我會建議一起裝下去，等等會用到的:ftp, vsftpd</p>
+<pre><code>yum -y install ftp vsftpd
+</code></pre><p>-y可以拿掉，這個選項的意思就是再問你yes or no的時候一路幫你Y到底，如果你想觀賞或者研究一下怎麼跑的話，我會建議拿掉來仔細看看。安裝完畢以後，記得要設定開機時啟動服務 :</p>
+<pre><code>chkconfig httpd on
+chkconfig mysql on
+#如果有裝vsftpd的話
+chkconfig vsftpd on
+</code></pre><p>當然，別忘了還要下載WordPress(<a href="http://tw.wordpress.org/wordpress-3.8.1-zh_TW.tar.gz" target="_blank" rel="external">中文版</a> <a href="https://wordpress.org/download/" target="_blank" rel="external">英文版</a>)。他語系是可以改的，不過不是那麼直覺，所以建議選擇你要的語言直接下載就好。我會建議你用wget來做這件事情，比方說</p>
+<pre><code>cd ~
+wget http://tw.wordpress.org/wordpress-3.8.1-zh_TW.tar.gz
+tar -zxvf wordpress-3.8.1-zh_TW.tar.gz
+</code></pre><p>好啦，我想我們該下載的東西都下載完畢了，接下來該開始設定了</p>
+<p>##設定mysql<br>WordPress需要一個mysql 的帳號密碼來儲存所有的post，所以我們要先給wordpress一個完整的帳號密碼</p>
+<pre><code>mysqladmin -u root -p &apos;&lt;你的密碼&gt;&apos;
+</code></pre><p>接下來就是登入mysql去給wordpress一個帳號密碼了，我傾向于這樣做：</p>
+<pre><code>mysql -u root -p
+&lt;會要求你輸入密碼&gt;
+#建立一個要用的wordpress資料庫
+create database wordpressdb;
+#建立wordpress帳號
+create user wordpress@localhost;
+#給予這個帳號密碼, 基本上由於我們限定他只能local登入，所以密碼不用太要求。
+#如果你想給予強度高一點的密碼也是可以的，反正後面都會要你輸入。
+set password for wordpressuser@localhost= password(&quot;wordpress&quot;);
+#給予這個wordpress操作wordpress資料庫的權限
+grant all privileges on wordpressdb.* to wordpress@localhost identified by &apos;wordpress&apos;;
+flush privileges;
+</code></pre><p>這樣mysql暫時算是搞定了。</p>
+<p>##設定httpd<br>除非你打算做子域名，不然普通來講你的網頁應該會直接連到/var/www/html/www下的index.html。我們就直接先把wordpress給放到那裡去。基本上，這邊問題最大的應該就是權限問題，等等多半會卡在這問題上打轉。</p>
+<p>首先，先把整個wordpress資料夾移到/var/www/html取代掉裡面本來的www</p>
+<pre><code>cd ~
+sudo rm /var/www/html/www
+sudo mv wordpress /var/www/html/www
+</code></pre><p>為了讓整個wordpress能夠被apache有權限讀取，有很多種不同的做法。group/owner是一種做法，不過因為後來還有一個ftp更新也會跟著加入戰局，所以我會建議直接改動權限。為了安全起見，我們所有的檔案都應該被設定為766(rwxrw-rw-)而所有在wordpress的目錄都被設為777(目錄一定要是有x屬性否則無法進入)。</p>
+<pre><code>cd /var/www/html
+chmod 777 www
+cd www
+chmod -R 766 .
+find . -type d -exec chmod 777 {} \;
+</code></pre><p>ok，理論上這樣應該設定算是完成一段落了，我們可以開始連上網域看看。如果出現之前的頁面的話，請重新讀取一次應該就可以了。</p>
+<p>##WordPress設定</p>
+<p>WordPress有引以自豪的五分鐘設定，所以應該不用過於著墨在這塊。他會要求你填入mysql帳號密碼，如果我們按照前面這定的話，資料庫就會是wordpressdb，帳號跟密碼就都會是wordpress。</p>
+<p>另外，如果顯示有任何開啟檔案讀取寫入失敗的話，請用root去看<code>/var/log/httpd/error_log</code>這檔案需要root才能看得到，這會很詳細的跟你說哪個檔案讀取不良。如果你想要測試看看apache是不是能順利讀取某個檔案的話，最簡單的方法就是</p>
+<pre><code>sudo -u apache cat &lt;你的檔案&gt;
+</code></pre><p>後面當然就是你要看的檔案名稱。這樣就能確定apache(也就是httpd)是不是的確無法順利開啟該檔案了，這些可能的問題包括了目錄沒有w跟x權限，父目錄一路往上有權限設定錯誤等等，請往上看httpd設定這一個小節。</p>
+<p>##FTP設定<br>WordPress本身使用了FTP來做更新以及許多安裝的動作，當在做update以及某些安裝的時候(plugin, theme…等等)，他會要求你提供一個ftp帳號來作業。事實上這個ftp帳號並不是架起一個ftp server那麼簡單，你必須讓它使用你提供的帳號密碼的時候，能讓他正確的登入wordpress所在目錄(以我們這裡的例子來說，就是/var/www/html/www)。在我們這個例子裡面，我們會使用vsftpd來做ftp daemon。</p>
+<p>###vsftpd的設定<br>前面假設已經yum install過vsftpd了，我們開啟他的設定檔案讓他能work。其實要改的地方不太多，大概就這幾個</p>
+<pre><code>#把匿名登入關掉。很奇怪的是這預設是打開的，因為opensource精神嗎（汗
+#請不要以為mark掉這行就是關掉，它mark掉就是預設值(開)
+anonymous_enable=NO
+#把它chroot起來
+#關於什麼是chroot?請參考http://fanqiang.chinaunix.net/a1/b5/20010416/134954.html
+#這個也很重要，不知道為什麼預設是關的，因為opensource精神嗎（汗
+chroot_local_user=YES
+#這兩行是沒有的，請自己加。主要就是指定ftp的根目錄。
+#當然，我們還沒有ftphome，所以我們等等要建一個
+local_root=/ftphome/$USER
+user_sub_token=$USER
+</code></pre><p>好，所以我們現在要讓wordpress能登入ftp，所以我們要幫她加一組帳號</p>
+<pre><code>sudo useradd wordpress
+sudo passwd wordpress
+&lt;自己輸入密碼&gt;
+</code></pre><p>在這邊要講解一個概念。ftp雖然可以使用系統的帳號密碼來認證，不過整個ftp的使用者就是”ftp”。也就是說，你只要使用ftp登入這系統，你對於這個系統而言就是”ftp”這個使用者。即使wordpress用自己的帳號密碼去登入ftp，他也只能寫”ftp使用者”能夠讀寫的權限，而不是”wordpress”使用者的。</p>
+<p>當然，我們就要幫”ftp”這個使用者做一個家了。</p>
+<pre><code>cd /
+sudo mkdir ftphome
+#其實chown ftp.ftp ftphome也可以
+chown ftp ftphome
+chgrp ftp ftphome
+cd ftphome
+</code></pre><p>根據我們在vsftpd.conf裡面的設定，我們會發現如果我們用wordpress登入的話，ftp的root應該是/ftphome/wordpress。這個應該要指向/var/www/html/www才對，所以我們要做一個symbolic link</p>
+<pre><code>sudo ln -s wordpress /var/www/html/www
+</code></pre><p>還記得我前面提過的嗎</p>
+<blockquote>
+<p>group/owner是一種做法，不過因為後來還有一個ftp更新也會跟著加入戰局，所以我會建議直接改動權限。</p>
+</blockquote>
+<p>所以這樣的設定可以確保ftp能讀寫www這目錄，可以用ftp試試看!</p>
+<p>###用ftp試試看吧</p>
+<pre><code>ftp localhost
+wordpress
+&lt;你設的密碼&gt;
+</code></pre><p>如果ok的話，恭喜，這應該設定就沒問題了。往後wordpress需要的ftp update/install等等都可以靠這組帳號密碼搞定</p>
+<p>##最大上傳限制</p>
+<p>預設的php上傳是2M，其實很多theme都不止這個大小，所以會報錯。所以我們得修給一下/etc/php.ini</p>
+<pre><code>sudo vim /etc/php.ini
+#找到下面這個把它改大
+; Maximum allowed size for uploaded files.
+; http://www.php.net/manual/en/ini.core.php#ini.upload-max-filesize
+upload_max_filesize = 16M
+</code></pre><p>我是把它改到16M啦 不過通常來講8M應該就夠了。</p>
+<p>恭喜，這大概就是一整個空的VPS上設定一個wordpress的歷程。感覺是不是比虛擬主機的cPanel複雜一點（汗）。不過，我想裝完一整個流程，應該可以對Linux的運作更熟悉一點了</p>
+<p>Disqus修好了，他們修得挺快的 XD</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Java 8 : 影響深遠的Stream, Lambda以及Functional Interfaces]]></title>
+      <url>/2014/03/21/java-8-far-reaching-stream-with-lambda/</url>
+      <content type="html"><![CDATA[<p>在幾天之前Java SE 8 SDK跟著JRE8一起發布了，然後JavaFX8在數個小時以後也跟著一起公開。Java8按照Oracle的說法帶來了相當巨大的<a href="http://www.infoworld.com/d/application-development/love-and-hate-java-8-223200" target="_blank" rel="external">革新</a>，而<a href="http://openjdk.java.net/projects/jdk8/" target="_blank" rel="external">OpenJDK8</a>也很快的跟上了腳步。中間其實還有個小插曲，原本Java SE 8的GM版本在去年九月就已經要發布了，結果因為幾個安全漏洞以至於被迫延期到今年三月才發表。</p>
+<p>Java8的衝擊其實算是還好，不過裡面有兩點算是特別吸引了目光，這兩點分別是Stream(跟我們知道的istream/ostream毫無關係)跟Lambda，我們來看看這兩個亮點分別是什麼樣子。</p>
+<p>##Lambda<br>Lambda其實是一個在Java7就該出場的東西了，只是由於某些不知道該稱為<a href="http://blog.orfjackal.net/2013/07/lambda-expressions-backported-to-java-7.html" target="_blank" rel="external">政治因素還是排程因素</a>，直到Java8被Stream(下面會提到)火燒屁股了才端出來。</p>
+<p>Lambda本身來講是一個相當簡單的技術，他已經在Scala跟Groovy實作出來很久了(<a href="http://www.csdn.net/article/2013-08-05/2816449-Love-and-hate-for-Java8" target="_blank" rel="external">有人</a>說其實根本是從scala直接搬過來的)。不過從我專案看起來的話…這個java跟groovy基本上是屬於互相抄襲的狀態(別戰我XD 我知道他們兩個之間的關係)。這個Lambda我是覺得應用影響最深遠的部分是跟下面會提到的Stream的整合，這兩個加起來根本就是…(Scala跟Groovy：哥們早就這樣跑好幾年了)</p>
+<p>如果寫C/C++很熟的話，應該寫Java的時候會注意到其實Java並沒有Function Pointer這種東西。Function Pointer在C/C++的地方主要就是告訴這段code:<em><em>當我有ooxx的時候，我要用什麼函數來處理ooxx</em></em>。Java並沒有這種東西，他必須要去new一個class，利用裡面定義好的class method來做這種行為。最明顯的的例子就是sort跟comparer之間的關係。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">```</div><div class="line"></div><div class="line"></div><div class="line">##Stream</div><div class="line">Stream跟我們熟知的java.io類別裡面的stream是完全無關的東西。這個東西的主要目的是為了強化在Java裡面相當不足的Collections(這東西在Java 1.5用generic大修過一次，不過顯然修的不是很好)。這算是一種新的概念，不過這概念的確跟Java IO裡面的Stream相當類似，不過Java的collection Stream提供了一些性質跟特徵</div><div class="line"></div><div class="line">1. Stream只能操作一次，就好像檔案ifstream你讀取內容結束後就只能.close()而不能拿這個stream再去開一個檔案，你只能在重新new一個出來。</div><div class="line">2. 他提供了許多循序單位操作的東西，以這次增加的例子來說有forEach, filter, map, reduce, min, max, sorted, distinct, limit....等等（嗯，有沒有注意到好像跟Groovy/scala提供的有點像？）</div><div class="line">3. 他可以combine Lambda(很重要，可是沒必要說三次)</div></pre></td></tr></table></figure>
+<p>List<something> some = getVeryBigListFromSomewhere();<br>//在之前我們如果要對這個list作拷貝動作的話<br>List<something> oldie = list.getStream().collect(Collection.toList());</something></something></p>
+<p>//但是我們現在有效能更高的Collection<br>List<something> some1 = list.getStream().collect(Collection.toList());</something></p>
+<p>//甚至可以用parallels的方式，分段List來增加效能<br>List<something> some2 = list.getStream().collect(Collection.toList());;<br>```</something></p>
+<p>##Lambda</p>
+<p>##Encore stage : Functional Interfaces</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[大人的玩具 : VPN on VPS]]></title>
+      <url>/2014/03/15/adult-toys-vpn-on-vps/</url>
+      <content type="html"><![CDATA[<p>##工程師的玩具<br>有時候做工程師做到某些地步的時候，很多東西都會想自己翻出來玩玩，比方說自己也想要架個站啦，或者說自己希望有一個自己的git server啦等等。很多人或多或少都會去弄一個VPS來玩玩，一個月也才5塊10塊USD就能有一組自己用的server，可以在上面跑自己的blog，或者自己架個git，自己架個VPN…等等。當然，我自己來講的話最大的目的是要有一個穩定的server來跑自己的實驗性專案，可是開在家裡面的電腦的話一個月電費就要近千啦(請參考<a href="http://cablechen.pixnet.net/blog/post/26911720" target="_blank" rel="external">這篇文章</a>)。加上還要搞個堪用的ADSL/光世代，平常也沒用的到的話，那這個「玩具」的開銷顯然是相當可觀的。</p>
+<p>這樣算算，一個月為了這個Hobby，大概至少要吃掉1張小朋友不止。當然電腦是家裡都有的，網路大家也都是吃到飽的，不過要24hr開機加上當Server需要的頻寬，造成多出來的成本每個月又是另外一回事了，加上ip不固定要弄個淺顯易懂的網域名稱也很麻煩，怎麼算實在都不太應該把家裡變成機房才對。</p>
+<p>所以，當然我們就會選擇在外面租一台Server。一台實體Server要價是相當可觀的，不過由於最近流行的雲端，虛擬balabala這些就算懂也不知道怎麼解釋的概念，現在已經不再是一租就得租一台server放在機房吹冷氣的時代了，現在流行的概念是<a href="http://zh.wikipedia.org/wiki/虚拟专用服务器" target="_blank" rel="external">VPS</a>。我們運氣不錯，流行通常也是「平價」的另外一種說法（太貴要怎麼流行起來啦！），所以我們就來看看這個東西要怎麼架，大概口袋要多深才玩得起這種大人的玩具。</p>
+<p>##為什麼要VPS?<br>其實這理由就跟「為什麼你會想要擱一台Server在家裡面」是完全一樣的道理。會想要在外面access檔案啦，需要git repo啦(<a href="https://github.com" target="_blank" rel="external">github</a>一個月最便宜的方案要7塊錢，我知道只要全public是免費，甚至<a href="https://bitbucket.com" target="_blank" rel="external">bitbucket</a>還可以讓你有免費的private project…不過不是本文要提的重點)，也許你需要VPN啦，你需要一個server來實驗一些東西啦…等等。</p>
+<p>簡單的說，你需要一個固定的ip，以及可以隨時打開關閉的一台主機對吧。像我自己的話，我需要一台Bugzilla跟一台repo+CI做自己的專案，所以我會去找一台VPS來做這件事情。有的人可能需要架一個Minecraft伺服器（開在家裡好貴的，真的），這些都足以構成「需要一個固定ip，以及一台24hr開機的主機」的條件。</p>
+<p>當然，如果只是想要一個php/cgi架站空間，那有更便宜的選擇。我想這種跟VPS需求已經<a href="http://gordon168.net/shared-hosting-and-vps-and-delicated-hosting.html" target="_blank" rel="external">很多人</a>寫過<a href="http://www.taki.com.tw/blog/options-comparing-dedicated-servers-cloud-servers-and-vps/" target="_blank" rel="external">不少文章</a>來<a href="http://tfeng.org/?p=4526" target="_blank" rel="external">探討這個</a>了。我比較懶，沒辦法寫的那麼圖文並茂，所以就請各位去翻翻這些文章了 =P。不過要稍微做點補充的是，其實並不是所有的VPS都是基於該文章說的<a href="">OpenVZ</a>以及<a href="">Xen</a>，<a href="http://www.parallels.com/products/automation/old/modules/vps/" target="_blank" rel="external">Parallels</a>自己也用了自家完全獨立的VPS技術，VMWare自己也有一套專屬的<a href="https://www.vmware.com/pdf/desktop/vmware-kvm.pdf" target="_blank" rel="external">Sphere KVM</a>。</p>
+<p>##所以VPS怎麼選?<br>很多人一定第一個會推薦口碑最不錯的<a href="https://www.linode.com" target="_blank" rel="external">Linode</a>，不過我推薦的比較不同，我推薦的是可以讓你免費玩一年試著用看看的<a href="http://aws.amazon.com/ec2/" target="_blank" rel="external">Amazon EC2</a>。我在後面會聊聊我以前到現在有接觸過的VPS。</p>
+<p>不是說我不推薦國貨，不過台灣的VPS是相當昂貴的，同樣的規格幾乎是外國的一倍半到兩倍的價格。除非這個VPS是以要服務台灣客戶為主，不然我並不會很推薦使用台灣的VPS。這篇文章要介紹的是玩具，不是生財工具啊…(遠目)</p>
+<ul>
+<li><p>###<a href="https://www.linode.com" target="_blank" rel="external">Linode</a></p>
+<ul>
+<li>這應該是目前最多人的選擇。穩定，客服好，加上有降過一次價（因為被某駭客團體打趴了一次，詳細故事請看<a href="http://blog.xdite.net/posts/2013/05/08/linode-hacked-htp" target="_blank" rel="external">這篇文章</a>)以後價格好了不少，算是一個相當穩定好用的VPS。真的要說缺點的話，就是他的價格是20USD/mo起跳，而這USD20給的規格其實也差不多就是做足了USD20該有的規格。20USD並不是什麼大錢，老實講。但是以一個起步用的玩玩看的實驗心態來說，這價格仍然是偏高了一點。</li>
+<li>但是說真的，要是哪天這玩具玩的大了一點的話，這是個值得考慮的對象。</li>
+<li>另外，他有提供功能算是很ok的Android/iPhone apps。</li>
+</ul>
+</li>
+<li><p>###<a href="http://aws.amazon.com/ec2/" target="_blank" rel="external">Amazon Web Service - EC2</a></p>
+<ul>
+<li>由於他有提供新使用者一整年的t1.micro free tier usage，白話的說，就是一整年的免費 – 雖給的資源很小很陽春，但是如果你不知道你要一個VPS能幹嘛，你可以拿這個去玩一年玩玩看！至少裝個VPN(下面會教學)看看。由於這點的關係，這完全成為了新手的首選！雖然他給的規格實在是很可憐，可是一開始我相信絕大多數人連這可憐的性能都用不滿XD。再怎麼陽春至少git也跑得起來，VPN也沒有問題，阿帕契…er…我不太確定他能不能完整的裝起LAMP，不過我想對大多數人來講，都是很夠的。要注意的是，他「免費」要認的東西是id，信用卡號以及登錄電話都要是新的才會給你免費。<a href="http://blog.rx836.tw/blog/first-amazon-web-services/" target="_blank" rel="external">有人寫了篇文章</a>來介紹怎麼免費註冊EC2一年。<a href="http://blog.soft.idv.tw/?p=823" target="_blank" rel="external">這邊</a>跟<a href="http://blog.soft.idv.tw/?p=824" target="_blank" rel="external">這邊</a>也有很詳細說明怎麼申請以及使用免費的EC2。</li>
+<li>不過這個連跑Minecraft server都很勉強，記憶體要壓到一半才能跑起來，但是還是能用的！真的！</li>
+<li>值得一提的是，由於他們家一些超級powerful的服務的關係，如果你需要用到他們的S3阿，RDS等等的話，用他們家的EC2是設定最少最方便的，幾乎拷貝貼上就能用了。另外他們的Free tier usage裡面包含的服務不止EC2，可以順便玩玩看他們其他的服務比方說CloudFront等等。</li>
+<li>不過事實上它幾乎是僅次於Krypt以後最貴的了… 但是也是少數有提供以小時計費的公司，所以網站掛點緊急開一個EC2來備援是很常見的做法。</li>
+</ul>
+</li>
+<li><p>###<a href="https://www.digitalocean.com" target="_blank" rel="external">DigitalOcean</a></p>
+<ul>
+<li>這家算是我覺得平價VPS裡面最適合初學者的首選。價格屬於相當低價的範圍，而且計費是以小時/月雙軌的方法計費，開instance又很快，幾乎是一分鐘之內就開起來了，賣點還有包含他們引以自豪的SSD。如果真的喜歡控制成本怕多花錢的來講，這家這點真的是無話可說的讚。</li>
+<li>不過說缺點也不算少。CPU來講這家給的是比較小氣的，這點尤其在作CI是很明顯看得出來。流量1T(5USD/mo)/2T(10USD/mo)是用不太完啦，不過有聽說有人因為BT等東西被警告的。其實對於內容控管是稍微嚴格一點，像是pornography等等，這家很像學生宿舍，便宜，但是有些東西會管。不過我想對大多數人來講，他們管的其實都跟我們再做的事情是擦不上邊的 =P</li>
+<li>我目前選擇的是這家。如果願意從我這邊referal的話，請點<a href="https://www.digitalocean.com/?refcode=b5c2c6a0bfdf" target="_blank" rel="external">這個連結</a>。這個小段落關於DigitalOcean的link是沒有藏Referral code的，如果不太喜歡Referral的話可以「安全」的點這個小段落最上面DigitalOcean的介紹link :3</li>
+</ul>
+</li>
+<li><p>###<a href="http://www.photonvps.com" target="_blank" rel="external">Photon</a></p>
+<ul>
+<li><a href="http://tfeng.org/?p=4539" target="_blank" rel="external">這位老兄比較圖文並茂一點</a>，所以就直接借用他的來介紹了。這家在對岸很多人推薦，也很穩，價格又很ok，所以很多人買來直接當VPN來玩 XD</li>
+</ul>
+</li>
+<li><p>###<a href="http://directspace.net" target="_blank" rel="external">DirectSpace</a></p>
+<ul>
+<li>這家有一個便宜到非常恐怖至極的15USD/yr(對，一年才15塊錢)的超經濟方案（而且規格還略比EC2免費等級還好一點）。但是好像…買不到了囧。如果買的到的話這絕對是跟EC2並列的超初心者首選方案啊。應該不是饑餓行銷或者幌子，而是因為他們網站最近設備也在升級，結果就是現在很多方案，以及幾乎所有的Dedicated Server都缺貨。</li>
+<li>C/P比相當不錯，不止一個人稱讚。10USD/mo可以給你到2G記憶體加上3vCPU(不過不知道真實計算能力怎樣)，這規格說真的市面上很難有人給的出來，而且我朋友是他的老客戶，也說這算頗穩了。</li>
+<li>但是，他們實在是懶到一個境界 – 標準開一個Software VPS要開一整天還開不起來，買下去要給你pending個兩三天，信也常常三兩天才回，非常的放羊吃草 XD。所以我買了下去結果開到現在VPS還在pending status，兩天了… orz 所以我就退掉先了，他們有三天無條件退款機制 – 可是兩天VPS都還沒開起來是哪招…</li>
+</ul>
+</li>
+<li><p>###<a href="http://www.krypt.com/cloud/" target="_blank" rel="external">Krypt</a></p>
+<ul>
+<li>Krypt基本上提供的並不是玩具等級的服務，他擁有非常完善的(以及異常昂貴的)全面零時備援以及高得驚人的頻寬(不過很妙的是他給的免費流量挺小氣的–以他的價格來講)，而且他的vCPU給的運算速度也幾乎是最高的。不過，商務來講我會選EC2或者Linode，玩具來講我會選DigitalOcean或者Photon…恩…</li>
+</ul>
+</li>
+</ul>
+<p>##不止VPS…還要再多一個Domain Name<br>基本上VPS Vender都會提供一個固定的ip給你，而大家應該會希望有一個自己的Domain Name吧。我自己的話是買了一個rayer.idv.tw, 這不貴，租三年才1080。值得注意的是，他租一年400，兩年800，第三年卻只要280，第四年又突然變高，所以租三年是最划算的。</p>
+<p>至於怎麼租怎麼設定，請看<a href="http://sofree.cc/domain-name/" target="_blank" rel="external">這裡</a>。如果想租國際等級的網域如.com的話，普通都會建議去<a href="https://www.godaddy.com" target="_blank" rel="external">GoDaddy</a>去註冊，價格就請自己去看，都不會太貴，甚至比租.idv.tw還便宜點。</p>
+<p>不過hinet DNS update得頗快，我用的是google的DNS(8.8.8.8/8.8.4.4)，不過基本上Hinet Domain註冊好以後ip也bind好以後5分鐘之內就指的到了，而GoDaddy常常需要花2小時到一天不等。不過，hinet雖然快而且不貴，但是由於它並不提供CNAME修改（需要你自己去架一個DNS，這不算難，別忘了我們可是有一台無所不能的VPS!不過就是麻煩）…所以有這需求的話其實其他家有更好的服務。但是，如果單純只是要價格ok更新速度又快（誰會一天到晚沒事改IP我也很好奇），hinet是首選。</p>
+<p>##動手來搞一個VPN…傻瓜版本<br>所以我們也買好VPS了，準備開始開工吧！我自己選擇的是CentOS 6.x的64bit版本。這邊版本喜好就見仁見智了，不過我已CentOS來當例子，架一個最普通的VPN試試看！在古早以前，pptpd的安裝是一個很麻煩的事情，不過有位老兄用script把他徹底簡化:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">sudo yum install git</div><div class="line">cd /opt </div><div class="line">sudo git clone git://github.com/drewsymo/VPN.git</div><div class="line">sudo cd VPN &amp;&amp; bash vpn-setup-vanilla.sh</div></pre></td></tr></table></figure>
+<p>就那麼簡單。不過，如果你的VPS供應商用的是OpenVZ的話，可能要多一個步驟。如何知道你供應商用的是不是OpenVZ呢？很簡單，<code>ifconfig</code>下去看有沒有veth0或者venet0這個接口就對了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo iptables -t nat -A POSTROUTING -j SNAT --to-source x.x.x.x</div></pre></td></tr></table></figure>
+<p>其中x.x.x.x就是該接口的ip位置。</p>
+<p>這樣預設裝好以後只有一組帳號叫做myuser/mypass。帳號密碼設定檔其實是放在/etc/ppp/chap-secrets，我們cat一下看看</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">sudo cat /etc/ppp/chap-secrets</div><div class="line"># Secrets for authentication using CHAP</div><div class="line"># client	server	secret			IP addresses</div><div class="line">myuser pptpd mypass *</div></pre></td></tr></table></figure>
+<p>簡單啦，就在下面加入&lt;你的id&gt; pptpd &lt;你的密碼&gt; *就成啦。</p>
+<p>##動手玩玩看這個VPN吧!<br>&lt;需要抓圖，待續&gt; 不過說真的大家都知道怎麼用VPN，應該也不太需要這一段了吧 =P</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Constructor call another Constructor w/ C++11]]></title>
+      <url>/2014/02/01/constructor-call-another-constructor-w-c-11/</url>
+      <content type="html"><![CDATA[<p>剛剛才意外發現的一個C++11 new feature, 參考一下。</p>
+<p>很多情況下我們會希望能從一個constructor去call另外一個constructor，比方說<code>foo()</code>希望就可以直接比照<code>foo(0,0)</code>, 或者說<code>foo(2,6)</code>可以直接比照<code>foo(2,6,POLICY_DEFAULT)</code>。在函數層級來講這個很簡單<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">double foo() &#123;</div><div class="line">	return foo(0, 0);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>但是如果foo是個constructor的話，基本上是做不到的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">foo::foo() &#123;</div><div class="line">	foo::foo(0, 0); //error!!!</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>這個其實不止C++, Java也蠻常見這種需求的，只是一直沒有解法。在C++03/Java裡面，我們比較常見的做法只能大約做到類似這樣而已 :</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">foo::foo() &#123;</div><div class="line">	init(0, 0); //或者我們也可以用default parameter的方法，init(double a = 0, double b = 0);</div><div class="line">&#125;</div><div class="line"></div><div class="line">foo::foo(double a, double b) &#123;</div><div class="line">	init(a, b);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>利用init去繞過這條限制。不過在C++11以後，這條限制就被解除了，我們可以利用相當類似C++的initialization list的方式來解決這個問題</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">foo::foo() : foo(0, 0) &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>皆大歡喜，ohya，不過java還是得用init()的方法來做 </p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[(Recycle from past) Game loop update in C#]]></title>
+      <url>/2014/01/23/recycle-from-past-game-loop-update-in-c/</url>
+      <content type="html"><![CDATA[<p>Game loop in C#<br>Game update loop is a problem in C#. Of course, first thought of us must be attach the Idle event of Application, like this.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">Application.Idle += new EventHandler(OnAppIdle);</div><div class="line">Application.Run(mMainFrame);</div><div class="line"></div><div class="line">static void OnAppIdle(object sender, EventArgs e)</div><div class="line">&#123;</div><div class="line">	//Do some game loop update here</div><div class="line">	mMainFrame.DoUpdate();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>It seems reasonable, we register a listener to Idle event, so it must be run OnAppIdle while application idle, right?</p>
+<p>Partially right.</p>
+<p>When the application keep going, it will only get message while “When application need to be updated”. It means, therefore, if you leave mouse out of this application form(so no MouseMove event sent), it will totally stop, so it will be updated only when getting some message : such like OnMouseMove….etc.</p>
+<p>Solution is from Rich, and he found it in sample of MDX applications. Don’t ask me how to do it, just need to know use this way to keep the game loop.</p>
+<p>We might discuss this in later post =3</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line">static class Program</div><div class="line">&#123;</div><div class="line">///</div><div class="line">/// The main entry point for the application.</div><div class="line">///</div><div class="line">/// </div><div class="line">	static SceneEditorMain mMainFrame;</div><div class="line">	[STAThread]</div><div class="line">	static void Main()</div><div class="line">	&#123;</div><div class="line">		Application.EnableVisualStyles();</div><div class="line">		Application.SetCompatibleTextRenderingDefault(false);</div><div class="line">		mMainFrame = new SceneEditorMain();</div><div class="line">		Application.Idle += new EventHandler(OnAppIdle);</div><div class="line">		Application.Run(mMainFrame);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	static void OnAppIdle(object sender, EventArgs e)</div><div class="line">	&#123;</div><div class="line">		while (AppStillIdle)</div><div class="line">		&#123;</div><div class="line">			mMainFrame.DoUpdate();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line">	private static bool AppStillIdle</div><div class="line">	&#123;</div><div class="line">		get</div><div class="line">		&#123;</div><div class="line">			NativeMethods.Message msg;</div><div class="line">			return !NativeMethods.PeekMessage(out msg, IntPtr.Zero, 0, 0, 0);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">	public class NativeMethods</div><div class="line">	&#123;</div><div class="line">	/**/</div><div class="line">	///</div><div class="line">	Windows Message</div><div class="line"></div><div class="line">	[StructLayout(LayoutKind.Sequential)]</div><div class="line">	public struct Message</div><div class="line">	&#123;</div><div class="line">		public IntPtr hWnd;</div><div class="line">		public uint msg;</div><div class="line">		public IntPtr wParam;</div><div class="line">		public IntPtr lParam;</div><div class="line">		public uint time;</div><div class="line">		public System.Drawing.Point p;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	[System.Security.SuppressUnmanagedCodeSecurity]</div><div class="line">	[DllImport(&quot;User32.dll&quot;, CharSet = CharSet.Auto)]</div><div class="line">	public static extern bool PeekMessage(out Message msg, IntPtr hWnd, uint messageFilterMin, uint messageFilterMax, uint flags);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[C++11 取得精確度很高的時間的方法]]></title>
+      <url>/2014/01/22/c-11-ways-to-obtain-high-accuracy-of-time/</url>
+      <content type="html"><![CDATA[<p>在製作遊戲時，有一個函數相當重要，幾乎大多數realtime的遊戲都需要它（其實只要任何東西會動，可能都跟他脫不了干系），這個函數稱為<code>update(Ty delta);</code>。這個delta在java相當容易時間，就是拿<code>System.getTimeinMillis();</code>，不過在C++裡面這個卻變得有點困難 – 在C++11以前，幾乎都得靠平台相依的方法才能取得。Windows API的話就是<code>void QueryPerformanceCounter( LARGE_INTEGER* currentTime );</code>，linux下可能就只能用<code>clock_getTime</code>或者用time_fd硬幹，C++本身只有提供time(0)可以讓你拿到一個….精確度到秒（甚至還不太精確）的…顯然不太夠用的時間。</p>
+<p>C++11以後，std提供了chrono library, 使得這終於有一個跨平台的解答。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">#include &lt;iostream&gt;</div><div class="line">#include &lt;chrono&gt;</div><div class="line">int main(int argc, const char * argv[])</div><div class="line">&#123;</div><div class="line">    typedef std::chrono::high_resolution_clock time;</div><div class="line">    typedef std::chrono::milliseconds ms;</div><div class="line">    </div><div class="line">    //initialize</div><div class="line">    auto timer = time::now();</div><div class="line">    </div><div class="line">    while(true) &#123;</div><div class="line">     </div><div class="line">        double delta = std::chrono::duration_cast&lt;std::chrono::duration&lt;double, std::ratio&lt;1&gt;&gt;&gt;(time::now() - timer).count();</div><div class="line"></div><div class="line"></div><div class="line">        std::cout &lt;&lt; delta &lt;&lt; std::endl;</div><div class="line">        timer = time::now();</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    </div><div class="line">    return 0;</div><div class="line">&#125;</div></pre></td></tr></table></figure>]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[淺談C++11 Lambda (3)]]></title>
+      <url>/2014/01/20/talking-about-the-c-11-lambda-3/</url>
+      <content type="html"><![CDATA[<p>不過Lambda也是有侷限的。</p>
+<p>廢話少說，我們來複習一下世界上最低效最基礎的泡沫排序法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">void sort(std::vector&lt;int&gt;&amp; raw) &#123;</div><div class="line">	int n = raw.size();</div><div class="line">	int temp;</div><div class="line">	for (int i = n - 1; i &gt; 0; i--)</div><div class="line">	&#123;</div><div class="line">		for (int j = 0; j &lt;= i - 1; j++)</div><div class="line">		&#123;</div><div class="line">			if (raw[j] &gt; raw[j + 1])</div><div class="line">			&#123;</div><div class="line">				temp = raw[j];</div><div class="line">				raw[j] = raw[j + 1];</div><div class="line">				raw[j + 1] = temp;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">int main(int argc, char *argv[]) &#123;</div><div class="line">	//requires C++11</div><div class="line">	std::vector&lt;int&gt; array = &#123;15, 22, 11, 13, 72, 19&#125;;</div><div class="line">	sort(array);</div><div class="line">	</div><div class="line">	for(int i : array)</div><div class="line">		std::cout &lt;&lt; i &lt;&lt; &quot; &quot;;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>這code能吐槽的地方很多，不過我們先不管 XD。這sort我們需要至少兩種加強：</p>
+<ol>
+<li>他要能接受所有型別</li>
+<li>他要能自定比較子(comparer, 決定A B哪個大哪個小的邏輯)</li>
+</ol>
+<p>我們先假設所有人對於template都很熟了，第一個需求可以很簡單的用template完成 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line">void sort(std::vector&lt;T&gt;&amp; raw) &#123;</div><div class="line">	int n = raw.size();</div><div class="line">	T temp;</div><div class="line">	for (int i = n - 1; i &gt; 0; i--)</div><div class="line">	&#123;</div><div class="line">		for (int j = 0; j &lt;= i - 1; j++)</div><div class="line">		&#123;</div><div class="line">			if (raw[j] &gt; raw[j + 1])</div><div class="line">			&#123;</div><div class="line">				temp = raw[j];</div><div class="line">				raw[j] = raw[j + 1];</div><div class="line">				raw[j + 1] = temp;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>這個我想對於任何稍微懂一點點template的人來說，都不困難，而這個使用也不需要額外的引數參考，可以直接套進去</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">std::vector&lt;int&gt; array = &#123;15, 22, 11, 13, 72, 19&#125;;</div><div class="line">sort(array); //不用寫成sort&lt;int&gt;(array);</div></pre></td></tr></table></figure>
+<p>接下來就是刺激的部分了。我們需要一個Camparer來加入戰場，我們可以很輕易地寫出來他的簽名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line">void sort(std::vector&lt;T&gt;&amp; raw, std::function&lt;bool(T&amp;, T&amp;)&gt; comparer);</div></pre></td></tr></table></figure>
+<p>這邊乍看之下是沒太大問題，但是當使用的時候問題就來了：我們需要一個default的comparer，這個comparer只需要<code>return A &gt; B;</code>即可。要是A, B所屬的class沒有定義operator&gt;(), 反正錯誤訊息會提示你說他們無從比對。ok, 所以看起來我們只要按照C++11的做法做一個default lambda來當作預設參數…</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line">auto defComparer = [](T&amp; A, T&amp;B)-&gt;bool&#123; return A &gt; B; &#125;;</div><div class="line"></div><div class="line">/*</div><div class="line">其實他真正的型別應該是長這樣，只是我們通常用C++11 auto呼籠過去省得麻煩而已 : </div><div class="line">template&lt;typename T&gt;</div><div class="line">std::function&lt;bool(T&amp;, T&amp;)&gt; defaultComparer = [](T&amp; a, T&amp; b)-&gt;bool&#123; return a &gt; b; &#125;;</div><div class="line">*/</div><div class="line"></div><div class="line">template&lt;typename T&gt;</div><div class="line">void sort(std::vector&lt;T&gt;&amp; raw, std::function&lt;bool(T&amp;, T&amp;)&gt; comparer = defaultComparer);</div></pre></td></tr></table></figure>
+<p>鐺鐺，編譯器發出了警告，把這行code擋了下來：對不起，lambda不能為template，阿哈哈哈你看看你!<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sort_example.cpp:6:29: error: variable &apos;defaultComparer&apos; declared as a template</div><div class="line">std::function&lt;bool(T&amp;, T&amp;)&gt; defaultComparer = [](T&amp; a, T&amp; b)-&gt;bool&#123; return a &gt; b; &#125;;</div><div class="line">                            ^</div></pre></td></tr></table></figure></p>
+<p>在C++11中，Lambda的實作是無法template化的。也許我們會想到利用<a href="http://blog.monkeypotion.net/gameprog/beginner/exploring-the-field-of-policy-based-class-design" target="_blank" rel="external">Policy</a>來實作這種情況，可是很不幸的是… function就是function你去哪生個繼承出來？</p>
+<p>比較普遍的做法是，使用overload來解決這個問題，所以code看起來會像是這樣 : </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div></pre></td><td class="code"><pre><div class="line">#include &lt;iostream&gt;</div><div class="line">#include &lt;vector&gt;</div><div class="line"></div><div class="line">template&lt;typename T&gt;</div><div class="line">bool defaultComparer(const T&amp; a, const T&amp; b) &#123;</div><div class="line">	return a &gt; b;</div><div class="line">&#125;</div><div class="line"></div><div class="line">template&lt;typename T&gt;</div><div class="line">void sort(std::vector&lt;T&gt;&amp; raw) &#123;</div><div class="line">	int n = raw.size();</div><div class="line">	T temp;</div><div class="line">	for (int i = n - 1; i &gt; 0; i--)</div><div class="line">	&#123;</div><div class="line">		for (int j = 0; j &lt;= i - 1; j++)</div><div class="line">		&#123;</div><div class="line">			if (raw[j] &gt; raw[j + 1])</div><div class="line">			&#123;</div><div class="line">				temp = raw[j];</div><div class="line">				raw[j] = raw[j + 1];</div><div class="line">				raw[j + 1] = temp;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">template&lt;typename T&gt;</div><div class="line">void sort(std::vector&lt;T&gt;&amp; raw, std::function&lt;bool(const T&amp;, const T&amp;)&gt; comparer) &#123;</div><div class="line">	int n = raw.size();</div><div class="line">		T temp;</div><div class="line">		for (int i = n - 1; i &gt; 0; i--)</div><div class="line">		&#123;</div><div class="line">			for (int j = 0; j &lt;= i - 1; j++)</div><div class="line">			&#123;</div><div class="line">				if (comparer(raw[j], raw[j + 1]))</div><div class="line">				&#123;</div><div class="line">					temp = raw[j];</div><div class="line">					raw[j] = raw[j + 1];</div><div class="line">					raw[j + 1] = temp;</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">class TestObject &#123;</div><div class="line">	int a;</div><div class="line">	int b;</div><div class="line">	public:</div><div class="line">	TestObject(int a, int b) : a(a), b(b)&#123;</div><div class="line">		</div><div class="line">	&#125;</div><div class="line">	TestObject() = default;</div><div class="line">	bool operator&gt;(const TestObject&amp; obj) const &#123;</div><div class="line">		return this-&gt;getValue() &gt; obj.getValue();</div><div class="line">	&#125;</div><div class="line">	int getValue() const &#123;</div><div class="line">		return a * b;</div><div class="line">	&#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">int main(int argc, char *argv[]) &#123;</div><div class="line">	//requires C++11</div><div class="line">	std::vector&lt;int&gt; array1 = &#123;15, 22, 11, 13, 72, 19&#125;;</div><div class="line">	//吃沒有comparer的sort, 注意這個sort不需要sort&lt;int&gt; 而且int, double float等等都吃</div><div class="line">	//只要系統有定義&gt;的都吃</div><div class="line">	sort(array1);</div><div class="line">	</div><div class="line">	for(int i : array1)</div><div class="line">		std::cout &lt;&lt; i &lt;&lt; &quot; &quot;;</div><div class="line">	</div><div class="line">	std::cout &lt;&lt; std::endl;</div><div class="line">	</div><div class="line"></div><div class="line">			</div><div class="line">	std::vector&lt;TestObject&gt; array2 = &#123;TestObject(1, 4), TestObject(2, 3), TestObject(0, 4), TestObject(3, 3), TestObject(9, 1)&#125;;</div><div class="line">	</div><div class="line">	//印出排序前的Array2</div><div class="line">	for(TestObject a : array2) </div><div class="line">		std::cout &lt;&lt; a.getValue() &lt;&lt; &quot; &quot;;</div><div class="line">	std::cout &lt;&lt; std::endl;</div><div class="line">	</div><div class="line">	//使用有comparer的sort，注意這得指定型別，不過可以試試看她吃不吃沒comparer的預設版本 XD</div><div class="line">	sort&lt;TestObject&gt;(array2, [](const TestObject&amp; a, const TestObject&amp; b)-&gt;bool&#123; return a.getValue() &gt; b.getValue();&#125;);</div><div class="line">	//印出排序後的Array2</div><div class="line">	for(TestObject a : array2) </div><div class="line">		std::cout &lt;&lt; a.getValue() &lt;&lt; &quot; &quot;;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>這算一種過渡性的做法吧，哎 :3 (本文仍然會繼續修改）</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Let your std::vector(or something else) compatible with stream operator <<]]></title>
+      <url>/2014/01/20/let-your-stdvectoror-something-else-compatible-with-stream-operator/</url>
+      <content type="html"><![CDATA[<p>Not a quite secret, just have some operator overload trick.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">char</span>&gt;&amp; <span class="keyword">operator</span>&lt;&lt;(<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">char</span>&gt;&amp; target, <span class="keyword">const</span> <span class="keyword">char</span>* word) &#123;</div><div class="line">	target.insert(target.end(), word, word + <span class="built_in">std</span>::<span class="built_in">strlen</span>(word));</div><div class="line">	<span class="keyword">return</span> target;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">char</span>&gt;&amp; <span class="keyword">operator</span>&lt;&lt;(<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">char</span>&gt;&amp; target, <span class="keyword">char</span> word) &#123;</div><div class="line">	target.push_back(word);</div><div class="line">	<span class="keyword">return</span> target;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">char</span>&gt;&amp; <span class="keyword">operator</span>&lt;&lt;(<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">char</span>&gt;&amp; target, <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; word) &#123;</div><div class="line">	<span class="keyword">return</span> (target &lt;&lt; word.c_str());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>This method have several benefit, first, <code>std::vector</code> can be inserted in templated class, to replace any stream : </p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> ContinerType&gt;</div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">SomethingFooFooFoo</span> &#123;</span></div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">somethingBalabala</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; source)</span> </span>&#123;</div><div class="line">  	ContainerType container;</div><div class="line">    container &lt;&lt; source;</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="comment">//it works</span></div><div class="line"><span class="built_in">std</span>::<span class="function"><span class="built_in">string</span> <span class="title">aString</span><span class="params">(<span class="string">"I am a string"</span>)</span></span>;</div><div class="line"></div><div class="line">SomethingFooFooFoo&lt;<span class="built_in">std</span>::iostream&gt; something;</div><div class="line">something.somethingBalabala(aString); <span class="comment">//Works</span></div><div class="line"></div><div class="line">SomethingFooFooFoo&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&gt; somethingElse;</div><div class="line">somethingElse.somethingBalabala(aString); <span class="comment">//also works</span></div></pre></td></tr></table></figure>
+<p>It can load up data into container, with controlled type. If you wish, you can even load any byte data into it(using first two implementations). Unloading a vector is quite easy, just use </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">const signed char* dumpData = (const signed char*)vectorContainer.data();</div></pre></td></tr></table></figure>
+<p>It’s easy, but there is 2 important highlight and ignoring these will easily mess up your code:</p>
+<ol>
+<li>This data have the same life cycle with the vector container, if the vector is destoryed, this data will no longer valid.</li>
+<li>This data should use <code>const</code> to get the data! missing <code>const</code> will directly changes data in vector, and cause unexpected side effect, be advised!</li>
+</ol>
+<p>For sake of safely, you should get this data via memcpy, or you know what you are doing. in general case, put both <code>dumpData</code> and <code>vectorContainer</code> in the same scope is a good idea, and it is common sense that you should not pass dumpData with pointer to outside of the scope.</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[淺談C++11 Lambda (2)]]></title>
+      <url>/2014/01/20/talking-about-the-c-11-lambda-2/</url>
+      <content type="html"><![CDATA[<p>(這是一個placeholder 主要是講述C++11 lambda的語法)<br>(這篇還沒寫，但是3已經寫好了 所以…..囧)</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[淺談C++11 Lambda (1)]]></title>
+      <url>/2014/01/17/talking-about-the-c-11-lambda/</url>
+      <content type="html"><![CDATA[<p>#披荊斬棘的史前時代</p>
+<p>Lambda在很多語言中有著相當的地位，不過相似的工具一直在C++11以前都付之闋如，而必須用傳入函數指標的方式來達成類似的效果 :<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">//這種寫法我們稱為C-Stype</div><div class="line">typedef int(*compare)(void*, void*);</div><div class="line">void sort(void** sortingObjects, int length, compare comparer);</div></pre></td></tr></table></figure></p>
+<p>這種寫法其實剛好踩在清楚不清楚的邊緣，而且說真的這種void*亂轉看起來也不太靠譜，所以後來大家在C++就改成用template來完成類似的東西</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//這個其實是編譯不過去的....</div><div class="line">template&lt;typename CmpObj&gt;</div><div class="line">int compare(const CmpObj&amp; Obj1, const CmpObj&amp; Obj2);</div><div class="line"></div><div class="line">template&lt;typename CmpObj&gt;</div><div class="line">void sort(const CmpObj* objList, int length, compare&lt;CmpObj&gt; comparer);</div></pre></td></tr></table></figure>
+<p>但是typedef其實這舊時代產物是不吃template的（這原因頗長，不過可以想想其實typedef原始目的根本不是拿來定義跟簡化函數指標），所以要不就是用C++11的using關鍵字，要不就是用很類似java的workaround</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">//C++11 only</div><div class="line">template&lt;typename CmpObj&gt;</div><div class="line">using compare = int (*) (const CmpObj&amp; obj1, const CmpObj&amp; obj2); </div><div class="line"></div><div class="line">template&lt;typename CmpObj&gt;</div><div class="line">void sort(const CmpObj* objList, int length, compare&lt;CmpObj&gt; comparer);</div><div class="line"></div><div class="line">//如果想要長得像Java的話...</div><div class="line">template&lt;typename CmpObj&gt;</div><div class="line">struct ComparerStr &#123;</div><div class="line">	//這static很重要 少了它就沒辦法ComparerStr&lt;CmpObj&gt;::compare了</div><div class="line">  //當然你要new一個我也不反對，只是這種東西多半是static，不管是new一個還是丟實體進去意義都差不多</div><div class="line">  //new的話還額外多了一個delete的成本跟風險。</div><div class="line">	static int compare(const CmpObj&amp; obj1, const CmpObj&amp; obj2);</div><div class="line">&#125;;</div><div class="line"></div><div class="line">//裡面就可以直接取cmp::compare,我就不多寫實做怎麼做了</div><div class="line">template&lt;typename CmpObj&gt;</div><div class="line">void sort(const CmpObj* objList, int length, ComparerStr&lt;CmpObj&gt; cmp);</div></pre></td></tr></table></figure>
+<p>在還沒有C++11 using的年頭，很顯然的要不就是學這種類java的做法丟class進去，要不就是用很恐怖的函數指標方式來處理這種問題。除了C Programmer以外，我想應該不會有太多正常人喜歡用函數指標，於是大家就開始使用boost::function以及旗下一大套東西來「表達」一個function</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">boost::function&lt;int(void*, void*)&gt; comparer;</div></pre></td></tr></table></figure>
+<p>但是很不幸的是，雖然C++提供template的技術，卻沒辦法讓你產生一個「template化的template」，所以事實上boost的做法並沒有辦法讓你提供comparer用的型別。</p>
+<p>上面的做法其實都有兩個很類似的問題，其中後者是相依于前者的，也就是：</p>
+<ul>
+<li>我必須把一個僅僅使用一次的comparer額外定義在一個很遙遠的地方，然後才能引用他，而非「他被用到的地方」</li>
+<li>要是這個comparer還需要根據一個外部變數來工作，那就死了</li>
+</ul>
+<p>#後來參戰的Obj-C<br>然後Obj-C開始有類似的技術 叫做Block<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">//由於id可以吃任何東西，以及由於obj-c語言特性，這個其實連template都用不上</div><div class="line">typedef int* (^comparer_block)(id, id);</div><div class="line">-(void) sort:(NSArray*) objects andComparer:(comparer_block) comparer;</div></pre></td></tr></table></figure></p>
+<p>這個我們就不深究了，畢竟這邊以C++ lambda為主。不過請記住， <strong>其實Obj-C的block就是Lambda</strong> </p>
+<p>#C++11終於出現的Lambda</p>
+<p>我們先拿一個簡單的東西作例子，就拿Bjarne Stroustrup自家的C++11 FAQ舉的例子吧</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//預設的sort法</div><div class="line">std::sort(v.begin(), v.end());</div><div class="line">//用我們自己決定的comparer來sort</div><div class="line">std::sort(v.begin(), v.end(), [](int a, int b) &#123; return abs(a)&lt;abs(b); &#125;);</div></pre></td></tr></table></figure>
+<p>這邊定義了一個新的sort方法，用新的Comparer來定義Sort的順序，從以default改為絕對值。在我們搞清楚怎麼把lambda寫入函式簽名以前，我們先看看這語法上代表的什麼意義</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">//-&gt;bool是可以省略的，這個相當於指定回傳型別</div><div class="line">[](int a, int b)-&gt;bool &#123; return abs(a) &lt; abs(b);&#125;</div></pre></td></tr></table></figure>
+<p>這邊一共分三個部分，[]等等會提到是什麼意思，而且在這例子裡面其實並沒有用到。中間則是很明顯的他需要兩個參數，都是int，而且是pass by value，最後則是隱式的傳回bool，沒有在裡面宣告。</p>
+<p>接下來的問題就是，如果我們要求一個特定簽名的lambda，那這個要怎麼寫？以前的函數指標可能可以寫成這樣<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">typedef int(*CMP)(void*, void*);</div><div class="line">//然後我們可以要求下面兩種之一的寫法</div><div class="line">void sort(void* itemArray, int length, int(*CMP)(void*, void*));</div><div class="line">void sort(void* itemArray, int length, CMP cmp);</div></pre></td></tr></table></figure></p>
+<p>在C++11要使用Lambda的場合則是用C++11新的std::function來當作參數來傳遞。另外，雖然上面提到的code很多明明有用到C++11卻可以再沒有–std=c++11的flag下編譯過關， <strong><em>可是下面這組code沒–std=c++11會死，請把它加入g++的參數裡面</em></strong> 。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">//這也沒有真正的sort 說說而已 XD</div><div class="line">template&lt;typename CmpObj&gt;</div><div class="line">void sort(std::vector&lt;CmpObj&gt; objList, std::function&lt;int(CmpObj&amp;, CmpObj&amp;)&gt; func) &#123;</div><div class="line">	CmpObj a, b;</div><div class="line">	a = objList[0];</div><div class="line">	b = objList[1];</div><div class="line">	printf(&quot;return : %d&quot;, func(a, b));</div><div class="line">&#125;</div><div class="line"></div><div class="line">int main(int argc, char *argv[]) &#123;</div><div class="line">	int a = 1;</div><div class="line">	int b = 2;</div><div class="line">	std::vector&lt;int&gt; list;</div><div class="line">	list.push_back(a);</div><div class="line">	list.push_back(b);</div><div class="line">  //這個&lt;int&gt;恐怕免不了，g++似乎無法正確推導lambda裡面的template parameter</div><div class="line">	sort&lt;int&gt;(list, [](int x, int y)&#123; printf(&quot;%d, %d\n&quot;, x, y); return 1;&#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>OK，這邊先淺嚐即止，剩下的我們留到下一篇討論。</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[不再Modern的Modern C++ Design... :)]]></title>
+      <url>/2014/01/15/no-modern-design-modern-c/</url>
+      <content type="html"><![CDATA[<p>寫在前面，我沒有任何貶低這本書的意思。這本書畢竟已經十幾年了，但是仍然是在C++技術領域中的經典之作。不過，在C++11出現的現在，這本在一些地方顯然是有點過時，所以每當我發現裡面有一些目前C++11已經可以cover掉的tech，我會在這裡做些補充。</p>
+<p>##STATIC_CHECK (replaced by C++11 static_assert() )<br>會發現這個其實是有點意外，因為這東西其實不太容易發現。我們先看看Loki版本的STATIC_CHECK長什麼樣子<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">define</span> STATIC_CHECK(expr) &#123; char unnamed[(expr) ? 1 : 0]; &#125;</span></div></pre></td></tr></table></figure></p>
+<p>這個容許你能夠在編譯期檢查一些東西。這東西建立在一個前提下：char[1]是可以合法編譯過關，而char[0]則會造成編譯錯誤，所以他有能力在compile time檢查硬生生的把compiling過程擋下來。以Modern C++ Design自己舉的例子來講<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> TO, <span class="keyword">typename</span> FROM&gt;</div><div class="line"><span class="function">TO <span class="title">safe_reinterpret_cast</span><span class="params">(FROM from)</span> </span>&#123;</div><div class="line">        STATIC_CHECK(<span class="keyword">sizeof</span>(TO) &gt;= <span class="keyword">sizeof</span>(FROM));</div><div class="line">        <span class="keyword">return</span> <span class="keyword">reinterpret_cast</span>&lt;TO&gt;(from);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>這個template其實極其簡單，就是如果你試圖把FROM轉成TO，他會先檢查TO是否是個足夠大，至少要足以容納FROM的大小，簡單的說，假設你的TO是char，FROM是double，他就會invoke出STATIC_CHECK，讓STATIC_CHECK編譯錯誤，因為試圖做一個char array大小為0。</p>
+<p>不過這段Code因為規格變更，有 <strong>很多</strong> 地方不再正確，我們一個個的看一下。</p>
+<p>首先，你會發現char[0]其實已經在C99合法化了，至於[0]的用途請參照<a href="http://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html" target="_blank" rel="external">這裡</a>，所以char[0]不再會造成編譯錯誤。另外，reinterpret_cast在C++11下已經會做出大小的檢查，已經不再允許把大的資料結構硬轉成小的資料結構了。</p>
+<p>最後一點，也是最重要的是，C++11引入了<code>static_assert(bool willAssert, const char* assertMessage)</code>，使得這種做法不再必要。不過，我們有很多舊有的code，該怎麼辦呢？</p>
+<p>在不支援C++11(但是因為C99所以可以合法宣告0長度array的場合)<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//既然0不會報錯，-1總會死了吧？</span></div><div class="line"><span class="meta">#<span class="meta-keyword">define</span> STATIC_CHECK(expr) &#123; char unnamed[(expr) ? 1 : -1]; &#125;</span></div></pre></td></tr></table></figure></p>
+<p>支援C++11的場合<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">define</span> STATIC_CHECK(expr) &#123; static_assert(expr, <span class="meta-string">"Static Assert is invoked!"</span>); &#125;</span></div></pre></td></tr></table></figure></p>
+<p>當然，新的code請都用static_assert來取代STATIC_CHECK</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[聊聊Mac為什麼逐漸蠶食PC市場]]></title>
+      <url>/2014/01/15/talk-about-why-mac-gradually-eating-away-at-pc-market/</url>
+      <content type="html"><![CDATA[<p>前幾天看到一篇文章，北美市場Mac增長25%+，同時間PC市場卻大幅萎縮。Mac跟PC的大戰也打了二十年了，PC始終無法徹底消滅掉Mac，當然Mac有相當多優越的地方，讓我們看看這次此消彼長的轉捩點。</p>
+<ul>
+<li>大約是在4-5年前，MBP有一波相當大的降價，大約台灣售價從九萬多變成七萬多(17”)，從此MBP不再是超高價的選擇，價格開始跟高階筆電差不多。</li>
+<li>第二代MBA的推出以及價格，這個我想是最大的轉捩點。第一代的MBA根本是個問題產品，直到第二代推出以後，價格跟當時超薄的厚度重量以及不錯的手工藝外觀，使得MBA開始為消費市場大量接受(即使當年推出的連core i都還不是，僅僅只是C2D)。說到MAC佔有率的上昇，第二世代的MBA真的功不可沒，也強迫PC陣營弄出個叫做Ultrabook的商業名詞，這波PC陣營在netbook領先的部分，幾乎是被瞬間追平。</li>
+<li>Magic Trackpad的推出，把MacBook的體驗完全徹底複製到了iMac上。</li>
+<li>平板的興起間接造成OpenGL的興盛以及DX的衰退。</li>
+</ul>
+<p>雖然我也不知道這是不是Apple的策略，不過顯然從MBA開始的MacBook產線，算是相當程度地打開了OSX的市場，而也一定程度的讓更多人願意使用看看iMac – 而有一個小產品也一定程度的幫助了iMac的銷售，就是Magic Trackpad。雖然這場大戰看起來Mac算是在順風側，不過，誰知道呢 =P 也許哪天PC也會來個驚人的發想，也說不一定，畢竟現在整體仍然是站在PC這端的。</p>
+<p>還有一件小事情對PC也是挺不利的 – 就是DirectX開發的沒落。目前來講，許多的遊戲成像引擎仍然支援OpenGL跟DX，但是相當多的遊戲開發商已經傾向于使用Wrapper – 比方說Unity – 而不是直接使用DX或者僅限於DX的引擎。當然目前來講，高端成像引擎如Crysis, GameByro仍然主流支援DX，但是在移植到平板簡單的誘因下，我想採用Wrapper甚至直接用OpenGL開發會越來越多，而這正是PC的痛處 – 支援DX可是別無分號，只有Windows可以做的到。DX跟OpenGL的戰爭也打了10年了，DX曾經贏到幾乎把OpenGL打到一無是處(感謝Khronos努力地守住最後一塊陣地，終於在平板成為主流以後努力開花結果)，而這幾年看來DX卻停滯在11，而且沒辦法在大多數平板上跑。採用OpenGL的意思就是，我們可以很合理的期待mac也能玩(撒花)，這也是許多人的軟肋 – 因為很多遊戲只能在Windows上跑。</p>
+<p>這場大戰，Mac慢慢地占了上風，只是離扳平還有很長的一段路要走啊，而且價格也是一個很難彌補的gap。這場大戰，讓我們繼續看下去…</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[淺談C++ Style的四種casting]]></title>
+      <url>/2014/01/08/talking-about-the-four-c-style-casting/</url>
+      <content type="html"><![CDATA[<p>這四個的名稱應該大家都很熟了，包含了static_cast, dynamic_cast, const_cast跟reinterpret_cast。不過，這些cast其實或多或少都有一些隱藏的灰色地帶，在這篇文章，我們試圖來看看這四種cast分別有什麼不容易被普通PG看到的地方。</p>
+<p>附錄：還有一個駭人聽聞的規格外的東西叫做boost::lexical_cast, 這東西我們晚點聊一下。</p>
+<p>##static_cast<br><code>static_cast&lt;Ty&gt;</code>是一個最常見的轉型法，這個轉型其實代表的背後意義是「編譯器被允許做的隱式轉型，void<em>間的互轉，以及non-runetime下安全的子轉父」，任何超出這個範疇的都會直接被編譯器擋下來，包含`int</em><code>轉</code>char<em>`這種行為，都會被擋下。編譯器會自動幫你做的隱式轉換包含了像是int幫你轉成double等等(也就是當你用explicit關鍵字的時候想要編譯器避免的行為)，void</em>互轉是特例，任何東西都能轉成void<em>而void</em>也能轉成任何東西(我一直認為這條規則是為了相容性而存在的)，以及比如<code>class B : public A</code>下允許<code>A* a = static_cast&lt;A*&gt;(new B());</code>這種轉法(但是並不允許相反的<code>B* b = static_cast&lt;B*&gt;(new A());</code>)。</p>
+<p>如果你很有把握你沒搞出太大致命的錯誤的話，由於少了很耗資源的RTTI檢查，理論上這種轉法會比dynamic_cast快上非常多。另外，如果你的dynamic_cast換成static_cast居然會出錯或者編不過（比方說你居然有地方需要做<code>if(dynamic_cast&lt;_ty*&gt;(a) != nullptr)</code>），那基本上我想你有95%機會結構上有非常值得非議的地方。正常的code其實不太應該需要dynamic_cast這關鍵字的，後面會詳述為什麼有些人會覺得dynamic_cast非用不可。</p>
+<p>其他的比方說<code>int*</code>轉<code>char*</code>這種雖然大家都司空見慣(在C真的是見怪不怪的)的轉型，這個是會被打回票的。但是！下面這段code居然是可以過的!</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span>* a;</div><div class="line"><span class="keyword">char</span>* b;</div><div class="line"> <span class="comment">//當然下面兩段code都過不了compiler</span></div><div class="line"> <span class="comment">//a = static_cast&lt;int*&gt;(b);</span></div><div class="line"> <span class="comment">//b = static_cast&lt;char*&gt;(a);</span></div><div class="line"> </div><div class="line"> <span class="comment">//可是這段是可以過的，WTF</span></div><div class="line">b = <span class="keyword">static_cast</span>&lt;<span class="keyword">char</span>*&gt;(<span class="keyword">static_cast</span>&lt;<span class="keyword">void</span>*&gt;(a));</div></pre></td></tr></table></figure>
+<p>如果有人用static_cast寫出這種轉型法，請不要客氣，對這個人飽以老拳，直到他知道再也不該寫出這種code為止。</p>
+<p>##dynamic_cast<br>正常來講，這種cast在絕大多數的情況下，會被視為一種設計錯誤，少數幾種情況下則是由於要達成exception neutral所作出的妥協，我們在這裡先忽略掉後面這種情況，來談談為什麼這多半會被視為設計錯誤。</p>
+<p>這種用法以粗劣的型別檢查，不該做的向下轉型占了絕大部分。粗劣的型別檢查大概會看起來像是下面這種code</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">A* a = <span class="literal">nullptr</span>;</div><div class="line">a = <span class="keyword">dynamic_cast</span>&lt;A*&gt;(input);</div><div class="line"><span class="keyword">if</span>(a != <span class="literal">nullptr</span>) <span class="comment">//轉型成功了!</span></div><div class="line">&#123;</div><div class="line">	a-&gt;doSomethingOnlyInA();</div><div class="line">&#125;</div><div class="line"><span class="keyword">else</span> </div><div class="line">&#123;</div><div class="line">	<span class="comment">//傳進來的東西居然不是A* 那我們應該怎樣怎樣</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>這種寫法其實就是完全照抄java的關鍵字<code>instanceof</code>的用法<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">A a = null;</div><div class="line"><span class="keyword">if</span>(input instanceof A) &#123;</div><div class="line">	.....</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>這種基本上我想毫無疑問是一種設計錯誤。一個良好的module不應該倚賴RTTI才能正常運作 – 尤其你要知道，RTTI是可以在編譯flag裡面基於各種理由關閉的(以gcc來講，<code>-fno-rtti</code>)。我們應該要倚賴於正確的函數簽名來讓compiler幫我們檢查進來的型別正確性，以及利用各種pattern避免掉「父類別需要去invoke特定某種子類別才有的class function」。上轉下其實很類似這個例子，所以就不贅述了，而且更明顯 – 你需要上轉下，那很明顯你一定哪裡寫錯啦!</p>
+<p>##const_cast<br>這東西主要是為了相容性而產生的東西，如果跟相容性無關的話，那我相信也是95%機率以上用錯了。相容性來說，這主要是為了相容3rd party，下面舉個例子</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//我們有個3rd party長這樣</span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">process</span><span class="params">(<span class="keyword">int</span> port, <span class="keyword">int</span> type)</span></span>;</div><div class="line"></div><div class="line"><span class="comment">//而我們有一個自己的函數長這樣</span></div><div class="line"><span class="function"><span class="keyword">const</span> <span class="keyword">int</span> <span class="title">getPort</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line"><span class="comment">//所以編譯這樣會炸掉</span></div><div class="line"><span class="comment">//int succeed = process(getPort(), type);</span></div><div class="line"><span class="comment">//必須要改成這樣才能過</span></div><div class="line"><span class="keyword">int</span> succeed = process(<span class="keyword">const_cast</span>&lt;<span class="keyword">int</span>&gt;(getPort()), type);</div></pre></td></tr></table></figure>
+<p>會有人好奇地問，如果我們移除掉const-ness然後去對她做寫入的動作的話會怎樣呢？答案是：很難講，端看這個const是放在哪裡。可能會因為寫入read-only區塊(也就是ELF的.data)炸飛，也有可能在某些compiler裡面相安無事，也有可能因為int被最佳化為short(假設這系統short比int小)，而你寫了一個比short大的東西而讓貞子從你螢幕爬出來…總之，就是未定義，最幸運的情況下就是炸掉當機並且明確地跟你說你試圖寫入read-only區塊。</p>
+<p>是的，由於3rd party並沒有掛保證他不會去改動port，當然也沒有把保證寫在signature上（所以我們才會需要const_cast）。當然，int你可以借由把它複製到另外一個int在傳進去來避開這問題，那要是3rd party長這樣呢</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">process</span><span class="params">(<span class="keyword">void</span>** memPageStart, <span class="keyword">int</span> type)</span></span>;</div></pre></td></tr></table></figure>
+<p>恩….. XD 這種地雷其實不少見，尤其是你再寫C++時卻需要c-style的3rd party更是常見。 這的確是有危險性（因為你實在是沒辦法保證3rd party在裡面會不會偷寫），不過可以算是一種妥協。</p>
+<p>const_cast還有另外一個功能就是移除/增加物件的volatile性質。這個….我只能說，你用到這一步大概99.95%是錯的，請儘量避免這種行為。</p>
+<p>##reinterpret_cast<br>其實在C裡面的轉型，扣掉void*互轉以外，大概大多數都是套用這種形式存在，包含struct mask這類的東西。struct mask這名詞可能大家有點陌生，舉個比較接近的例子來看看的話大概就是類似這個</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> rc = connect(sd, (struct sockaddr *)&amp;serveraddr, <span class="keyword">sizeof</span>(serveraddr));</div></pre></td></tr></table></figure>
+<p>裡面的<code>sockaddr_in*</code>硬轉成<code>sockaddr*</code>就是一種struct mask。這種轉法其實在C++裡面別無他法，就是得用reinterpret_cast去轉，其他的很常見的char<em>轉int</em>等等都是得用這個東西–基本上這算是一帖萬古黴素，沒有其他的方法能用的情況下就是這樣做。</p>
+<p>不過這東西其實頗危險，基本上也是為了相容性而存在的。在C裡面並沒有繼承這東西，所以當有數種不同的結構裡面有相同的構造的時候，就得使用這種方法去轉型。以這個例子來說，sockaddr*保留了14個char的空間給他的子類別自由發揮，所以她長得大概像是這樣子<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span> &#123;</span></div><div class="line"><span class="keyword">unsigned</span>  <span class="keyword">short</span>  sa_family;     <span class="comment">/* address family, AF_xxx */</span></div><div class="line"><span class="keyword">char</span>  sa_data[<span class="number">14</span>];                 <span class="comment">/* 14 bytes of protocol address */</span></div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>後面這char[14]是什麼意思，是由他的子類別來決定，比方說其中一個子類別是sockaddr_in<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">struct</span>  <span class="title">sockaddr_in</span> &#123;</span></div><div class="line"><span class="keyword">short</span>  <span class="keyword">int</span>  sin_family;                      <span class="comment">/* Address family */</span></div><div class="line"><span class="keyword">unsigned</span>  <span class="keyword">short</span>  <span class="keyword">int</span>  sin_port;       <span class="comment">/* Port number */</span></div><div class="line"><span class="class"><span class="keyword">struct</span>  <span class="title">in_addr</span>  <span class="title">sin_addr</span>;</span>              <span class="comment">/* Internet address */</span></div><div class="line"><span class="keyword">unsigned</span>  <span class="keyword">char</span>  sin_zero[<span class="number">8</span>];         <span class="comment">/* Same size as struct sockaddr */</span></div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>值得注意的是sockaddr_in也留了8個char的大小來做padding，以對齊sockaddr的大小。由於C沒有繼承，所以只好用這種方法來達成很類似繼承的效果。在C++中這種API別無選擇，就真的只有reinterpret_cast可以用，因為他們在class層級來看是風馬牛不相干的。</p>
+<p>reinterpret_cast最常出包的地方在endian不同的系統，也就是說，只要用了這種轉法，通常也代表了不可移植。至於為什麼endian會出包呢？因為reinterpret_cast的做法基本上是隨著編譯器而變，大家可以仔細想想為什麼。</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Fibonacci數列的三種寫法 in C++]]></title>
+      <url>/2014/01/01/fibonacci-sequence-of-three-kinds-of-writing-in-c/</url>
+      <content type="html"><![CDATA[<p>剛剛生病閒著，突然想到連續數列通常在C++有三種表達方法，包含template偏特化，遞迴以及傳統迴圈，於是就拿Fibonacci來作範例寫一組來玩玩看。</p>
+<p>這組code展示了這三種寫法。人家說遞迴好寫不是沒有理由的，但是能活著撐過高order的只有迴圈 – 其他都會有call depth爆炸的問題 =P 有興趣的可以玩玩看</p>
+<p>###Template &amp; Specialization</p>
+<ul>
+<li>最顯為人知的特點就是他是編譯期計算。然而，這算是優點也算是缺點，因為template的模板參數必須是型別或者const – 這很合理，我們不可能依賴runtime產生的數據去讓這東西編譯期產生object。優點來講，就是幾乎所有計算的功都在編譯期完成，以下面的範例來講，這幾乎等於是 <figure class="highlight plain"><figcaption><span><< 6765 << endl;```。基本上，很適合建表，但是很占記憶體資源也得很小心的把runtime資料切開。</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">+ 另外其實他邏輯跟寫法都跟Recursive差不多，滿容易變換的，老實講扣掉除錯中的錯誤訊息以外，也滿容易理解的。</div><div class="line">+ 所以同樣的會發生一些call depth方面的問題，不過是炸在不夠力的編譯器上而非runtime。</div><div class="line"></div><div class="line">###Functional Recursive</div><div class="line">+ 看下面的例子就知道這超直覺的，基本上遞迴算是很多數列問題最直觀最直覺的解答。</div><div class="line">+ 但是Call Depth是個很大的問題，以VC6來講，這東西沒辦法處理超過8x以上，而G++似乎也差不多是類似的數字就會炸掉。</div><div class="line">+ 效能普遍很拉蒙，簡單的代價啊（遠目）</div><div class="line"></div><div class="line">###Classic Loop</div><div class="line">+ 基本上這恐怕是三者之中最複雜最難寫的一種</div><div class="line">+ 可是卻是唯一可以活過call depth陷阱的一種做法，下面的20改成100，只有Classic Loop可以活下來</div><div class="line"></div><div class="line">-------------------------</div><div class="line">不過，還是先來個動手玩吧...</div></pre></td></tr></table></figure></li>
+</ul>
+<p>#include <iostream></iostream></p>
+<p>template<int order=""><br>long fibonacci() { return fibonacci<order-1>() + fibonacci<order-2>();}</order-2></order-1></int></p>
+<p>template&lt;&gt;<br>long fibonacci<0>() { return 0; }</0></p>
+<p>template&lt;&gt;<br>long fibonacci<1>() { return 1; }</1></p>
+<p>long fibonacci_rec(int order) {<br>    if(order == 0)<br>        return 0;<br>    if(order == 1)<br>        return 1;<br>    return fibonacci_rec(order - 1) + fibonacci_rec(order - 2);<br>}</p>
+<p>long fibonacci_classic(int order) {<br>    if(order == 0)<br>        return 0;<br>    if(order == 1)<br>        return 1;</p>
+<pre><code>long past2 = 0, past1 = 1, ret = 0;
+for(int i = 0; i &lt; order - 1; ++i) {
+    ret = past2 + past1;
+    past2 = past1;
+    past1 = ret;
+}
+return ret;
+</code></pre><p>}</p>
+<p>using namespace std;<br>int main(int argc, char *argv[]) {</p>
+<pre><code>cout &lt;&lt; fibonacci&lt;20&gt;() &lt;&lt; endl;
+cout &lt;&lt; fibonacci_rec(20) &lt;&lt; endl;
+cout &lt;&lt; fibonacci_classic(20) &lt;&lt; endl;
+
+return 0;
+</code></pre><p>}<br>```</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[The path to Scheduled Process Singleton]]></title>
+      <url>/2013/12/26/the-path-to-scheduled-process-singleton/</url>
+      <content type="html"><![CDATA[<p>我們來看看怎麼改造一個Singleton讓它成為thread-safe。</p>
+<p>##本來的Singleton<br>我們先複習一下一個基本的Singleton應該是長什麼樣子<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">class Singleton &#123;</div><div class="line">private:</div><div class="line">    static Singleton* s_defInst;</div><div class="line">    Singleton() = delete;</div><div class="line">    Singleton&amp; Singleton(const Singleton&amp;) = delete;</div><div class="line">    Singleton&amp; operator=(const Singleton&amp;) = delete;</div><div class="line">   </div><div class="line">public:</div><div class="line">    //還記得為什麼是Singleton&amp;而不是Singleton*嗎?</div><div class="line">    static Singleton&amp; getInst() &#123;</div><div class="line">        if(s_defInst == nullptr)</div><div class="line">            s_defInst = new Singleton();</div><div class="line">        return *s_defInst;	</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    void methodA();</div><div class="line">    RTValue methodB();</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>所以，我們使用Singleton的時候看起來會像是這樣<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Singleton::getInst().methodA();</div></pre></td></tr></table></figure></p>
+<p>##我們希望這個Singleton能怎樣呢<br>目前來說，所以我們會希望有一個東西可以傳回一個「thread safe」的handle，這東西完全跟拿::getInst()擁有完全相同的界面，唯一的不同就是他會「排程」丟進Singleton讓他去一個個的做，或者讓它可以「僅鎖定共用資料，但是不會lock thread local」的方法來跑。</p>
+<p>所以我們現在至少可以看出這東西會幾個Policy : </p>
+<pre><code>1. 我們要能選擇multi thread的「策略」，可以讓他queue，也可以讓他選擇regular，甚至可以指定thread pool
+2. 我們要能選擇single的生成方法以及原則(其實這不就是Modern C++ Design第一章的例子嗎)
+3. 如果可能的話，Singleton自己有一個骨架，而實作跟界面要能當作Policy傳進來。
+</code></pre><p>而讓他看起來應該至少要像是這樣<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ISingletonMethods* s = Singleton::getProxy();</div></pre></td></tr></table></figure></p>
+<p>或者更進一步，我們應該要有能力選擇要得到一個blocked或者non-blocked的proxy<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">ISingletonMethods* blocked = Singleton::getProxy&lt;blocked&gt;();</div><div class="line">ISingletonMethods* unblocked = Singleton::getProxy&lt;unblocked&gt;();</div><div class="line"></div><div class="line">//blocked就像普通Singleton，會block自己的這個thread在得到結果</div><div class="line">blocked-&gt;methodA();</div><div class="line"></div><div class="line">//unblocked會讓你直接回傳...雖然我們現在還沒想到要怎麼傳比較漂亮</div><div class="line">//但是沒關係，我們後面會想到方法的 XD</div><div class="line">boost::tuple&lt;int, IRetNotifyHandle&gt; ret = unblocked-&gt;methodA();</div></pre></td></tr></table></figure></p>
+<p>##「提供功能的界面以及實作」<br>很明顯的，如果要讓getProxy()跟getInst()一樣的功能的話，他們必須要有一個共通的界面才可以。當然，爽的話寫死也不會有什麼問題，但是我想這不是一個好的coder該做的事情 =P</p>
+<p>假設，我們現在有兩個method，分別是<code>void methodA();</code>跟<code>RetValue methodB();</code>，那很明顯我們將會需要一個界面來宣告這個，兩個實作這個<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">class ISingletonMethod &#123;</div><div class="line">    public:</div><div class="line">    void methodA() = 0;</div><div class="line">    RetValue methodB() = 0;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">class SingletonMethodImpl : public ISingletonMethod &#123;</div><div class="line">    public:</div><div class="line">    void methodA() &#123; printf(&quot;This is methodA Impl!&quot;); &#125;</div><div class="line">    RetValue methodB &#123; return RetValue(); &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">class SingletonMethodProxy : public ISingletonMethod &#123;</div><div class="line">    public:</div><div class="line">    void methodA() &#123; /*還沒有能決定這邊要queue呢 還是thread呢*/ &#125;</div><div class="line">    RetValue methodB() &#123; /*這邊更麻煩，我們甚至還不知道該怎麼拿ret value*/ &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>##決定multi thread策略的Proxy<br>現在我們有界面了，我們也定義出來這些東西了，所以我們可以讓Singleton看起來像是這樣 – 目前來講，我們恐怕只能讓<code>getProxy()</code>傳回指標，這有點尷尬呢</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyInterface, typename _TyImpl&gt;</div><div class="line">class Singleton : public _TyImpl &#123;</div><div class="line">private:</div><div class="line">    static Singleton* s_defInst;</div><div class="line">    Singleton() = delete;</div><div class="line">    Singleton&amp; Singleton(const Singleton&amp;) = delete;</div><div class="line">    Singleton&amp; operator=(const Singleton&amp;) = delete;</div><div class="line">   </div><div class="line">public:</div><div class="line">    //還記得為什麼是Singleton&amp;而不是Singleton*嗎?</div><div class="line">    static Singleton&amp; getInst() &#123;</div><div class="line">        if(s_defInst == nullptr)</div><div class="line">            s_defInst = new Singleton();</div><div class="line">        return *s_defInst;	</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    static _TyInterface* getProxy() &#123;</div><div class="line">       /*看來我們的主戰場就在這裡了。*/</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    //這兩個沒了，改用繼承的方式繼承過來</div><div class="line">    //void methodA();</div><div class="line">    //RTValue methodB();</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>這Proxy該怎麼寫呢？目前來看，Proxy至少要能做到轉發給impl，所以這別無選擇，一定不是繼承，而是template。我們先寫一個什麼都不做的Proxy試試看</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyInterface, typename _TyImpl&gt;</div><div class="line">class Proxy : public _TyInterface &#123;</div><div class="line">/*糟糕 中間要轉發一狗票_TyInterface的東西該怎麼寫？*/</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>很明顯，這種寫法會卡在Proxy無法正確的在編譯期產生正確的Proxy實作。我們可能會希望Proxy「經由某個管理步驟」以後完美的轉發給實作，看起來template展開後會很像是這樣<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">class SingletonMethodProxy : public ISingleton &#123;</div><div class="line">	SingletonMethodImpl _impl;</div><div class="line">  void methodA() &#123; doSomething(); _impl-&gt;methodA(); &#125;</div><div class="line">  RetValue methodB() &#123;doSomething(); return _impl-&gt;methodB(); &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>問題來了，methodA(), methodB()的Proxy實作我們無法順利地在template裡面轉發給_impl，使用者沒辦法如同呼叫Singleton::getInst().methodA()般的對Proxy做一樣的事情。</p>
+<p>這個問題其實困擾了我一陣子，不過後來發現這可以經由override <code>operator-&gt;()</code>跟<code>operator.()</code>來解決一部份，這個code看起來會很像下面這樣…<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyImpl&gt;</div><div class="line">class Proxy : public _TyImpl &#123;</div><div class="line">private:</div><div class="line">    _TyImpl&amp; _impl;</div><div class="line">    void doSomething();</div><div class="line">public:</div><div class="line">    Proxy(_TyImpl&amp; impl) : _impl(_TyImpl) &#123; &#125;</div><div class="line">    _TyImpl&amp; operator.() &#123; doSomething(); return _impl; &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>這看起來很ok 但是有個問題：operator.是不被允許overload的，我們必須要overload operator-&gt;。overload operator-&gt;會產生另外一個很有趣（但是還算可以接受的）問題，我們先看看整個proxy應該要長什麼樣子<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyImpl&gt;</div><div class="line">class Proxy &#123;</div><div class="line">	_TyImpl* _impl;</div><div class="line">	void doSomething() &#123; cout &lt;&lt; &quot;DoSomething&quot; &lt;&lt; endl; &#125;</div><div class="line">	public:</div><div class="line">	Proxy(_TyImpl* impl = nullptr) : _impl(impl) &#123;</div><div class="line">		if(_impl == nullptr)</div><div class="line">			_impl = new _TyImpl();</div><div class="line">	&#125;</div><div class="line">	_TyImpl* operator-&gt;() &#123; doSomething(); return _impl; &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>這會產生一個問題，就是這做法其實相當不直覺，有點像smart pointer的做法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Proxy&lt;SingletonMethodImpl&gt;* proxy1 = new Proxy&lt;SingletonMethodImpl&gt;;</div><div class="line">proxy1-&gt;methodA(); //compile time error!</div><div class="line">(*proxy1)-&gt;methodA(); //ok, but WTF??</div><div class="line"></div><div class="line">Proxy&lt;SingletonMethodImpl&gt; proxy2;</div><div class="line">proxy2-&gt;methodA(); //ok, pass, 但是真的很不直覺，很像smart pointer的做法。、</div></pre></td></tr></table></figure></p>
+<p>暫時解決了轉發的問題以後，現在要開始解決最難纏的排程的問題。這個其實可以借由Lambda相當清楚地解決一部份，不過仍然相當的抽象。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyImpl&gt;</div><div class="line">_TyImpl* Proxy&lt;_TyImpl&gt;::operator-&gt;() &#123;</div><div class="line">    /*所以我們這邊要做什麼來排程呢？*/</div><div class="line">    return _impl; //這邊都把處理權交出去了....</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>首先，很明顯的我們不可能直接return _impl了，我們必須要回一個proxy(proxy裡面的proxy，有沒有那麼拗口？)，這個proxy的proxy需要能被cast成_TyImpl，所以大概會長這樣<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyImpl&gt; </div><div class="line">class PProxy &#123;</div><div class="line">	operator _TyImpl*();</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Implicit Protocols]]></title>
+      <url>/2013/12/19/explicit-protocols/</url>
+      <content type="html"><![CDATA[<p>Implicit protocols, which is hint by its own name, is a protocol that “Other would not know”, and it is a bad design in most cases.</p>
+<p>Let us start from a simple example :</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">IService getService(String serviceName) &#123;</div><div class="line">	String[] args = serviceName.spilt(&apos; &apos;);</div><div class="line">	if(args.length == 1) //without any arguments</div><div class="line">		return targetService;</div><div class="line">    </div><div class="line">	if(args[1].equalsIgnoreCase(&quot;nonshared&quot;)</div><div class="line"> 		return createServiceFromClassName(serviceName);</div><div class="line">  </div><div class="line">  return null;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>This is a very bad design. We can guess the intentation from source code, for example, if the service name is “IOService” : we can get the IOService from <figure class="highlight plain"><figcaption><span>but if we want to have new instance other then the existed one, we should get this service as ```getService("IOService nonshared");```.</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">We **implicitly** uses the service name as a totally non-related usage. Even with documents, we should not do this because it will insanely increase the complexity of maintaining, and how do others know this? by looking into source code coincidentally observed this usage by others? no, it **NOT** makes sense, avoid this.</div><div class="line"></div><div class="line">Some implicit protocol comes with another name : *Convension*</div><div class="line"></div><div class="line">There is a perfect example in Java. We usually use ```~``` as representive of **Home Dictionary**, so it would come like this code :</div></pre></td></tr></table></figure></p>
+<p>File file = new File(“~/Desktop/example.txt”);<br>file.mkdirs();<br>```</p>
+<p>You would never find your file under the “~/Desktop” where it is expected, instead, you can guess where it goes :).</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Visual Studio Online]]></title>
+      <url>/2013/12/03/visual-studio-online/</url>
+      <content type="html"><![CDATA[<p><a href="http://www.windowsazure.com/zh-tw/pricing/details/visual-studio-online/" target="_blank" rel="external">Visual Studio Online</a>我到了剛剛才搞懂那是啥東西 囧</p>
+<p>簡單的說，這並不是一個<strong>“基於HTML5，以及網頁技術，可以讓你只要開瀏覽器就能管理編輯專案”</strong>的東西，而是比較類似GitHub(同時他的主要對手也是GitHub, 嗚呼)，而且比GitHub更加深入的整合的一個雲端專案代管系統。他比GitHub高檔的地方在於他同時結合了CI(不過看起來要價不少)以及與Visual Studio無縫的整合(這聽起來好像廢話)，甚至提供了Eclipse Plugin讓你可以不用Visual Studio也能協同開發。這服務是Windows Azure的一部分，所以可以跟現有的Windows Azure Credit Quota共用。</p>
+<p>有點我倒是想說，昨天我才註冊了上去，今天就有小姐打電話來問了，這一天是想問出什麼使用感想阿 XD。另外…MSTW用的節費電話(看號碼應該是Skype?)品質實在堪慮，這樣的客服電話讓客人聽一句漏兩句是不行的 囧興</p>
+<p>價格可以參考我剛post的pricing，不過我待過的幾家公司似乎只有一家用Visual Studio當solution，以coder的世界來講，除非是.net開發者，不然這東西看起來似乎不是很討好阿(遠目)</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[This is SINGLETON!]]></title>
+      <url>/2013/08/07/this-is-singleton/</url>
+      <content type="html"><![CDATA[<p>Singleton…</p>
+<p>說真的，這可能可以榮登史上最常見被濫用的Pattern，沒有之一。它本身撰寫並不困難，使用直覺（只是使用上實在又臭又長了一點），在C++裡面就更簡單了，隨便一個class套個<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div></pre></td></tr></table></figure></p>
+<p>class Balabala {<br>    public:<br>        void doSomething();<br>};<br>typedef Loki::SingletonHolder<balabala> SingleBala;</balabala></p>
+<p>void test() {<br>    SingleBala::instance().doSomething();<br>};<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">甚至要撰寫一個最基本的Singleton也是簡單到爆炸</div></pre></td></tr></table></figure></p>
+<p>class Balabala {<br>    private:<br>        static Balabala* defInst;<br>    public:<br>        static inline Balabala&amp; instance() {<br>            if(defInst == null)<br>                defInst = new Balabala();</p>
+<pre><code>    return *defInst;
+}
+</code></pre><p>};<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">當然，Loki的SingletonHolder裡面做了很多有趣的事情，有興趣的人請自己參考一下[這裡](http://sourcecodebrowser.com/asc/1.16.3.0/_singleton_8h_source.html)。當然，請先稍微念一下Modern C++ Design，不然可能連第一個開頭宣告的```CreationPolicy```都不知道是幹嘛的。不過，即使是很初步的大略看了一下，都看得出來Andrei Alexandrescu在設計這個東西的時候，考慮了生命週期以及保留了其他new/delete方法選擇上的彈性。</div><div class="line"></div><div class="line">事實上，也由於```Loki::SingletonHolder&lt;T&gt;```的關係，這個東西在許多系統裡面被濫用到一種莫名其妙的地步， ***幾乎所有希望能夠被在全域存取的物件*** 都會有人想把它寫成Singleton。更糟糕的是，如果你試圖阻止他的話，他會用更糟的static或者毫無章法的在precompiled header內extern去做這種行為。</div></pre></td></tr></table></figure></p>
+<p>//in Precompile.pch<br>extern SingleFooService FOO;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">![](https://dl.dropboxusercontent.com/u/3992354/double_facepalm.jpg)</div><div class="line"></div><div class="line">所以，當你有足夠的知識去判斷 ***「這個不該用Singleton」*** 的時候，請很明確地順便跟他說這東西 ***「不該被在不受控管的情況下全域存取」*** ，甚至 ***「根本不該做成全域存取，應該以參考的方式傳入」*** 。很多時候，明明只需要一個String，可是因為貪圖方便不去改member function，直接在裡面呼叫衛星砲Singleton把String傳下來，結果就是把相依性搞得亂七八糟。</div><div class="line"></div><div class="line">有個作者(可以google一下WashuHibiki)做了一個一針見血的評論 : *Not really, most of the use cases for singletons revolve around: &quot;I want to access X, but its not &apos;OO&apos; to use a global, so I&apos;ll dress it up in a class and call it &apos;OO&apos;!&quot;.* 「恩..大多數的Singleton的使用情況，都是在於『我要要存取X，但是使用全域實在不是OO的風格，所以我把X給變裝裝在一個class下，這就是OO了!』」</div><div class="line"></div><div class="line">Singleton的優點我想應該不用說太多，每個人用Singleton一定都是因為他有優勢所以才會去用他。可是，Singleton有很多侷限，很多人卻對這些侷限一無所知而照樣用下去。Singleton有幾個比較明顯的缺點</div><div class="line"></div><div class="line">- 它會讓整個相依性爛成一鍋粥。</div><div class="line">- 它由於本身特性使然，使的它一旦被使用下去就很難去擴充。一旦決策錯誤，大多數的Singleton設計上都很難讓人補救。</div><div class="line">- 也是由於它本身特性使然，它對於threading的處理有很多潛在的問題，尤其是當它有context的時候。</div><div class="line">- 它在很多情況下沒辦法掌握先後順序。舉個最簡單的例子，假設它需要init，而你在foo::instance()的當下壓根不知道她有沒有被init過，你得做個旗標去控制它。然而，並不是所有的地方都可以讓Singleton有正確的context做init的。</div><div class="line"></div><div class="line">這些缺點都是在他被 ***正確*** 使用的時候會碰到的問題，更不用講它被 ***不正確*** 使用的時候會有多少問題。```Loki::SingletonHolder&lt;class&gt;```實在是方便到爆炸，以至於大家什麼class都想往裡面包。我來舉幾個我看過的慘劇</div><div class="line"></div><div class="line">- 某人先宣告了一個```typedef Loki::SingletonHolder&lt;FOO&gt; singleFoo;``` 另外一個人在不同的.h裡面宣告了```typedef Loki::SingletonHolder&lt;FOO&gt; fooSingle```，然後某人開始抱怨為什麼singleFoo會自己改東西，明明沒有code呼叫他</div><div class="line">- 某些情況下的```singleFoo::instance().xxx()```會炸掉，問題幾乎無法重現。後來才發現炸掉的沒有```.init()```，而他一點把握都沒有到底在系統的什麼地方對他作```singleFoo::instance().init(context)```才能正確的把singleFoo init起來，因為他根本沒把握哪個地方會是第一次執行singleFoo的地方。</div><div class="line">- 這個比較偏向於笑話，有人把有state的class包成singleton，比方說DX的```beginDraw()```, ```endDraw()```, 你很多操作一定要放在這兩者之間....可以想想有stack一路call下去會怎樣</div><div class="line">- 這也是個笑話，設計不良的singleton跑在multi thread環境下debug一個難以重現的錯誤debug了一個月</div><div class="line"></div><div class="line">其實先撇掉這些令人噴飯的使用例子，其實大多數Singleton都有一些小撇步來避開這些問題。通常來講，我們要有一個認知： ***Singleton就是Global，不要再催眠自己它不是不是Global了!*** Global的缺點Singleton一個都不會少，我們要用Global的方法去思考這些東西的必要性。</div><div class="line"></div><div class="line">首先，我們要盡量降低Singleton的數量。最簡單的方式就是讓系統整個Singleton剩下一個。比方說我們可能有以下的範例</div></pre></td></tr></table></figure></p>
+<p>typedef Loki::SingletonHolder<txmanager> SingleTxManager;<br>typedef Loki::SingletonHolder<bandmanager> SingleBandManager;<br>typedef Loki::SingletonHolder<channelmanager> SingleChannelManager;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">我們只允許系統存在一個Singleton，稱為SystemManager</div></pre></td></tr></table></figure></channelmanager></bandmanager></txmanager></p>
+<p>class SystemManager {<br>private:<br>    TxManager<em> mTxManager;<br>    BandManager</em> mBandManager;<br>    ChannelManager<em> mChannelManager;<br>public:<br>    TxManager</em> getTxManager();<br>    BandManager<em> getBandManager();<br>    ChannelManager</em> getChannelManager();<br>};</p>
+<p>typedef Loki::SingletonHolder<systemmanager> SingleSystem;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">這是最簡單的一步，而且優點非常的明顯。其中一個很明顯的地方在於，當系統需要第二組TxManager的時候，第一種做法會讓整個系統毫無辦法的只能整個大改，但是第二種做法卻可以這樣做</div></pre></td></tr></table></figure></systemmanager></p>
+<p>enum TxMgrType {<br>    TX_ORIGINAL,<br>    TX_EXTENDED<br>};</p>
+<p>TxManager* getTxManager(TxMgrType type = TX_ORIGINAL);<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">這樣就可以輕易的轉換過去，沒有參數的getTxManager會拿到原來的，有傳入TX_EXTENDED的則可以拿到新的。當然，這只是個緩衝跟拖時間的方法，趕快把系統過渡到有兩個TxManager的語法吧... 而且，SystemManager基本上需要考慮的threading issue可以降到最低，因為整個System的Context看起來都是init以後就可以frozen，所以整個系統設計起來將會非常簡單。最後，我們可以比較簡單地找到一個地方去把所有的class初始化。</div><div class="line"></div><div class="line">Singleton的Threading issue也是一個常常被討論的話題。因為這東西被存取的地方實在太多，可能性也太過於頻繁，所以我們必須用許許多多的mutex把很多部分給保護住。但是就有如所有的Semaphore-like的保護一樣，這東西會造成相當程度的設計問題以及死結。所以，為了因應這種問題，我們通常來講會在一些已知的高Threading issue Singleton做一些手腳，比方說把所有的context parameter分開等等...</div></pre></td></tr></table></figure></p>
+<p>class FooService {<br>private:<br>    typedef void(<em>FOO_CALLBACK)(void</em>);<br>    const int MAX_WORKING_THREAD = 20;<br>    boost::threadpool::pool s_ThreadPool(MAX_WORKING_THREAD);<br>public:<br>    int doSomething(FOO_CALLBACK callback);<br>};</p>
+<p>typedef Loki::SingletonHolder<fooservice> SingleFooService;<br>```</fooservice></p>
+<p>簡單的說，我們直接把Thread的事情自己收進來管理，再由一個Callback來把結果傳回去。Java在後期引進了一個概念叫做<a href="http://openhome.cc/Gossip/JavaGossip-V2/CallableFuture.htm" target="_blank" rel="external">Future</a>, <a href="http://www.boost.org/doc/libs/1_46_0/boost/thread/future.hpp" target="_blank" rel="external">C++也有</a>，這個對Threading設計算是非常重要的一個概念，可以大幅減化這方面的設計（也就是讓Singleton傳回一個boost::future，你需要的時候再跑起來就好）</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[突然想到這個老掉牙的笑話]]></title>
+      <url>/2013/07/18/suddenly-thought-of-that-old-joke/</url>
+      <content type="html"><![CDATA[<p>某天差點被自己害死</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">sid = setsid();</div><div class="line">printf(&quot;Starting daemon, sid = %d\n&quot;, sid);</div><div class="line"></div><div class="line">printf(&quot;Disabling each standard file pipes... \n&quot;);</div><div class="line">int FilePipe[3] = &#123;STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO&#125;;</div><div class="line">for(int i = 0; i &lt; sizeof(FilePipe)/sizeof(int); ++i)</div><div class="line">	close(FilePipe[i]);</div><div class="line">printf(&quot;Done\n&quot;);</div></pre></td></tr></table></figure>
+<p>恩….誰看出問題在哪了？單單從log上看看起來很像是這個for loop永遠跑不完 XD</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[來聊聊Service的設計上的一個Technique吧!]]></title>
+      <url>/2013/07/17/talk-about-service-design/</url>
+      <content type="html"><![CDATA[<p>我們在一個大型系統裡面，常常會用到許多Service，這些Service通常來講會以Singleton的形式存在（或者他的變形，比方說在Spring裡面就是@Autowire）。這些系統用的Service通常會有一個共通的界面，比方說，這些Service都是CRUD服務的話，大概會長這樣…</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">interface IService &#123;</div><div class="line">	String getServiceName();</div><div class="line">	String getServiceID();</div><div class="line">&#125;</div><div class="line"></div><div class="line">interface ICRUDService&lt;Target&gt; extends IService &#123;</div><div class="line">	long create(Target t) throw ServiceException;</div><div class="line">	T read(long uuid) throw ServiceException;</div><div class="line">	long update(Target t) throw ServiceException;</div><div class="line">	bool delete(long uuid) throw ServiceException;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>淺顯易懂沒有任何問題。假設我們有一個Service叫做NameCard service，我們可能就會這樣實作…</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public class NameCardService implements ICRUDService&lt;NameCard&gt; &#123;</div><div class="line">	// ICRUDService implementation is here</div><div class="line">	…</div><div class="line">	…</div><div class="line">	…</div><div class="line">	</div><div class="line">	//NameCardService only public method</div><div class="line">	public void sort();</div><div class="line">	public List&lt;NameCard&gt; getDuplicated();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>當我們需要取用這個服務的時候，有很多種不同的做法。最普通的Singleton風格就是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">NameCardService service = NameCardService.getInst();</div></pre></td></tr></table></figure>
+<p>而Spring風格則會是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">@Autowire</div><div class="line">NameCardService service;</div></pre></td></tr></table></figure>
+<p>而Android風格則會是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">NameCardService service = (NameCardService)context.getSystemService(NAME_CARD_SERVICE);</div></pre></td></tr></table></figure>
+<p>前兩者其實都沒什麼型別安全上的問題，第一個做法會有Scaling上的問題，我們必須要在getInst()裡面檢查太多東西（別忘了，getInst()是static，沒辦法被包進interface – 這點顯然obj-c是好一點），比方說有沒有權限拿取啊，該做哪些logging阿….balabalaba，這些通通都是duplicated code – 因為他們沒辦法被寫入interface。第二種作法則是綁死在Spring，而且我想應該不用我說，大家也知道Spring新增一個服務並沒有那麼簡單直觀。</p>
+<p>所以Android選擇了3，但是很明顯地，這邊存在一個無法在編譯期檢查出來的型別問題，也就是說，你可能無法阻止別人寫成這樣(注意getSystemService傳進去的參數)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">NameCardService service = (NameCardService)context.getSystemService(TELEPHONY_SERVICE);</div></pre></td></tr></table></figure>
+<p>因為它getSystemService傳回來的是一個類似IService的東西，這等於要強迫使用者使用「正確的Context」「正確的Service Handle」去轉型成「正確的Service」</p>
+<p>以一個寫Framework的人來講，這真是惡夢 - 誰曉得Framework user這些工程師會不會拿一些莫名其妙的錯用來當作bug開給你？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//以下當然會執行期爆掉</div><div class="line">((NameCardService)context.getSystemService(TELEPHONY_SERVICE)).sort();</div><div class="line"></div><div class="line">//我必須對某些喜歡這種懶人寫法的人致敬，這些人專注於寫出讓人（包含自己）看不懂的code的努力，實在是令人太欽佩了。</div></pre></td></tr></table></figure>
+<p>重點在於Java來講，用任何一個Native型別去當作Handle都是一種頗令人困惑而且不智的行為。什麼是Handle？其實就相當於map裡面的key，用這個key去取得value(在這裡就是指Service)。有興趣的人可以看看Android的getSystemService(…)裡面傳入的參數是什麼？結論會很讓你噴飯，他傳入的Handle索引居然是一個字串…不過這有他的道理，他傳入的字串是一組class的qualified name，這可以讓他很輕易地「無中生有」出一組service – 我們不在這裡討論這種規格外的做法。另外，傳入string還有一個非常糟糕的用途–它可以把要傳給service的參數包在一部分的String傳進去，很方便，很好用，我們也可以想像這是維護上的多大的災難。</p>
+<p>比方說這類型的災難</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">OMGWTF omg = (OMGWTF)context.getSystemService(&quot;OMGWTF Service! 隔壁老王是變態，小明是笨蛋，初始化的時候順便幫我買兩斤三星蔥!&quot;);</div><div class="line"></div><div class="line">//簡單說，就是拿字串當protocol...這種天才我職業生涯碰過好幾次，非常的天才，非常的創意無限，非常的奔放</div></pre></td></tr></table></figure>
+<p>有沒有什麼方法至少可以逼使用者不用轉型，甚至在編輯器裡面就可以輕鬆地幫你指出你拿到的是什麼Service而不會出錯呢？比方說我們能不能在編譯時期就檢查出下面這寫法對不對</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//拿出來就是NameCardService，不需要轉型</div><div class="line">BaseCRUDService.getService(???????????).sort();</div><div class="line">//拿出來就是Telephony Service，不需要轉型</div><div class="line">BaseCRUDService.getService(???????????).getTeleponyStatus();</div></pre></td></tr></table></figure>
+<p>甚至Eclipse就可以幫你檢查出來了!這乾五可能!?</p>
+<p><strong>廢話，當然可以，不然我寫這篇幹嘛 XD</strong> </p>
+<p>這秘密在於我們Handle的選擇。String?這顯然不對，long?這當然也不行，特殊規格的class?我沒想到要怎麼用這種方法，也許誰來發明一下</p>
+<p><strong>我們Handle選用的是Java Generic可以直接支援的Class&lt;?&gt;</strong></p>
+<p>老實講我一直覺得Java Generic雖然靈活度不比C++的Template，不過Generic裡面的”?”實在是一個很無賴的東西，它可以做出很多平常根本想當想不到的方法。</p>
+<p>首先，我們為了讓所有的CRUD Service都會「註冊自己」，讓自己可以被CURDService找到，所以我們必須要有一個「所有的CRUDService都會跑得到的地方」–我們當然第一個想到的就是constructor，所以我們要讓所有的CRUD Service從implements ICRUDService改成extend BaseCRUDService</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">abstract class BaseCRUDService&lt;T&gt; implements ICRUDService&lt;T&gt; &#123;</div><div class="line">	BaseCRUDService() &#123;</div><div class="line">	//現在我們有一個地方可以讓所有的CRUD Service都跑到了</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public class NameCardService extends BaseCRUDService&lt;NameCard&gt; &#123;</div><div class="line">…</div><div class="line">…</div><div class="line">…</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>這邊有一份實作，可以先給大家參考一下，出來差不多就是我剛剛講的結果。所有的Service只要繼承BaseCRUDService，就可以用BaseCRUDService.getService(Class&lt;? extends BaseCRUDService&gt; clz);拿出正確的Service，而且可以直接編譯期判斷出該型別，並且可以用編譯器的自動完成去呼叫該Service獨有的method。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">import java.util.HashMap;</div><div class="line"></div><div class="line">public abstract class BaseCRUDService&lt;MarshelBean extends ICRUDBean&gt; implements ICRUDService&lt;MarshelBean&gt; &#123;</div><div class="line">	</div><div class="line">	protected BaseCRUDService() &#123;</div><div class="line">		registerSelf(this);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@SuppressWarnings(&#123; &quot;unchecked&quot; &#125;)</div><div class="line">	private &lt;T extends ICRUDService&lt;?&gt;&gt; void registerSelf(T service) &#123;</div><div class="line">		serviceMap.put( (Class&lt;? extends ICRUDService&lt;?&gt;&gt;) service.getClass(), service);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	/**</div><div class="line">	 * For thread safety, it can be ConcurrentHashMap...as long as I don&apos;t think it is needed.</div><div class="line">	 * Since it is single thread write one time only, HashMap can be good enough in any case.</div><div class="line">	 */</div><div class="line">	static HashMap&lt;Class&lt;? extends ICRUDService&lt;?&gt;&gt;, ICRUDService&lt;?&gt;&gt; serviceMap = new HashMap&lt;Class&lt;? extends ICRUDService&lt;?&gt;&gt;, ICRUDService&lt;?&gt;&gt;();</div><div class="line">	</div><div class="line">	@SuppressWarnings(&quot;unchecked&quot;)</div><div class="line">	static public &lt;T extends ICRUDService&lt;?&gt; &gt; T getService(Class&lt;T&gt; targetService) &#123;</div><div class="line">		return (T) serviceMap.get(targetService);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>這份實作神奇的地方在於，只要任何服務繼承它，那它就可以被 <strong>「型別安全的」</strong> 取出來。這點很重要，請跟著我重複念兩次。另外，這份實作是取自於我自己寫的一個PP通訊界面，所有CRUD都會至少有一個Marshel(管理)的對象，這個被管理的對象一定會繼承自IBean，如果你不知道他是幹嘛的，請完全不用理他。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">class PeopleRecordService extends BaseCRUDService&lt;PeopleRecord&gt; &#123;</div><div class="line">…</div><div class="line">…</div><div class="line">…</div><div class="line"></div><div class="line">	void people_record_only_function();</div><div class="line">&#125;</div><div class="line"></div><div class="line">class CarRecordService extends  BaseCRUDService&lt;CarRecord&gt; &#123;</div><div class="line">…</div><div class="line">…</div><div class="line">…</div><div class="line">	void car_record_only_function();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>好，我們把這個東西setup了，該試試看他的威力了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">//PASS!</div><div class="line">BaseCRUDService.getService(PeopleRecordService.class).people_record_only_function();</div><div class="line"></div><div class="line">//Compile Time error!</div><div class="line">BaseCRUDService.getService(PeopleRecordService.class).car_record_only_function();</div><div class="line"></div><div class="line">//或著試試看下面這邊自動完成會幫你秀出什麼東西？</div><div class="line">BaseCRUDService.getService(CarRecordService.class).;</div></pre></td></tr></table></figure>
+<p>That’s it~ 沒有強制轉型，沒有奇怪的Context問題，更沒有duplicated static method，世界真是美好…</p>
+<p>當然，接下來我們當然要仔細看看為什麼要這樣設計了。這些設計其實都很簡單（甚至沒有偷瞄其他專案，因為我還沒看過其他人這樣寫）。首先，我們會希望有一個地方能夠索引到所有的Service，不然getService()要找誰要Service去？（就算是Spring也是從xml裡面取出qualified name去invoke…我的媽，我很討厭這種做法 囧，我們不能把它靜態的存起來嗎？），我們乾脆直接使用CRUDService的中繼界面（以這邊的例子來講就是BaseCRUDService）來放這張表。以中繼界面來放這張表還有一個好處，就是Register也可以寫在這裡，這樣就有一個constructor可以讓所有的CRUDService有個共通執行的地方–把自己註冊上去。</p>
+<p>不過這語法看起來真是恐怖，我們把它拆解過來看一下。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">static HashMap&lt;Class&lt;? extends ICRUDService&lt;?&gt;&gt;, ICRUDService&lt;?&gt;&gt; serviceMap = new HashMap&lt;Class&lt;? extends ICRUDService&lt;?&gt;&gt;, ICRUDService&lt;?&gt;&gt;();</div></pre></td></tr></table></figure>
+<p>這HashMap我們把它放大來看的話，會發現他的key其實是一個<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">記住，要使用者工程師去寫這些是不好的，我們最好在背後就偷偷的把它做掉，比方說經由這種機制偷偷的把它註冊起來，下游使用者甚至不知道這回事，他們只要知道以後用```getService()```能拿到服務就好。下游工程師的小腦袋已經裝了太多的痛苦跟哀傷，我們要盡可能避免因為他沒時間看文件以至於少寫```registerSelf()```跑來把這種哀慟傳遞給我們（逃）</div><div class="line"></div><div class="line">所以我們現在就有一個型別檢查的serviceMap了，這東西會做一次基本的型別檢查，不管用得到用不到。它可以保證，進去的Class一定至少是個ICRUDService，而不是IGiveUp或者IDontCare</div><div class="line"></div><div class="line">接下來這Service拿出來的地方就很Tricky了，同樣的，語法上看不懂的請回去翻Java課本的Generic [^1]</div></pre></td></tr></table></figure></p>
+<pre><code>@SuppressWarnings(&quot;unchecked&quot;)
+static public &lt;T extends ICRUDService&lt;?&gt; &gt; T getService(Class&lt;T&gt; targetService) {
+    return (T) serviceMap.get(targetService);
+}
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div><div class="line">Generic傳回型別基本上可以保證它傳回的值一定是個ICRUDService，不過看起來好像沒上面提到的那麼神奇？不，這個傳回值其實是由getService裡面的```Class&lt;T&gt; targetService```幫我們定案的，前者只是幫我們把T限定在ICRUDService而以，後者才是幫我們真正決定T到底要是什麼。假設我們targetService在編譯期就指定了PersonRecordService.class，那這樣不就足以逼他傳回PersonRecordService的物件了嗎？上面的自動完成居然是被這樣hint出來的，該說Eclipse好聰明嗎 XD</div><div class="line"></div><div class="line">哎呀，真難得Generic居然可以勉強做到跟C++的Template一樣神奇的了（也許還更神奇點，因為C++ template甚至沒辦法在pre-compile做這些檢查，他必須要等compile後把template真正實體化出來才能開始做很多事情--包括印出一堆讓人看不懂的error訊息在內）</div><div class="line"></div><div class="line">當然這東西並不是真正的skip掉轉型，看那堆```@SupressWarnings(&quot;unchecked&quot;)```就知道其實我們只是讓使用者不准自己轉而以，我們可以幫他們轉好以後丟出去(老實講，跟Android拿service的方式比起來，我真的覺得這種做法有著巨大的好處，當然Android有他自己的理由)。使用者在用的時候只需要把正確的.class當handle丟進去，```getService()```就會吐出已經幫你轉好，而且不會有任何錯誤的Service。</div><div class="line"></div><div class="line">C++有很類似的作法，而且有更明顯的好處 -- 我們可以在系統裡面偷偷用```static_cast&lt;&gt;```幫使用者轉，而不是讓使用者自己冒著風險去轉，或者謹慎的使用者使用更耗費資源的```dynamic_cast&lt;&gt;```去轉 -- 以java來講，就是拿回來的Service還得用instanceof關鍵字去檢查，沒這必要! 我們幫使用者做好這些事情就好。</div><div class="line"></div><div class="line">最後我們提供一個乾淨的，可以馬上執行的範例，讓大家玩玩看。</div></pre></td></tr></table></figure>
+<p>package com.rayer.service.example;</p>
+<p>import java.util.HashMap;<br>import java.util.Map;</p>
+<p>interface IService {<br>    void this_interface_is_not_really_important();<br>}</p>
+<p>class ServiceBase implements IService {</p>
+<pre><code>public void this_interface_is_not_really_important() {
+    System.out.println(&quot;Not important at all!&quot;);
+
+}
+
+protected ServiceBase() {
+    registerSelf();
+}
+
+private void registerSelf() {
+    ServiceBase.register(this);
+}
+
+//Static method and fields
+
+private static Map&lt;Class&lt;? extends IService&gt;, IService&gt; serviceMap = new HashMap&lt;Class&lt;? extends IService&gt;, IService&gt;();
+
+static private void register(IService service) {
+    serviceMap.put( (Class&lt;? extends IService&gt;) service.getClass(), service);
+}
+
+@SuppressWarnings(&quot;unchecked&quot;)
+static public &lt;T extends IService&gt; T getService(Class&lt;T&gt; clazz) {
+    return (T)serviceMap.get(clazz);
+}
+</code></pre><p>}</p>
+<p>class AService extends ServiceBase {<br>    public void service_A_only_method() {<br>        System.out.println(“Service A!”);<br>    }<br>}</p>
+<p>class BService extends ServiceBase {<br>    public void service_B_only_method() {<br>        System.out.println(“Service B!”);<br>    }<br>}</p>
+<p>class CService extends ServiceBase {<br>    public void service_C_only_method() {<br>        System.out.println(“Service C!”);<br>    }<br>}</p>
+<p>public class Example {<br>    AService a = new AService();<br>    BService b = new BService();<br>    CService c = new CService();</p>
+<pre><code>void main(String[] args) {
+    ServiceBase.getService(AService.class).service_A_only_method();
+    ServiceBase.getService(BService.class).service_B_only_method();
+    //大家可以試試看 在下面打入
+    //ServiceBase.getService(CService.class).
+    //eclipse的自動完成會幫你完成什麼？
+
+    IService if = ServiceBase.getService(AService.class); //OK!
+    AService as = ServiceBase.getService(AService.class); //OK! 不用幫他轉型!
+    BService bs = ServiceBase.getService(AService.class); //Compile time error! 幫你檢查好型別了!
+
+}
+</code></pre><p>}<br>```</p>
+<p>其實這份實作對於Singleton Service來講，還是有許多需要改進跟保護的地方。比方說，事實上<code>new AService()</code>不是很必要，我們可以設計一下讓他在getService裡面，要是沒辦法取到AService instance的話幫他invoke一個起來，或者有個機制可以一口氣註冊invoke一次完成…不過關於Service完善設計可能要寫的code跟篇幅將會不亞於這篇，下次吧 XD</p>
+<p>[^1]: 老實講，這種code看不懂似乎也是很正常，畢竟Generic很少有哪些範例會需要那麼複雜的前置宣告。就如同我以前曾經也說過，C++過於精美的template將會對<strong>正常</strong>水平的coder是一種過度的負擔。不過，武器工匠本來就該懂來福線要怎麼磨，普通使用者只要知道怎麼開槍就好，這種等級的library就交給該有相當等級的coder去維護吧，不需要太考慮「語法上的過難」這問題，不然STL就真的變成很糟的設計了，能維護的人實在太少。不過顯然大家都不會對STL有這種想法 XD</p>
+]]></content>
+      
+        
+    </entry>
+    
+  
+  
+</search>

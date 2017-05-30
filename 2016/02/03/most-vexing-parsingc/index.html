@@ -5,16 +5,16 @@
   
   <title>Most Vexing Parsing(C++) | Hex Fantastic</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="我在寫Daemonizer(註一)的時候，碰到了一個很奇怪的語法錯誤 123ifstream f(this-&amp;gt;pid_file_name());string content(istreambuf_iterator&amp;lt;char&amp;gt;(f), istreambuf_iterator&amp;lt;char&amp;gt;());pid_t pid = stoi(content); 他會跑出error，聲稱">
+  <meta name="description" content="我在寫Daemonizer(註一)的時候，碰到了一個很奇怪的語法錯誤 1234ifstream f(this-&amp;gt;pid_file_name());string content(istreambuf_iterator&amp;lt;char&amp;gt;(f), istreambuf_iterator&amp;lt;char&amp;gt;());pid_t pid = stoi(content); 他會跑出error，聲">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Most Vexing Parsing(C++)">
 <meta property="og:url" content="https://rayer.github.com/2016/02/03/most-vexing-parsingc/index.html">
 <meta property="og:site_name" content="Hex Fantastic">
-<meta property="og:description" content="我在寫Daemonizer(註一)的時候，碰到了一個很奇怪的語法錯誤 123ifstream f(this-&amp;gt;pid_file_name());string content(istreambuf_iterator&amp;lt;char&amp;gt;(f), istreambuf_iterator&amp;lt;char&amp;gt;());pid_t pid = stoi(content); 他會跑出error，聲稱">
-<meta property="og:updated_time" content="2017-05-30T06:55:56.000Z">
+<meta property="og:description" content="我在寫Daemonizer(註一)的時候，碰到了一個很奇怪的語法錯誤 1234ifstream f(this-&amp;gt;pid_file_name());string content(istreambuf_iterator&amp;lt;char&amp;gt;(f), istreambuf_iterator&amp;lt;char&amp;gt;());pid_t pid = stoi(content); 他會跑出error，聲">
+<meta property="og:updated_time" content="2017-05-30T07:33:52.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Most Vexing Parsing(C++)">
-<meta name="twitter:description" content="我在寫Daemonizer(註一)的時候，碰到了一個很奇怪的語法錯誤 123ifstream f(this-&amp;gt;pid_file_name());string content(istreambuf_iterator&amp;lt;char&amp;gt;(f), istreambuf_iterator&amp;lt;char&amp;gt;());pid_t pid = stoi(content); 他會跑出error，聲稱">
+<meta name="twitter:description" content="我在寫Daemonizer(註一)的時候，碰到了一個很奇怪的語法錯誤 1234ifstream f(this-&amp;gt;pid_file_name());string content(istreambuf_iterator&amp;lt;char&amp;gt;(f), istreambuf_iterator&amp;lt;char&amp;gt;());pid_t pid = stoi(content); 他會跑出error，聲">
   
     <link rel="alternate" href="/atom.xml" title="Hex Fantastic" type="application/atom+xml">
   
@@ -56,9 +56,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://rayer.github.com"></form>
@@ -90,7 +90,7 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>我在寫Daemonizer(註一)的時候，碰到了一個很奇怪的語法錯誤</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ifstream f(this-&gt;pid_file_name());</div><div class="line">string content(istreambuf_iterator&lt;char&gt;(f), istreambuf_iterator&lt;char&gt;());</div><div class="line">pid_t pid = stoi(content);</div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">ifstream f(this-&gt;pid_file_name());</div><div class="line">string content(istreambuf_iterator&lt;char&gt;(f), istreambuf_iterator&lt;char&gt;());</div><div class="line">pid_t pid = stoi(content);</div></pre></td></tr></table></figure>
 <p>他會跑出error，聲稱content是一個function所以無法當做stoi的引數。然而，要是這種傳法就能work </p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="built_in">string</span> <span class="title">content</span><span class="params">(<span class="string">"123"</span>)</span></span>;</div><div class="line"><span class="comment">// OR</span></div><div class="line"><span class="built_in">string</span> content = <span class="built_in">string</span>(istreambuf_iterator&lt;<span class="keyword">char</span>&gt;(f), istreambuf_iterator&lt;<span class="keyword">char</span>&gt;());</div></pre></td></tr></table></figure>
 <p>這錯誤的主要成因是，第一個例子中的<code>string content(istreambuf_iterator&lt;char&gt;(f), istreambuf_iterator&lt;char&gt;());</code>被錯誤的當成了function prototype（話說，哪個use case會要在函數本體內宣告另外一個函數的prototype?）。這種情況叫做<a href="https://en.wikipedia.org/wiki/Most_vexing_parse" target="_blank" rel="external">Most vexing parse</a></p>
@@ -102,7 +102,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2016/02/03/most-vexing-parsingc/" data-id="cj3b8bo3k000udjsi7n16sxkc" class="article-share-link">Partager</a>
+      <a data-url="https://rayer.github.com/2016/02/03/most-vexing-parsingc/" data-id="cj3bh77nr000x2qsizqqqe1tk" class="article-share-link">Share</a>
       
       
     </footer>
@@ -113,7 +113,7 @@
   
   
     <a href="/2015/08/23/markdown-text-color-support/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Ancien</strong>
+      <strong class="article-nav-caption">Older</strong>
       <div class="article-nav-title">Markdown文字色彩支援</div>
     </a>
   
@@ -146,7 +146,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Articles récents</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
         
@@ -183,7 +183,7 @@
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2017 Rayer<br>
-      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>

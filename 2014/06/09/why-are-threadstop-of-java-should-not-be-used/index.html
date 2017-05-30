@@ -5,16 +5,16 @@
   
   <title>[翻譯] 為什麼Java的Thread.stop()不該被使用？ | Hex Fantastic</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="這篇算是相當詳盡的說明了一些設計原則，包含了為什麼Java不再允許使用者直接中止(kill)掉一個運行中的thread物件，以及有沒有任何的替代方案。相對的，C++的std::thread也有一些行為上需要注意的地方，不過往後再提這點。 原文在此 ##Java Thread為什麼有些method被廢棄了###為什麼Thread.stop不再被支援了？理由很簡單：這東西從本質上就不安全。你去.sto">
+  <meta name="description" content="這篇算是相當詳盡的說明了一些設計原則，包含了為什麼Java不再允許使用者直接中止(kill)掉一個運行中的thread物件，以及有沒有任何的替代方案。相對的，C++的std::thread也有一些行為上需要注意的地方，不過往後再提這點。 原文在此 Java Thread為什麼有些method被廢棄了為什麼Thread.stop不再被支援了？理由很簡單：這東西從本質上就不安全。你去.stop()一個">
 <meta property="og:type" content="article">
 <meta property="og:title" content="[翻譯] 為什麼Java的Thread.stop()不該被使用？">
 <meta property="og:url" content="https://rayer.github.com/2014/06/09/why-are-threadstop-of-java-should-not-be-used/index.html">
 <meta property="og:site_name" content="Hex Fantastic">
-<meta property="og:description" content="這篇算是相當詳盡的說明了一些設計原則，包含了為什麼Java不再允許使用者直接中止(kill)掉一個運行中的thread物件，以及有沒有任何的替代方案。相對的，C++的std::thread也有一些行為上需要注意的地方，不過往後再提這點。 原文在此 ##Java Thread為什麼有些method被廢棄了###為什麼Thread.stop不再被支援了？理由很簡單：這東西從本質上就不安全。你去.sto">
-<meta property="og:updated_time" content="2017-05-29T22:29:26.000Z">
+<meta property="og:description" content="這篇算是相當詳盡的說明了一些設計原則，包含了為什麼Java不再允許使用者直接中止(kill)掉一個運行中的thread物件，以及有沒有任何的替代方案。相對的，C++的std::thread也有一些行為上需要注意的地方，不過往後再提這點。 原文在此 Java Thread為什麼有些method被廢棄了為什麼Thread.stop不再被支援了？理由很簡單：這東西從本質上就不安全。你去.stop()一個">
+<meta property="og:updated_time" content="2017-05-30T07:20:57.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="[翻譯] 為什麼Java的Thread.stop()不該被使用？">
-<meta name="twitter:description" content="這篇算是相當詳盡的說明了一些設計原則，包含了為什麼Java不再允許使用者直接中止(kill)掉一個運行中的thread物件，以及有沒有任何的替代方案。相對的，C++的std::thread也有一些行為上需要注意的地方，不過往後再提這點。 原文在此 ##Java Thread為什麼有些method被廢棄了###為什麼Thread.stop不再被支援了？理由很簡單：這東西從本質上就不安全。你去.sto">
+<meta name="twitter:description" content="這篇算是相當詳盡的說明了一些設計原則，包含了為什麼Java不再允許使用者直接中止(kill)掉一個運行中的thread物件，以及有沒有任何的替代方案。相對的，C++的std::thread也有一些行為上需要注意的地方，不過往後再提這點。 原文在此 Java Thread為什麼有些method被廢棄了為什麼Thread.stop不再被支援了？理由很簡單：這東西從本質上就不安全。你去.stop()一個">
   
     <link rel="alternate" href="/atom.xml" title="Hex Fantastic" type="application/atom+xml">
   
@@ -56,9 +56,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://rayer.github.com"></form>
@@ -91,12 +91,12 @@
       
         <p>這篇算是相當詳盡的說明了一些設計原則，包含了為什麼Java不再允許使用者直接中止(kill)掉一個運行中的thread物件，以及有沒有任何的替代方案。相對的，C++的std::thread也有一些行為上需要注意的地方，不過往後再提這點。</p>
 <p><a href="http://docs.oracle.com/javase/7/docs/technotes/guides/concurrency/threadPrimitiveDeprecation.html" target="_blank" rel="external">原文在此</a></p>
-<h2 id="Java-Thread為什麼有些method被廢棄了"><a href="#Java-Thread為什麼有些method被廢棄了" class="headerlink" title="##Java Thread為什麼有些method被廢棄了"></a>##Java Thread為什麼有些method被廢棄了</h2><p>###為什麼Thread.stop不再被支援了？<br>理由很簡單：這東西從本質上就不安全。你去.stop()一個thread會造成所有該thread同步資源鎖定(lock)的區段全部都解鎖(unlock)。只要系統抓到ThreadDeath這個exception，該區段的同步鎖定都會被unlock。<br>Because it is inherently unsafe. Stopping a thread causes it to unlock all the monitors that it has locked. (The monitors are unlocked as the ThreadDeath exception propagates up the stack.) If any of the objects previously protected by these monitors were in an inconsistent state, other threads may now view these objects in an inconsistent state. Such objects are said to be damaged. When threads operate on damaged objects, arbitrary behavior can result. This behavior may be subtle and difficult to detect, or it may be pronounced. Unlike other unchecked exceptions, ThreadDeath kills threads silently; thus, the user has no warning that his program may be corrupted. The corruption can manifest itself at any time after the actual damage occurs, even hours or days in the future.</p>
+<h2 id="Java-Thread為什麼有些method被廢棄了"><a href="#Java-Thread為什麼有些method被廢棄了" class="headerlink" title="Java Thread為什麼有些method被廢棄了"></a>Java Thread為什麼有些method被廢棄了</h2><h3 id="為什麼Thread-stop不再被支援了？"><a href="#為什麼Thread-stop不再被支援了？" class="headerlink" title="為什麼Thread.stop不再被支援了？"></a>為什麼Thread.stop不再被支援了？</h3><p>理由很簡單：這東西從本質上就不安全。你去.stop()一個thread會造成所有該thread同步資源鎖定(lock)的區段全部都解鎖(unlock)。只要系統抓到ThreadDeath這個exception，該區段的同步鎖定都會被unlock。<br>Because it is inherently unsafe. Stopping a thread causes it to unlock all the monitors that it has locked. (The monitors are unlocked as the ThreadDeath exception propagates up the stack.) If any of the objects previously protected by these monitors were in an inconsistent state, other threads may now view these objects in an inconsistent state. Such objects are said to be damaged. When threads operate on damaged objects, arbitrary behavior can result. This behavior may be subtle and difficult to detect, or it may be pronounced. Unlike other unchecked exceptions, ThreadDeath kills threads silently; thus, the user has no warning that his program may be corrupted. The corruption can manifest itself at any time after the actual damage occurs, even hours or days in the future.</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2014/06/09/why-are-threadstop-of-java-should-not-be-used/" data-id="cj3b8bo2x000ndjsiexpi1jep" class="article-share-link">Partager</a>
+      <a data-url="https://rayer.github.com/2014/06/09/why-are-threadstop-of-java-should-not-be-used/" data-id="cj3bh77n7000o2qsihz82s2a6" class="article-share-link">Share</a>
       
       
     </footer>
@@ -106,7 +106,7 @@
 <nav id="article-nav">
   
     <a href="/2014/06/26/coder-said-coder-wants/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Récent</strong>
+      <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
           Coder說的跟Coder所想的
@@ -116,7 +116,7 @@
   
   
     <a href="/2014/06/08/what-function-whats-to-hint-you/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Ancien</strong>
+      <strong class="article-nav-caption">Older</strong>
       <div class="article-nav-title">C++傳回值想要「暗示」你什麼?</div>
     </a>
   
@@ -149,7 +149,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Articles récents</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
         
@@ -186,7 +186,7 @@
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2017 Rayer<br>
-      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>
