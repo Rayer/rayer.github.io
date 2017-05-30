@@ -48,9 +48,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -60,204 +60,6 @@
 </header>
       <div class="outer">
         <section id="main">
-  
-    <article id="post-starting-java-console-application-with-maven" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2014/03/12/starting-java-console-application-with-maven/" class="article-date">
-  <time datetime="2014-03-11T22:57:00.000Z" itemprop="datePublished">2014-03-12</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2014/03/12/starting-java-console-application-with-maven/">Starting Java Console Application with Maven</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2014/03/12/starting-java-console-application-with-maven/" data-id="cj3b76vos000ihzsis5eb0538" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-unordered-collections-in-c-11" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2014/02/02/unordered-collections-in-c-11/" class="article-date">
-  <time datetime="2014-02-02T03:37:00.000Z" itemprop="datePublished">2014-02-02</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2014/02/02/unordered-collections-in-c-11/">unordered collections in C++11</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2014/02/02/unordered-collections-in-c-11/" data-id="cj3b76vor000hhzsiftnx4kvg" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-constructor-call-another-constructor-w-c-11" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2014/02/01/constructor-call-another-constructor-w-c-11/" class="article-date">
-  <time datetime="2014-01-31T17:12:00.000Z" itemprop="datePublished">2014-02-01</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2014/02/01/constructor-call-another-constructor-w-c-11/">Constructor call another Constructor w/ C++11</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>剛剛才意外發現的一個C++11 new feature, 參考一下。</p>
-<p>很多情況下我們會希望能從一個constructor去call另外一個constructor，比方說<code>foo()</code>希望就可以直接比照<code>foo(0,0)</code>, 或者說<code>foo(2,6)</code>可以直接比照<code>foo(2,6,POLICY_DEFAULT)</code>。在函數層級來講這個很簡單<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">double foo() &#123;</div><div class="line">	return foo(0, 0);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>但是如果foo是個constructor的話，基本上是做不到的</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">foo::foo() &#123;</div><div class="line">	foo::foo(0, 0); //error!!!</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>這個其實不止C++, Java也蠻常見這種需求的，只是一直沒有解法。在C++03/Java裡面，我們比較常見的做法只能大約做到類似這樣而已 :</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">foo::foo() &#123;</div><div class="line">	init(0, 0); //或者我們也可以用default parameter的方法，init(double a = 0, double b = 0);</div><div class="line">&#125;</div><div class="line"></div><div class="line">foo::foo(double a, double b) &#123;</div><div class="line">	init(a, b);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>利用init去繞過這條限制。不過在C++11以後，這條限制就被解除了，我們可以利用相當類似C++的initialization list的方式來解決這個問題</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">foo::foo() : foo(0, 0) &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>皆大歡喜，ohya，不過java還是得用init()的方法來做 </p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2014/02/01/constructor-call-another-constructor-w-c-11/" data-id="cj3b76von000ghzsiqvetpfci" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-recycle-from-past-game-loop-update-in-c" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2014/01/23/recycle-from-past-game-loop-update-in-c/" class="article-date">
-  <time datetime="2014-01-23T09:10:00.000Z" itemprop="datePublished">2014-01-23</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2014/01/23/recycle-from-past-game-loop-update-in-c/">(Recycle from past) Game loop update in C#</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Game loop in C#<br>Game update loop is a problem in C#. Of course, first thought of us must be attach the Idle event of Application, like this.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">Application.Idle += new EventHandler(OnAppIdle);</div><div class="line">Application.Run(mMainFrame);</div><div class="line"></div><div class="line">static void OnAppIdle(object sender, EventArgs e)</div><div class="line">&#123;</div><div class="line">	//Do some game loop update here</div><div class="line">	mMainFrame.DoUpdate();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>It seems reasonable, we register a listener to Idle event, so it must be run OnAppIdle while application idle, right?</p>
-<p>Partially right.</p>
-<p>When the application keep going, it will only get message while “When application need to be updated”. It means, therefore, if you leave mouse out of this application form(so no MouseMove event sent), it will totally stop, so it will be updated only when getting some message : such like OnMouseMove….etc.</p>
-<p>Solution is from Rich, and he found it in sample of MDX applications. Don’t ask me how to do it, just need to know use this way to keep the game loop.</p>
-<p>We might discuss this in later post =3</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line">static class Program</div><div class="line">&#123;</div><div class="line">///</div><div class="line">/// The main entry point for the application.</div><div class="line">///</div><div class="line">/// </div><div class="line">	static SceneEditorMain mMainFrame;</div><div class="line">	[STAThread]</div><div class="line">	static void Main()</div><div class="line">	&#123;</div><div class="line">		Application.EnableVisualStyles();</div><div class="line">		Application.SetCompatibleTextRenderingDefault(false);</div><div class="line">		mMainFrame = new SceneEditorMain();</div><div class="line">		Application.Idle += new EventHandler(OnAppIdle);</div><div class="line">		Application.Run(mMainFrame);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	static void OnAppIdle(object sender, EventArgs e)</div><div class="line">	&#123;</div><div class="line">		while (AppStillIdle)</div><div class="line">		&#123;</div><div class="line">			mMainFrame.DoUpdate();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line">	private static bool AppStillIdle</div><div class="line">	&#123;</div><div class="line">		get</div><div class="line">		&#123;</div><div class="line">			NativeMethods.Message msg;</div><div class="line">			return !NativeMethods.PeekMessage(out msg, IntPtr.Zero, 0, 0, 0);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">	public class NativeMethods</div><div class="line">	&#123;</div><div class="line">	/**/</div><div class="line">	///</div><div class="line">	Windows Message</div><div class="line"></div><div class="line">	[StructLayout(LayoutKind.Sequential)]</div><div class="line">	public struct Message</div><div class="line">	&#123;</div><div class="line">		public IntPtr hWnd;</div><div class="line">		public uint msg;</div><div class="line">		public IntPtr wParam;</div><div class="line">		public IntPtr lParam;</div><div class="line">		public uint time;</div><div class="line">		public System.Drawing.Point p;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	[System.Security.SuppressUnmanagedCodeSecurity]</div><div class="line">	[DllImport(&quot;User32.dll&quot;, CharSet = CharSet.Auto)]</div><div class="line">	public static extern bool PeekMessage(out Message msg, IntPtr hWnd, uint messageFilterMin, uint messageFilterMax, uint flags);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2014/01/23/recycle-from-past-game-loop-update-in-c/" data-id="cj3b76voj000fhzsihelk6e9l" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-c-11-ways-to-obtain-high-accuracy-of-time" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2014/01/22/c-11-ways-to-obtain-high-accuracy-of-time/" class="article-date">
-  <time datetime="2014-01-22T02:38:00.000Z" itemprop="datePublished">2014-01-22</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2014/01/22/c-11-ways-to-obtain-high-accuracy-of-time/">C++11 取得精確度很高的時間的方法</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在製作遊戲時，有一個函數相當重要，幾乎大多數realtime的遊戲都需要它（其實只要任何東西會動，可能都跟他脫不了干系），這個函數稱為<code>update(Ty delta);</code>。這個delta在java相當容易時間，就是拿<code>System.getTimeinMillis();</code>，不過在C++裡面這個卻變得有點困難 – 在C++11以前，幾乎都得靠平台相依的方法才能取得。Windows API的話就是<code>void QueryPerformanceCounter( LARGE_INTEGER* currentTime );</code>，linux下可能就只能用<code>clock_getTime</code>或者用time_fd硬幹，C++本身只有提供time(0)可以讓你拿到一個….精確度到秒（甚至還不太精確）的…顯然不太夠用的時間。</p>
-<p>C++11以後，std提供了chrono library, 使得這終於有一個跨平台的解答。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">#include &lt;iostream&gt;</div><div class="line">#include &lt;chrono&gt;</div><div class="line">int main(int argc, const char * argv[])</div><div class="line">&#123;</div><div class="line">    typedef std::chrono::high_resolution_clock time;</div><div class="line">    typedef std::chrono::milliseconds ms;</div><div class="line">    </div><div class="line">    //initialize</div><div class="line">    auto timer = time::now();</div><div class="line">    </div><div class="line">    while(true) &#123;</div><div class="line">     </div><div class="line">        double delta = std::chrono::duration_cast&lt;std::chrono::duration&lt;double, std::ratio&lt;1&gt;&gt;&gt;(time::now() - timer).count();</div><div class="line"></div><div class="line"></div><div class="line">        std::cout &lt;&lt; delta &lt;&lt; std::endl;</div><div class="line">        timer = time::now();</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    </div><div class="line">    return 0;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2014/01/22/c-11-ways-to-obtain-high-accuracy-of-time/" data-id="cj3b76vog000dhzsim4px1bfg" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
   
     <article id="post-talking-about-the-c-11-lambda-3" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -305,7 +107,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2014/01/20/talking-about-the-c-11-lambda-3/" data-id="cj3b76voh000ehzsivbljenzb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2014/01/20/talking-about-the-c-11-lambda-3/" data-id="cj3b7ce6l000dqvsi6vfxkzk7" class="article-share-link">Partager</a>
       
       
     </footer>
@@ -353,7 +155,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2014/01/20/let-your-stdvectoror-something-else-compatible-with-stream-operator/" data-id="cj3b76vod000bhzsi6r5t91tg" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2014/01/20/let-your-stdvectoror-something-else-compatible-with-stream-operator/" data-id="cj3b7ce6i000bqvsiiew4tdlh" class="article-share-link">Partager</a>
       
       
     </footer>
@@ -390,7 +192,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2014/01/20/talking-about-the-c-11-lambda-2/" data-id="cj3b76vof000chzsinfss5g3h" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2014/01/20/talking-about-the-c-11-lambda-2/" data-id="cj3b7ce6k000cqvsijr4fb6i3" class="article-share-link">Partager</a>
       
       
     </footer>
@@ -451,7 +253,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2014/01/17/talking-about-the-c-11-lambda/" data-id="cj3b76vob000ahzsi3qkydbqk" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2014/01/17/talking-about-the-c-11-lambda/" data-id="cj3b7ce6g000aqvsilrm950vn" class="article-share-link">Partager</a>
       
       
     </footer>
@@ -497,7 +299,280 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2014/01/15/no-modern-design-modern-c/" data-id="cj3b76vo60008hzsi8w93dos0" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2014/01/15/no-modern-design-modern-c/" data-id="cj3b7ce6c0008qvsi46tppnv1" class="article-share-link">Partager</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-talk-about-why-mac-gradually-eating-away-at-pc-market" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/01/15/talk-about-why-mac-gradually-eating-away-at-pc-market/" class="article-date">
+  <time datetime="2014-01-14T20:52:00.000Z" itemprop="datePublished">2014-01-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/01/15/talk-about-why-mac-gradually-eating-away-at-pc-market/">聊聊Mac為什麼逐漸蠶食PC市場</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>前幾天看到一篇文章，北美市場Mac增長25%+，同時間PC市場卻大幅萎縮。Mac跟PC的大戰也打了二十年了，PC始終無法徹底消滅掉Mac，當然Mac有相當多優越的地方，讓我們看看這次此消彼長的轉捩點。</p>
+<ul>
+<li>大約是在4-5年前，MBP有一波相當大的降價，大約台灣售價從九萬多變成七萬多(17”)，從此MBP不再是超高價的選擇，價格開始跟高階筆電差不多。</li>
+<li>第二代MBA的推出以及價格，這個我想是最大的轉捩點。第一代的MBA根本是個問題產品，直到第二代推出以後，價格跟當時超薄的厚度重量以及不錯的手工藝外觀，使得MBA開始為消費市場大量接受(即使當年推出的連core i都還不是，僅僅只是C2D)。說到MAC佔有率的上昇，第二世代的MBA真的功不可沒，也強迫PC陣營弄出個叫做Ultrabook的商業名詞，這波PC陣營在netbook領先的部分，幾乎是被瞬間追平。</li>
+<li>Magic Trackpad的推出，把MacBook的體驗完全徹底複製到了iMac上。</li>
+<li>平板的興起間接造成OpenGL的興盛以及DX的衰退。</li>
+</ul>
+<p>雖然我也不知道這是不是Apple的策略，不過顯然從MBA開始的MacBook產線，算是相當程度地打開了OSX的市場，而也一定程度的讓更多人願意使用看看iMac – 而有一個小產品也一定程度的幫助了iMac的銷售，就是Magic Trackpad。雖然這場大戰看起來Mac算是在順風側，不過，誰知道呢 =P 也許哪天PC也會來個驚人的發想，也說不一定，畢竟現在整體仍然是站在PC這端的。</p>
+<p>還有一件小事情對PC也是挺不利的 – 就是DirectX開發的沒落。目前來講，許多的遊戲成像引擎仍然支援OpenGL跟DX，但是相當多的遊戲開發商已經傾向于使用Wrapper – 比方說Unity – 而不是直接使用DX或者僅限於DX的引擎。當然目前來講，高端成像引擎如Crysis, GameByro仍然主流支援DX，但是在移植到平板簡單的誘因下，我想採用Wrapper甚至直接用OpenGL開發會越來越多，而這正是PC的痛處 – 支援DX可是別無分號，只有Windows可以做的到。DX跟OpenGL的戰爭也打了10年了，DX曾經贏到幾乎把OpenGL打到一無是處(感謝Khronos努力地守住最後一塊陣地，終於在平板成為主流以後努力開花結果)，而這幾年看來DX卻停滯在11，而且沒辦法在大多數平板上跑。採用OpenGL的意思就是，我們可以很合理的期待mac也能玩(撒花)，這也是許多人的軟肋 – 因為很多遊戲只能在Windows上跑。</p>
+<p>這場大戰，Mac慢慢地占了上風，只是離扳平還有很長的一段路要走啊，而且價格也是一個很難彌補的gap。這場大戰，讓我們繼續看下去…</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2014/01/15/talk-about-why-mac-gradually-eating-away-at-pc-market/" data-id="cj3b7ce6e0009qvsing78lita" class="article-share-link">Partager</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-talking-about-the-four-c-style-casting" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/01/08/talking-about-the-four-c-style-casting/" class="article-date">
+  <time datetime="2014-01-07T23:53:00.000Z" itemprop="datePublished">2014-01-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/01/08/talking-about-the-four-c-style-casting/">淺談C++ Style的四種casting</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>這四個的名稱應該大家都很熟了，包含了static_cast, dynamic_cast, const_cast跟reinterpret_cast。不過，這些cast其實或多或少都有一些隱藏的灰色地帶，在這篇文章，我們試圖來看看這四種cast分別有什麼不容易被普通PG看到的地方。</p>
+<p>附錄：還有一個駭人聽聞的規格外的東西叫做boost::lexical_cast, 這東西我們晚點聊一下。</p>
+<p>##static_cast<br><code>static_cast&lt;Ty&gt;</code>是一個最常見的轉型法，這個轉型其實代表的背後意義是「編譯器被允許做的隱式轉型，void<em>間的互轉，以及non-runetime下安全的子轉父」，任何超出這個範疇的都會直接被編譯器擋下來，包含`int</em><code>轉</code>char<em>`這種行為，都會被擋下。編譯器會自動幫你做的隱式轉換包含了像是int幫你轉成double等等(也就是當你用explicit關鍵字的時候想要編譯器避免的行為)，void</em>互轉是特例，任何東西都能轉成void<em>而void</em>也能轉成任何東西(我一直認為這條規則是為了相容性而存在的)，以及比如<code>class B : public A</code>下允許<code>A* a = static_cast&lt;A*&gt;(new B());</code>這種轉法(但是並不允許相反的<code>B* b = static_cast&lt;B*&gt;(new A());</code>)。</p>
+<p>如果你很有把握你沒搞出太大致命的錯誤的話，由於少了很耗資源的RTTI檢查，理論上這種轉法會比dynamic_cast快上非常多。另外，如果你的dynamic_cast換成static_cast居然會出錯或者編不過（比方說你居然有地方需要做<code>if(dynamic_cast&lt;_ty*&gt;(a) != nullptr)</code>），那基本上我想你有95%機會結構上有非常值得非議的地方。正常的code其實不太應該需要dynamic_cast這關鍵字的，後面會詳述為什麼有些人會覺得dynamic_cast非用不可。</p>
+<p>其他的比方說<code>int*</code>轉<code>char*</code>這種雖然大家都司空見慣(在C真的是見怪不怪的)的轉型，這個是會被打回票的。但是！下面這段code居然是可以過的!</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span>* a;</div><div class="line"><span class="keyword">char</span>* b;</div><div class="line"> <span class="comment">//當然下面兩段code都過不了compiler</span></div><div class="line"> <span class="comment">//a = static_cast&lt;int*&gt;(b);</span></div><div class="line"> <span class="comment">//b = static_cast&lt;char*&gt;(a);</span></div><div class="line"> </div><div class="line"> <span class="comment">//可是這段是可以過的，WTF</span></div><div class="line">b = <span class="keyword">static_cast</span>&lt;<span class="keyword">char</span>*&gt;(<span class="keyword">static_cast</span>&lt;<span class="keyword">void</span>*&gt;(a));</div></pre></td></tr></table></figure>
+<p>如果有人用static_cast寫出這種轉型法，請不要客氣，對這個人飽以老拳，直到他知道再也不該寫出這種code為止。</p>
+<p>##dynamic_cast<br>正常來講，這種cast在絕大多數的情況下，會被視為一種設計錯誤，少數幾種情況下則是由於要達成exception neutral所作出的妥協，我們在這裡先忽略掉後面這種情況，來談談為什麼這多半會被視為設計錯誤。</p>
+<p>這種用法以粗劣的型別檢查，不該做的向下轉型占了絕大部分。粗劣的型別檢查大概會看起來像是下面這種code</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">A* a = <span class="literal">nullptr</span>;</div><div class="line">a = <span class="keyword">dynamic_cast</span>&lt;A*&gt;(input);</div><div class="line"><span class="keyword">if</span>(a != <span class="literal">nullptr</span>) <span class="comment">//轉型成功了!</span></div><div class="line">&#123;</div><div class="line">	a-&gt;doSomethingOnlyInA();</div><div class="line">&#125;</div><div class="line"><span class="keyword">else</span> </div><div class="line">&#123;</div><div class="line">	<span class="comment">//傳進來的東西居然不是A* 那我們應該怎樣怎樣</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>這種寫法其實就是完全照抄java的關鍵字<code>instanceof</code>的用法<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">A a = null;</div><div class="line"><span class="keyword">if</span>(input instanceof A) &#123;</div><div class="line">	.....</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>這種基本上我想毫無疑問是一種設計錯誤。一個良好的module不應該倚賴RTTI才能正常運作 – 尤其你要知道，RTTI是可以在編譯flag裡面基於各種理由關閉的(以gcc來講，<code>-fno-rtti</code>)。我們應該要倚賴於正確的函數簽名來讓compiler幫我們檢查進來的型別正確性，以及利用各種pattern避免掉「父類別需要去invoke特定某種子類別才有的class function」。上轉下其實很類似這個例子，所以就不贅述了，而且更明顯 – 你需要上轉下，那很明顯你一定哪裡寫錯啦!</p>
+<p>##const_cast<br>這東西主要是為了相容性而產生的東西，如果跟相容性無關的話，那我相信也是95%機率以上用錯了。相容性來說，這主要是為了相容3rd party，下面舉個例子</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//我們有個3rd party長這樣</span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">process</span><span class="params">(<span class="keyword">int</span> port, <span class="keyword">int</span> type)</span></span>;</div><div class="line"></div><div class="line"><span class="comment">//而我們有一個自己的函數長這樣</span></div><div class="line"><span class="function"><span class="keyword">const</span> <span class="keyword">int</span> <span class="title">getPort</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line"><span class="comment">//所以編譯這樣會炸掉</span></div><div class="line"><span class="comment">//int succeed = process(getPort(), type);</span></div><div class="line"><span class="comment">//必須要改成這樣才能過</span></div><div class="line"><span class="keyword">int</span> succeed = process(<span class="keyword">const_cast</span>&lt;<span class="keyword">int</span>&gt;(getPort()), type);</div></pre></td></tr></table></figure>
+<p>會有人好奇地問，如果我們移除掉const-ness然後去對她做寫入的動作的話會怎樣呢？答案是：很難講，端看這個const是放在哪裡。可能會因為寫入read-only區塊(也就是ELF的.data)炸飛，也有可能在某些compiler裡面相安無事，也有可能因為int被最佳化為short(假設這系統short比int小)，而你寫了一個比short大的東西而讓貞子從你螢幕爬出來…總之，就是未定義，最幸運的情況下就是炸掉當機並且明確地跟你說你試圖寫入read-only區塊。</p>
+<p>是的，由於3rd party並沒有掛保證他不會去改動port，當然也沒有把保證寫在signature上（所以我們才會需要const_cast）。當然，int你可以借由把它複製到另外一個int在傳進去來避開這問題，那要是3rd party長這樣呢</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">process</span><span class="params">(<span class="keyword">void</span>** memPageStart, <span class="keyword">int</span> type)</span></span>;</div></pre></td></tr></table></figure>
+<p>恩….. XD 這種地雷其實不少見，尤其是你再寫C++時卻需要c-style的3rd party更是常見。 這的確是有危險性（因為你實在是沒辦法保證3rd party在裡面會不會偷寫），不過可以算是一種妥協。</p>
+<p>const_cast還有另外一個功能就是移除/增加物件的volatile性質。這個….我只能說，你用到這一步大概99.95%是錯的，請儘量避免這種行為。</p>
+<p>##reinterpret_cast<br>其實在C裡面的轉型，扣掉void*互轉以外，大概大多數都是套用這種形式存在，包含struct mask這類的東西。struct mask這名詞可能大家有點陌生，舉個比較接近的例子來看看的話大概就是類似這個</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> rc = connect(sd, (struct sockaddr *)&amp;serveraddr, <span class="keyword">sizeof</span>(serveraddr));</div></pre></td></tr></table></figure>
+<p>裡面的<code>sockaddr_in*</code>硬轉成<code>sockaddr*</code>就是一種struct mask。這種轉法其實在C++裡面別無他法，就是得用reinterpret_cast去轉，其他的很常見的char<em>轉int</em>等等都是得用這個東西–基本上這算是一帖萬古黴素，沒有其他的方法能用的情況下就是這樣做。</p>
+<p>不過這東西其實頗危險，基本上也是為了相容性而存在的。在C裡面並沒有繼承這東西，所以當有數種不同的結構裡面有相同的構造的時候，就得使用這種方法去轉型。以這個例子來說，sockaddr*保留了14個char的空間給他的子類別自由發揮，所以她長得大概像是這樣子<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span> &#123;</span></div><div class="line"><span class="keyword">unsigned</span>  <span class="keyword">short</span>  sa_family;     <span class="comment">/* address family, AF_xxx */</span></div><div class="line"><span class="keyword">char</span>  sa_data[<span class="number">14</span>];                 <span class="comment">/* 14 bytes of protocol address */</span></div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>後面這char[14]是什麼意思，是由他的子類別來決定，比方說其中一個子類別是sockaddr_in<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">struct</span>  <span class="title">sockaddr_in</span> &#123;</span></div><div class="line"><span class="keyword">short</span>  <span class="keyword">int</span>  sin_family;                      <span class="comment">/* Address family */</span></div><div class="line"><span class="keyword">unsigned</span>  <span class="keyword">short</span>  <span class="keyword">int</span>  sin_port;       <span class="comment">/* Port number */</span></div><div class="line"><span class="class"><span class="keyword">struct</span>  <span class="title">in_addr</span>  <span class="title">sin_addr</span>;</span>              <span class="comment">/* Internet address */</span></div><div class="line"><span class="keyword">unsigned</span>  <span class="keyword">char</span>  sin_zero[<span class="number">8</span>];         <span class="comment">/* Same size as struct sockaddr */</span></div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>值得注意的是sockaddr_in也留了8個char的大小來做padding，以對齊sockaddr的大小。由於C沒有繼承，所以只好用這種方法來達成很類似繼承的效果。在C++中這種API別無選擇，就真的只有reinterpret_cast可以用，因為他們在class層級來看是風馬牛不相干的。</p>
+<p>reinterpret_cast最常出包的地方在endian不同的系統，也就是說，只要用了這種轉法，通常也代表了不可移植。至於為什麼endian會出包呢？因為reinterpret_cast的做法基本上是隨著編譯器而變，大家可以仔細想想為什麼。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2014/01/08/talking-about-the-four-c-style-casting/" data-id="cj3b7ce680007qvsithnygjca" class="article-share-link">Partager</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-fibonacci-sequence-of-three-kinds-of-writing-in-c" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/01/01/fibonacci-sequence-of-three-kinds-of-writing-in-c/" class="article-date">
+  <time datetime="2013-12-31T23:33:00.000Z" itemprop="datePublished">2014-01-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/01/01/fibonacci-sequence-of-three-kinds-of-writing-in-c/">Fibonacci數列的三種寫法 in C++</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>剛剛生病閒著，突然想到連續數列通常在C++有三種表達方法，包含template偏特化，遞迴以及傳統迴圈，於是就拿Fibonacci來作範例寫一組來玩玩看。</p>
+<p>這組code展示了這三種寫法。人家說遞迴好寫不是沒有理由的，但是能活著撐過高order的只有迴圈 – 其他都會有call depth爆炸的問題 =P 有興趣的可以玩玩看</p>
+<p>###Template &amp; Specialization</p>
+<ul>
+<li>最顯為人知的特點就是他是編譯期計算。然而，這算是優點也算是缺點，因為template的模板參數必須是型別或者const – 這很合理，我們不可能依賴runtime產生的數據去讓這東西編譯期產生object。優點來講，就是幾乎所有計算的功都在編譯期完成，以下面的範例來講，這幾乎等於是 <figure class="highlight plain"><figcaption><span><< 6765 << endl;```。基本上，很適合建表，但是很占記憶體資源也得很小心的把runtime資料切開。</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">+ 另外其實他邏輯跟寫法都跟Recursive差不多，滿容易變換的，老實講扣掉除錯中的錯誤訊息以外，也滿容易理解的。</div><div class="line">+ 所以同樣的會發生一些call depth方面的問題，不過是炸在不夠力的編譯器上而非runtime。</div><div class="line"></div><div class="line">###Functional Recursive</div><div class="line">+ 看下面的例子就知道這超直覺的，基本上遞迴算是很多數列問題最直觀最直覺的解答。</div><div class="line">+ 但是Call Depth是個很大的問題，以VC6來講，這東西沒辦法處理超過8x以上，而G++似乎也差不多是類似的數字就會炸掉。</div><div class="line">+ 效能普遍很拉蒙，簡單的代價啊（遠目）</div><div class="line"></div><div class="line">###Classic Loop</div><div class="line">+ 基本上這恐怕是三者之中最複雜最難寫的一種</div><div class="line">+ 可是卻是唯一可以活過call depth陷阱的一種做法，下面的20改成100，只有Classic Loop可以活下來</div><div class="line"></div><div class="line">-------------------------</div><div class="line">不過，還是先來個動手玩吧...</div></pre></td></tr></table></figure></li>
+</ul>
+<p>#include <iostream></iostream></p>
+<p>template<int order=""><br>long fibonacci() { return fibonacci<order-1>() + fibonacci<order-2>();}</order-2></order-1></int></p>
+<p>template&lt;&gt;<br>long fibonacci<0>() { return 0; }</0></p>
+<p>template&lt;&gt;<br>long fibonacci<1>() { return 1; }</1></p>
+<p>long fibonacci_rec(int order) {<br>    if(order == 0)<br>        return 0;<br>    if(order == 1)<br>        return 1;<br>    return fibonacci_rec(order - 1) + fibonacci_rec(order - 2);<br>}</p>
+<p>long fibonacci_classic(int order) {<br>    if(order == 0)<br>        return 0;<br>    if(order == 1)<br>        return 1;</p>
+<pre><code>long past2 = 0, past1 = 1, ret = 0;
+for(int i = 0; i &lt; order - 1; ++i) {
+    ret = past2 + past1;
+    past2 = past1;
+    past1 = ret;
+}
+return ret;
+</code></pre><p>}</p>
+<p>using namespace std;<br>int main(int argc, char *argv[]) {</p>
+<pre><code>cout &lt;&lt; fibonacci&lt;20&gt;() &lt;&lt; endl;
+cout &lt;&lt; fibonacci_rec(20) &lt;&lt; endl;
+cout &lt;&lt; fibonacci_classic(20) &lt;&lt; endl;
+
+return 0;
+</code></pre><p>}<br>```</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2014/01/01/fibonacci-sequence-of-three-kinds-of-writing-in-c/" data-id="cj3b7ce660006qvsizjkisxyc" class="article-share-link">Partager</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-the-path-to-scheduled-process-singleton" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/12/26/the-path-to-scheduled-process-singleton/" class="article-date">
+  <time datetime="2013-12-26T00:56:00.000Z" itemprop="datePublished">2013-12-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/12/26/the-path-to-scheduled-process-singleton/">The path to Scheduled Process Singleton</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>我們來看看怎麼改造一個Singleton讓它成為thread-safe。</p>
+<p>##本來的Singleton<br>我們先複習一下一個基本的Singleton應該是長什麼樣子<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">class Singleton &#123;</div><div class="line">private:</div><div class="line">    static Singleton* s_defInst;</div><div class="line">    Singleton() = delete;</div><div class="line">    Singleton&amp; Singleton(const Singleton&amp;) = delete;</div><div class="line">    Singleton&amp; operator=(const Singleton&amp;) = delete;</div><div class="line">   </div><div class="line">public:</div><div class="line">    //還記得為什麼是Singleton&amp;而不是Singleton*嗎?</div><div class="line">    static Singleton&amp; getInst() &#123;</div><div class="line">        if(s_defInst == nullptr)</div><div class="line">            s_defInst = new Singleton();</div><div class="line">        return *s_defInst;	</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    void methodA();</div><div class="line">    RTValue methodB();</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>所以，我們使用Singleton的時候看起來會像是這樣<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Singleton::getInst().methodA();</div></pre></td></tr></table></figure></p>
+<p>##我們希望這個Singleton能怎樣呢<br>目前來說，所以我們會希望有一個東西可以傳回一個「thread safe」的handle，這東西完全跟拿::getInst()擁有完全相同的界面，唯一的不同就是他會「排程」丟進Singleton讓他去一個個的做，或者讓它可以「僅鎖定共用資料，但是不會lock thread local」的方法來跑。</p>
+<p>所以我們現在至少可以看出這東西會幾個Policy : </p>
+<pre><code>1. 我們要能選擇multi thread的「策略」，可以讓他queue，也可以讓他選擇regular，甚至可以指定thread pool
+2. 我們要能選擇single的生成方法以及原則(其實這不就是Modern C++ Design第一章的例子嗎)
+3. 如果可能的話，Singleton自己有一個骨架，而實作跟界面要能當作Policy傳進來。
+</code></pre><p>而讓他看起來應該至少要像是這樣<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ISingletonMethods* s = Singleton::getProxy();</div></pre></td></tr></table></figure></p>
+<p>或者更進一步，我們應該要有能力選擇要得到一個blocked或者non-blocked的proxy<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">ISingletonMethods* blocked = Singleton::getProxy&lt;blocked&gt;();</div><div class="line">ISingletonMethods* unblocked = Singleton::getProxy&lt;unblocked&gt;();</div><div class="line"></div><div class="line">//blocked就像普通Singleton，會block自己的這個thread在得到結果</div><div class="line">blocked-&gt;methodA();</div><div class="line"></div><div class="line">//unblocked會讓你直接回傳...雖然我們現在還沒想到要怎麼傳比較漂亮</div><div class="line">//但是沒關係，我們後面會想到方法的 XD</div><div class="line">boost::tuple&lt;int, IRetNotifyHandle&gt; ret = unblocked-&gt;methodA();</div></pre></td></tr></table></figure></p>
+<p>##「提供功能的界面以及實作」<br>很明顯的，如果要讓getProxy()跟getInst()一樣的功能的話，他們必須要有一個共通的界面才可以。當然，爽的話寫死也不會有什麼問題，但是我想這不是一個好的coder該做的事情 =P</p>
+<p>假設，我們現在有兩個method，分別是<code>void methodA();</code>跟<code>RetValue methodB();</code>，那很明顯我們將會需要一個界面來宣告這個，兩個實作這個<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">class ISingletonMethod &#123;</div><div class="line">    public:</div><div class="line">    void methodA() = 0;</div><div class="line">    RetValue methodB() = 0;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">class SingletonMethodImpl : public ISingletonMethod &#123;</div><div class="line">    public:</div><div class="line">    void methodA() &#123; printf(&quot;This is methodA Impl!&quot;); &#125;</div><div class="line">    RetValue methodB &#123; return RetValue(); &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">class SingletonMethodProxy : public ISingletonMethod &#123;</div><div class="line">    public:</div><div class="line">    void methodA() &#123; /*還沒有能決定這邊要queue呢 還是thread呢*/ &#125;</div><div class="line">    RetValue methodB() &#123; /*這邊更麻煩，我們甚至還不知道該怎麼拿ret value*/ &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>##決定multi thread策略的Proxy<br>現在我們有界面了，我們也定義出來這些東西了，所以我們可以讓Singleton看起來像是這樣 – 目前來講，我們恐怕只能讓<code>getProxy()</code>傳回指標，這有點尷尬呢</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyInterface, typename _TyImpl&gt;</div><div class="line">class Singleton : public _TyImpl &#123;</div><div class="line">private:</div><div class="line">    static Singleton* s_defInst;</div><div class="line">    Singleton() = delete;</div><div class="line">    Singleton&amp; Singleton(const Singleton&amp;) = delete;</div><div class="line">    Singleton&amp; operator=(const Singleton&amp;) = delete;</div><div class="line">   </div><div class="line">public:</div><div class="line">    //還記得為什麼是Singleton&amp;而不是Singleton*嗎?</div><div class="line">    static Singleton&amp; getInst() &#123;</div><div class="line">        if(s_defInst == nullptr)</div><div class="line">            s_defInst = new Singleton();</div><div class="line">        return *s_defInst;	</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    static _TyInterface* getProxy() &#123;</div><div class="line">       /*看來我們的主戰場就在這裡了。*/</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    //這兩個沒了，改用繼承的方式繼承過來</div><div class="line">    //void methodA();</div><div class="line">    //RTValue methodB();</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>這Proxy該怎麼寫呢？目前來看，Proxy至少要能做到轉發給impl，所以這別無選擇，一定不是繼承，而是template。我們先寫一個什麼都不做的Proxy試試看</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyInterface, typename _TyImpl&gt;</div><div class="line">class Proxy : public _TyInterface &#123;</div><div class="line">/*糟糕 中間要轉發一狗票_TyInterface的東西該怎麼寫？*/</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>很明顯，這種寫法會卡在Proxy無法正確的在編譯期產生正確的Proxy實作。我們可能會希望Proxy「經由某個管理步驟」以後完美的轉發給實作，看起來template展開後會很像是這樣<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">class SingletonMethodProxy : public ISingleton &#123;</div><div class="line">	SingletonMethodImpl _impl;</div><div class="line">  void methodA() &#123; doSomething(); _impl-&gt;methodA(); &#125;</div><div class="line">  RetValue methodB() &#123;doSomething(); return _impl-&gt;methodB(); &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>問題來了，methodA(), methodB()的Proxy實作我們無法順利地在template裡面轉發給_impl，使用者沒辦法如同呼叫Singleton::getInst().methodA()般的對Proxy做一樣的事情。</p>
+<p>這個問題其實困擾了我一陣子，不過後來發現這可以經由override <code>operator-&gt;()</code>跟<code>operator.()</code>來解決一部份，這個code看起來會很像下面這樣…<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyImpl&gt;</div><div class="line">class Proxy : public _TyImpl &#123;</div><div class="line">private:</div><div class="line">    _TyImpl&amp; _impl;</div><div class="line">    void doSomething();</div><div class="line">public:</div><div class="line">    Proxy(_TyImpl&amp; impl) : _impl(_TyImpl) &#123; &#125;</div><div class="line">    _TyImpl&amp; operator.() &#123; doSomething(); return _impl; &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>這看起來很ok 但是有個問題：operator.是不被允許overload的，我們必須要overload operator-&gt;。overload operator-&gt;會產生另外一個很有趣（但是還算可以接受的）問題，我們先看看整個proxy應該要長什麼樣子<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyImpl&gt;</div><div class="line">class Proxy &#123;</div><div class="line">	_TyImpl* _impl;</div><div class="line">	void doSomething() &#123; cout &lt;&lt; &quot;DoSomething&quot; &lt;&lt; endl; &#125;</div><div class="line">	public:</div><div class="line">	Proxy(_TyImpl* impl = nullptr) : _impl(impl) &#123;</div><div class="line">		if(_impl == nullptr)</div><div class="line">			_impl = new _TyImpl();</div><div class="line">	&#125;</div><div class="line">	_TyImpl* operator-&gt;() &#123; doSomething(); return _impl; &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>這會產生一個問題，就是這做法其實相當不直覺，有點像smart pointer的做法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Proxy&lt;SingletonMethodImpl&gt;* proxy1 = new Proxy&lt;SingletonMethodImpl&gt;;</div><div class="line">proxy1-&gt;methodA(); //compile time error!</div><div class="line">(*proxy1)-&gt;methodA(); //ok, but WTF??</div><div class="line"></div><div class="line">Proxy&lt;SingletonMethodImpl&gt; proxy2;</div><div class="line">proxy2-&gt;methodA(); //ok, pass, 但是真的很不直覺，很像smart pointer的做法。、</div></pre></td></tr></table></figure></p>
+<p>暫時解決了轉發的問題以後，現在要開始解決最難纏的排程的問題。這個其實可以借由Lambda相當清楚地解決一部份，不過仍然相當的抽象。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyImpl&gt;</div><div class="line">_TyImpl* Proxy&lt;_TyImpl&gt;::operator-&gt;() &#123;</div><div class="line">    /*所以我們這邊要做什麼來排程呢？*/</div><div class="line">    return _impl; //這邊都把處理權交出去了....</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>首先，很明顯的我們不可能直接return _impl了，我們必須要回一個proxy(proxy裡面的proxy，有沒有那麼拗口？)，這個proxy的proxy需要能被cast成_TyImpl，所以大概會長這樣<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyImpl&gt; </div><div class="line">class PProxy &#123;</div><div class="line">	operator _TyImpl*();</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2013/12/26/the-path-to-scheduled-process-singleton/" data-id="cj3b7ce640005qvsifrzy08et" class="article-share-link">Partager</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-explicit-protocols" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/12/19/explicit-protocols/" class="article-date">
+  <time datetime="2013-12-18T19:12:00.000Z" itemprop="datePublished">2013-12-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/12/19/explicit-protocols/">Implicit Protocols</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Implicit protocols, which is hint by its own name, is a protocol that “Other would not know”, and it is a bad design in most cases.</p>
+<p>Let us start from a simple example :</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">IService getService(String serviceName) &#123;</div><div class="line">	String[] args = serviceName.spilt(&apos; &apos;);</div><div class="line">	if(args.length == 1) //without any arguments</div><div class="line">		return targetService;</div><div class="line">    </div><div class="line">	if(args[1].equalsIgnoreCase(&quot;nonshared&quot;)</div><div class="line"> 		return createServiceFromClassName(serviceName);</div><div class="line">  </div><div class="line">  return null;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>This is a very bad design. We can guess the intentation from source code, for example, if the service name is “IOService” : we can get the IOService from <figure class="highlight plain"><figcaption><span>but if we want to have new instance other then the existed one, we should get this service as ```getService("IOService nonshared");```.</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">We **implicitly** uses the service name as a totally non-related usage. Even with documents, we should not do this because it will insanely increase the complexity of maintaining, and how do others know this? by looking into source code coincidentally observed this usage by others? no, it **NOT** makes sense, avoid this.</div><div class="line"></div><div class="line">Some implicit protocol comes with another name : *Convension*</div><div class="line"></div><div class="line">There is a perfect example in Java. We usually use ```~``` as representive of **Home Dictionary**, so it would come like this code :</div></pre></td></tr></table></figure></p>
+<p>File file = new File(“~/Desktop/example.txt”);<br>file.mkdirs();<br>```</p>
+<p>You would never find your file under the “~/Desktop” where it is expected, instead, you can guess where it goes :).</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2013/12/19/explicit-protocols/" data-id="cj3b7ce610003qvsi1ndl1cpg" class="article-share-link">Partager</a>
       
       
     </footer>
@@ -528,7 +603,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li></ul>
     </div>
   </div>
 
@@ -536,17 +611,9 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">Articles récents</h3>
     <div class="widget">
       <ul>
-        
-          <li>
-            <a href="/2017/04/09/how-to-use-cmake-with-git-to-easily-use-external-library/">如何利用CMake跟git來輕易的使用外部Library</a>
-          </li>
-        
-          <li>
-            <a href="/2017/02/13/python-trick-burst-attack-test/">Python Trick : Burst Attack Test</a>
-          </li>
         
           <li>
             <a href="/2016/02/03/most-vexing-parsingc/">Most Vexing Parsing(C++)</a>
@@ -557,7 +624,15 @@
           </li>
         
           <li>
-            <a href="/2015/08/16/starry-sky/">Starry Sky</a>
+            <a href="/2015/07/26/create-your-own-pgp-digital-signature/">創造一個自己的PGP電子簽章</a>
+          </li>
+        
+          <li>
+            <a href="/2015/06/15/sourceforge-bundled-third-party-software-causes-serious-disputes/">SourceForge綑綁第三方軟體引發嚴重爭議</a>
+          </li>
+        
+          <li>
+            <a href="/2015/04/12/oauth-with-android/">舊文回收:OAuth with Android</a>
           </li>
         
       </ul>
@@ -573,7 +648,7 @@
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2017 John Doe<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>
