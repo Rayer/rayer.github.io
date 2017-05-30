@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>淺談C++ Style的四種casting | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="這四個的名稱應該大家都很熟了，包含了static_cast, dynamic_cast, const_cast跟reinterpret_cast。不過，這些cast其實或多或少都有一些隱藏的灰色地帶，在這篇文章，我們試圖來看看這四種cast分別有什麼不容易被普通PG看到的地方。 附錄：還有一個駭人聽聞的規格外的東西叫做boost::lexical_cast, 這東西我們晚點聊一下。 ##stati">
+<meta property="og:type" content="article">
+<meta property="og:title" content="淺談C++ Style的四種casting">
+<meta property="og:url" content="http://yoursite.com/2014/01/08/talking-about-the-four-c-style-casting/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="這四個的名稱應該大家都很熟了，包含了static_cast, dynamic_cast, const_cast跟reinterpret_cast。不過，這些cast其實或多或少都有一些隱藏的灰色地帶，在這篇文章，我們試圖來看看這四種cast分別有什麼不容易被普通PG看到的地方。 附錄：還有一個駭人聽聞的規格外的東西叫做boost::lexical_cast, 這東西我們晚點聊一下。 ##stati">
+<meta property="og:updated_time" content="2017-05-29T22:29:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="淺談C++ Style的四種casting">
+<meta name="twitter:description" content="這四個的名稱應該大家都很熟了，包含了static_cast, dynamic_cast, const_cast跟reinterpret_cast。不過，這些cast其實或多或少都有一些隱藏的灰色地帶，在這篇文章，我們試圖來看看這四種cast分別有什麼不容易被普通PG看到的地方。 附錄：還有一個駭人聽聞的規格外的東西叫做boost::lexical_cast, 這東西我們晚點聊一下。 ##stati">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-talking-about-the-four-c-style-casting" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/01/08/talking-about-the-four-c-style-casting/" class="article-date">
+  <time datetime="2014-01-07T23:53:00.000Z" itemprop="datePublished">2014-01-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      淺談C++ Style的四種casting
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>這四個的名稱應該大家都很熟了，包含了static_cast, dynamic_cast, const_cast跟reinterpret_cast。不過，這些cast其實或多或少都有一些隱藏的灰色地帶，在這篇文章，我們試圖來看看這四種cast分別有什麼不容易被普通PG看到的地方。</p>
+<p>附錄：還有一個駭人聽聞的規格外的東西叫做boost::lexical_cast, 這東西我們晚點聊一下。</p>
+<p>##static_cast<br><code>static_cast&lt;Ty&gt;</code>是一個最常見的轉型法，這個轉型其實代表的背後意義是「編譯器被允許做的隱式轉型，void<em>間的互轉，以及non-runetime下安全的子轉父」，任何超出這個範疇的都會直接被編譯器擋下來，包含`int</em><code>轉</code>char<em>`這種行為，都會被擋下。編譯器會自動幫你做的隱式轉換包含了像是int幫你轉成double等等(也就是當你用explicit關鍵字的時候想要編譯器避免的行為)，void</em>互轉是特例，任何東西都能轉成void<em>而void</em>也能轉成任何東西(我一直認為這條規則是為了相容性而存在的)，以及比如<code>class B : public A</code>下允許<code>A* a = static_cast&lt;A*&gt;(new B());</code>這種轉法(但是並不允許相反的<code>B* b = static_cast&lt;B*&gt;(new A());</code>)。</p>
+<p>如果你很有把握你沒搞出太大致命的錯誤的話，由於少了很耗資源的RTTI檢查，理論上這種轉法會比dynamic_cast快上非常多。另外，如果你的dynamic_cast換成static_cast居然會出錯或者編不過（比方說你居然有地方需要做<code>if(dynamic_cast&lt;_ty*&gt;(a) != nullptr)</code>），那基本上我想你有95%機會結構上有非常值得非議的地方。正常的code其實不太應該需要dynamic_cast這關鍵字的，後面會詳述為什麼有些人會覺得dynamic_cast非用不可。</p>
+<p>其他的比方說<code>int*</code>轉<code>char*</code>這種雖然大家都司空見慣(在C真的是見怪不怪的)的轉型，這個是會被打回票的。但是！下面這段code居然是可以過的!</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span>* a;</div><div class="line"><span class="keyword">char</span>* b;</div><div class="line"> <span class="comment">//當然下面兩段code都過不了compiler</span></div><div class="line"> <span class="comment">//a = static_cast&lt;int*&gt;(b);</span></div><div class="line"> <span class="comment">//b = static_cast&lt;char*&gt;(a);</span></div><div class="line"> </div><div class="line"> <span class="comment">//可是這段是可以過的，WTF</span></div><div class="line">b = <span class="keyword">static_cast</span>&lt;<span class="keyword">char</span>*&gt;(<span class="keyword">static_cast</span>&lt;<span class="keyword">void</span>*&gt;(a));</div></pre></td></tr></table></figure>
+<p>如果有人用static_cast寫出這種轉型法，請不要客氣，對這個人飽以老拳，直到他知道再也不該寫出這種code為止。</p>
+<p>##dynamic_cast<br>正常來講，這種cast在絕大多數的情況下，會被視為一種設計錯誤，少數幾種情況下則是由於要達成exception neutral所作出的妥協，我們在這裡先忽略掉後面這種情況，來談談為什麼這多半會被視為設計錯誤。</p>
+<p>這種用法以粗劣的型別檢查，不該做的向下轉型占了絕大部分。粗劣的型別檢查大概會看起來像是下面這種code</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">A* a = <span class="literal">nullptr</span>;</div><div class="line">a = <span class="keyword">dynamic_cast</span>&lt;A*&gt;(input);</div><div class="line"><span class="keyword">if</span>(a != <span class="literal">nullptr</span>) <span class="comment">//轉型成功了!</span></div><div class="line">&#123;</div><div class="line">	a-&gt;doSomethingOnlyInA();</div><div class="line">&#125;</div><div class="line"><span class="keyword">else</span> </div><div class="line">&#123;</div><div class="line">	<span class="comment">//傳進來的東西居然不是A* 那我們應該怎樣怎樣</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>這種寫法其實就是完全照抄java的關鍵字<code>instanceof</code>的用法<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">A a = null;</div><div class="line"><span class="keyword">if</span>(input instanceof A) &#123;</div><div class="line">	.....</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>這種基本上我想毫無疑問是一種設計錯誤。一個良好的module不應該倚賴RTTI才能正常運作 – 尤其你要知道，RTTI是可以在編譯flag裡面基於各種理由關閉的(以gcc來講，<code>-fno-rtti</code>)。我們應該要倚賴於正確的函數簽名來讓compiler幫我們檢查進來的型別正確性，以及利用各種pattern避免掉「父類別需要去invoke特定某種子類別才有的class function」。上轉下其實很類似這個例子，所以就不贅述了，而且更明顯 – 你需要上轉下，那很明顯你一定哪裡寫錯啦!</p>
+<p>##const_cast<br>這東西主要是為了相容性而產生的東西，如果跟相容性無關的話，那我相信也是95%機率以上用錯了。相容性來說，這主要是為了相容3rd party，下面舉個例子</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//我們有個3rd party長這樣</span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">process</span><span class="params">(<span class="keyword">int</span> port, <span class="keyword">int</span> type)</span></span>;</div><div class="line"></div><div class="line"><span class="comment">//而我們有一個自己的函數長這樣</span></div><div class="line"><span class="function"><span class="keyword">const</span> <span class="keyword">int</span> <span class="title">getPort</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line"><span class="comment">//所以編譯這樣會炸掉</span></div><div class="line"><span class="comment">//int succeed = process(getPort(), type);</span></div><div class="line"><span class="comment">//必須要改成這樣才能過</span></div><div class="line"><span class="keyword">int</span> succeed = process(<span class="keyword">const_cast</span>&lt;<span class="keyword">int</span>&gt;(getPort()), type);</div></pre></td></tr></table></figure>
+<p>會有人好奇地問，如果我們移除掉const-ness然後去對她做寫入的動作的話會怎樣呢？答案是：很難講，端看這個const是放在哪裡。可能會因為寫入read-only區塊(也就是ELF的.data)炸飛，也有可能在某些compiler裡面相安無事，也有可能因為int被最佳化為short(假設這系統short比int小)，而你寫了一個比short大的東西而讓貞子從你螢幕爬出來…總之，就是未定義，最幸運的情況下就是炸掉當機並且明確地跟你說你試圖寫入read-only區塊。</p>
+<p>是的，由於3rd party並沒有掛保證他不會去改動port，當然也沒有把保證寫在signature上（所以我們才會需要const_cast）。當然，int你可以借由把它複製到另外一個int在傳進去來避開這問題，那要是3rd party長這樣呢</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">process</span><span class="params">(<span class="keyword">void</span>** memPageStart, <span class="keyword">int</span> type)</span></span>;</div></pre></td></tr></table></figure>
+<p>恩….. XD 這種地雷其實不少見，尤其是你再寫C++時卻需要c-style的3rd party更是常見。 這的確是有危險性（因為你實在是沒辦法保證3rd party在裡面會不會偷寫），不過可以算是一種妥協。</p>
+<p>const_cast還有另外一個功能就是移除/增加物件的volatile性質。這個….我只能說，你用到這一步大概99.95%是錯的，請儘量避免這種行為。</p>
+<p>##reinterpret_cast<br>其實在C裡面的轉型，扣掉void*互轉以外，大概大多數都是套用這種形式存在，包含struct mask這類的東西。struct mask這名詞可能大家有點陌生，舉個比較接近的例子來看看的話大概就是類似這個</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> rc = connect(sd, (struct sockaddr *)&amp;serveraddr, <span class="keyword">sizeof</span>(serveraddr));</div></pre></td></tr></table></figure>
+<p>裡面的<code>sockaddr_in*</code>硬轉成<code>sockaddr*</code>就是一種struct mask。這種轉法其實在C++裡面別無他法，就是得用reinterpret_cast去轉，其他的很常見的char<em>轉int</em>等等都是得用這個東西–基本上這算是一帖萬古黴素，沒有其他的方法能用的情況下就是這樣做。</p>
+<p>不過這東西其實頗危險，基本上也是為了相容性而存在的。在C裡面並沒有繼承這東西，所以當有數種不同的結構裡面有相同的構造的時候，就得使用這種方法去轉型。以這個例子來說，sockaddr*保留了14個char的空間給他的子類別自由發揮，所以她長得大概像是這樣子<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span> &#123;</span></div><div class="line"><span class="keyword">unsigned</span>  <span class="keyword">short</span>  sa_family;     <span class="comment">/* address family, AF_xxx */</span></div><div class="line"><span class="keyword">char</span>  sa_data[<span class="number">14</span>];                 <span class="comment">/* 14 bytes of protocol address */</span></div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>後面這char[14]是什麼意思，是由他的子類別來決定，比方說其中一個子類別是sockaddr_in<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">struct</span>  <span class="title">sockaddr_in</span> &#123;</span></div><div class="line"><span class="keyword">short</span>  <span class="keyword">int</span>  sin_family;                      <span class="comment">/* Address family */</span></div><div class="line"><span class="keyword">unsigned</span>  <span class="keyword">short</span>  <span class="keyword">int</span>  sin_port;       <span class="comment">/* Port number */</span></div><div class="line"><span class="class"><span class="keyword">struct</span>  <span class="title">in_addr</span>  <span class="title">sin_addr</span>;</span>              <span class="comment">/* Internet address */</span></div><div class="line"><span class="keyword">unsigned</span>  <span class="keyword">char</span>  sin_zero[<span class="number">8</span>];         <span class="comment">/* Same size as struct sockaddr */</span></div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>值得注意的是sockaddr_in也留了8個char的大小來做padding，以對齊sockaddr的大小。由於C沒有繼承，所以只好用這種方法來達成很類似繼承的效果。在C++中這種API別無選擇，就真的只有reinterpret_cast可以用，因為他們在class層級來看是風馬牛不相干的。</p>
+<p>reinterpret_cast最常出包的地方在endian不同的系統，也就是說，只要用了這種轉法，通常也代表了不可移植。至於為什麼endian會出包呢？因為reinterpret_cast的做法基本上是隨著編譯器而變，大家可以仔細想想為什麼。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2014/01/08/talking-about-the-four-c-style-casting/" data-id="cj3b76vo00007hzsi10d023kn" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/01/15/talk-about-why-mac-gradually-eating-away-at-pc-market/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          聊聊Mac為什麼逐漸蠶食PC市場
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/01/01/fibonacci-sequence-of-three-kinds-of-writing-in-c/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Fibonacci數列的三種寫法 in C++</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/04/09/how-to-use-cmake-with-git-to-easily-use-external-library/">如何利用CMake跟git來輕易的使用外部Library</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/python-trick-burst-attack-test/">Python Trick : Burst Attack Test</a>
+          </li>
+        
+          <li>
+            <a href="/2016/02/03/most-vexing-parsingc/">Most Vexing Parsing(C++)</a>
+          </li>
+        
+          <li>
+            <a href="/2015/08/23/markdown-text-color-support/">Markdown文字色彩支援</a>
+          </li>
+        
+          <li>
+            <a href="/2015/08/16/starry-sky/">Starry Sky</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

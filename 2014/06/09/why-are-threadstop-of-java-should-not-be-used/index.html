@@ -3,14 +3,18 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Archives: 2017 | Hexo</title>
+  <title>[翻譯] 為什麼Java的Thread.stop()不該被使用？ | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/archives/2017/index.html">
+  <meta name="description" content="這篇算是相當詳盡的說明了一些設計原則，包含了為什麼Java不再允許使用者直接中止(kill)掉一個運行中的thread物件，以及有沒有任何的替代方案。相對的，C++的std::thread也有一些行為上需要注意的地方，不過往後再提這點。 原文在此 ##Java Thread為什麼有些method被廢棄了###為什麼Thread.stop不再被支援了？理由很簡單：這東西從本質上就不安全。你去.sto">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[翻譯] 為什麼Java的Thread.stop()不該被使用？">
+<meta property="og:url" content="http://yoursite.com/2014/06/09/why-are-threadstop-of-java-should-not-be-used/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="這篇算是相當詳盡的說明了一些設計原則，包含了為什麼Java不再允許使用者直接中止(kill)掉一個運行中的thread物件，以及有沒有任何的替代方案。相對的，C++的std::thread也有一些行為上需要注意的地方，不過往後再提這點。 原文在此 ##Java Thread為什麼有些method被廢棄了###為什麼Thread.stop不再被支援了？理由很簡單：這東西從本質上就不安全。你去.sto">
+<meta property="og:updated_time" content="2017-05-29T22:29:26.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
+<meta name="twitter:title" content="[翻譯] 為什麼Java的Thread.stop()不該被使用？">
+<meta name="twitter:description" content="這篇算是相當詳盡的說明了一些設計原則，包含了為什麼Java不再允許使用者直接中止(kill)掉一個運行中的thread物件，以及有沒有任何的替代方案。相對的，C++的std::thread也有一些行為上需要注意的地方，不過往後再提這點。 原文在此 ##Java Thread為什麼有些method被廢棄了###為什麼Thread.stop不再被支援了？理由很簡單：這東西從本質上就不安全。你去.sto">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -59,58 +63,63 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2017/04/09/how-to-use-cmake-with-git-to-easily-use-external-library/" class="archive-article-date">
-  <time datetime="2017-04-09T08:43:00.000Z" itemprop="datePublished">Apr 9</time>
+        <section id="main"><article id="post-why-are-threadstop-of-java-should-not-be-used" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/06/09/why-are-threadstop-of-java-should-not-be-used/" class="article-date">
+  <time datetime="2014-06-09T04:27:00.000Z" itemprop="datePublished">2014-06-09</time>
 </a>
-      
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/04/09/how-to-use-cmake-with-git-to-easily-use-external-library/">如何利用CMake跟git來輕易的使用外部Library</a>
+    <h1 class="article-title" itemprop="name">
+      [翻譯] 為什麼Java的Thread.stop()不該被使用？
     </h1>
   
 
-    </header>
-  </div>
-</article>
-  
+      </header>
     
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2017/02/13/python-trick-burst-attack-test/" class="archive-article-date">
-  <time datetime="2017-02-13T01:30:00.000Z" itemprop="datePublished">Feb 13</time>
-</a>
+    <div class="article-entry" itemprop="articleBody">
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/02/13/python-trick-burst-attack-test/">Python Trick : Burst Attack Test</a>
-    </h1>
-  
+        <p>這篇算是相當詳盡的說明了一些設計原則，包含了為什麼Java不再允許使用者直接中止(kill)掉一個運行中的thread物件，以及有沒有任何的替代方案。相對的，C++的std::thread也有一些行為上需要注意的地方，不過往後再提這點。</p>
+<p><a href="http://docs.oracle.com/javase/7/docs/technotes/guides/concurrency/threadPrimitiveDeprecation.html" target="_blank" rel="external">原文在此</a></p>
+<h2 id="Java-Thread為什麼有些method被廢棄了"><a href="#Java-Thread為什麼有些method被廢棄了" class="headerlink" title="##Java Thread為什麼有些method被廢棄了"></a>##Java Thread為什麼有些method被廢棄了</h2><p>###為什麼Thread.stop不再被支援了？<br>理由很簡單：這東西從本質上就不安全。你去.stop()一個thread會造成所有該thread同步資源鎖定(lock)的區段全部都解鎖(unlock)。只要系統抓到ThreadDeath這個exception，該區段的同步鎖定都會被unlock。<br>Because it is inherently unsafe. Stopping a thread causes it to unlock all the monitors that it has locked. (The monitors are unlocked as the ThreadDeath exception propagates up the stack.) If any of the objects previously protected by these monitors were in an inconsistent state, other threads may now view these objects in an inconsistent state. Such objects are said to be damaged. When threads operate on damaged objects, arbitrary behavior can result. This behavior may be subtle and difficult to detect, or it may be pronounced. Unlike other unchecked exceptions, ThreadDeath kills threads silently; thus, the user has no warning that his program may be corrupted. The corruption can manifest itself at any time after the actual damage occurs, even hours or days in the future.</p>
 
-    </header>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2014/06/09/why-are-threadstop-of-java-should-not-be-used/" data-id="cj3b76vp4000nhzsid2ybv4k4" class="article-share-link">Share</a>
+      
+      
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/06/26/coder-said-coder-wants/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Coder說的跟Coder所想的
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/06/08/what-function-whats-to-hint-you/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">C++傳回值想要「暗示」你什麼?</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
 
 </section>
         

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>淺談C++11 Lambda (1) | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="#披荊斬棘的史前時代 Lambda在很多語言中有著相當的地位，不過相似的工具一直在C++11以前都付之闋如，而必須用傳入函數指標的方式來達成類似的效果 :123//這種寫法我們稱為C-Stypetypedef int(*compare)(void*, void*);void sort(void** sortingObjects, int length, compare comparer); 這種寫">
+<meta property="og:type" content="article">
+<meta property="og:title" content="淺談C++11 Lambda (1)">
+<meta property="og:url" content="http://yoursite.com/2014/01/17/talking-about-the-c-11-lambda/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="#披荊斬棘的史前時代 Lambda在很多語言中有著相當的地位，不過相似的工具一直在C++11以前都付之闋如，而必須用傳入函數指標的方式來達成類似的效果 :123//這種寫法我們稱為C-Stypetypedef int(*compare)(void*, void*);void sort(void** sortingObjects, int length, compare comparer); 這種寫">
+<meta property="og:updated_time" content="2017-05-29T22:29:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="淺談C++11 Lambda (1)">
+<meta name="twitter:description" content="#披荊斬棘的史前時代 Lambda在很多語言中有著相當的地位，不過相似的工具一直在C++11以前都付之闋如，而必須用傳入函數指標的方式來達成類似的效果 :123//這種寫法我們稱為C-Stypetypedef int(*compare)(void*, void*);void sort(void** sortingObjects, int length, compare comparer); 這種寫">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-talking-about-the-c-11-lambda" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/01/17/talking-about-the-c-11-lambda/" class="article-date">
+  <time datetime="2014-01-16T22:39:00.000Z" itemprop="datePublished">2014-01-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      淺談C++11 Lambda (1)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>#披荊斬棘的史前時代</p>
+<p>Lambda在很多語言中有著相當的地位，不過相似的工具一直在C++11以前都付之闋如，而必須用傳入函數指標的方式來達成類似的效果 :<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">//這種寫法我們稱為C-Stype</div><div class="line">typedef int(*compare)(void*, void*);</div><div class="line">void sort(void** sortingObjects, int length, compare comparer);</div></pre></td></tr></table></figure></p>
+<p>這種寫法其實剛好踩在清楚不清楚的邊緣，而且說真的這種void*亂轉看起來也不太靠譜，所以後來大家在C++就改成用template來完成類似的東西</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//這個其實是編譯不過去的....</div><div class="line">template&lt;typename CmpObj&gt;</div><div class="line">int compare(const CmpObj&amp; Obj1, const CmpObj&amp; Obj2);</div><div class="line"></div><div class="line">template&lt;typename CmpObj&gt;</div><div class="line">void sort(const CmpObj* objList, int length, compare&lt;CmpObj&gt; comparer);</div></pre></td></tr></table></figure>
+<p>但是typedef其實這舊時代產物是不吃template的（這原因頗長，不過可以想想其實typedef原始目的根本不是拿來定義跟簡化函數指標），所以要不就是用C++11的using關鍵字，要不就是用很類似java的workaround</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">//C++11 only</div><div class="line">template&lt;typename CmpObj&gt;</div><div class="line">using compare = int (*) (const CmpObj&amp; obj1, const CmpObj&amp; obj2); </div><div class="line"></div><div class="line">template&lt;typename CmpObj&gt;</div><div class="line">void sort(const CmpObj* objList, int length, compare&lt;CmpObj&gt; comparer);</div><div class="line"></div><div class="line">//如果想要長得像Java的話...</div><div class="line">template&lt;typename CmpObj&gt;</div><div class="line">struct ComparerStr &#123;</div><div class="line">	//這static很重要 少了它就沒辦法ComparerStr&lt;CmpObj&gt;::compare了</div><div class="line">  //當然你要new一個我也不反對，只是這種東西多半是static，不管是new一個還是丟實體進去意義都差不多</div><div class="line">  //new的話還額外多了一個delete的成本跟風險。</div><div class="line">	static int compare(const CmpObj&amp; obj1, const CmpObj&amp; obj2);</div><div class="line">&#125;;</div><div class="line"></div><div class="line">//裡面就可以直接取cmp::compare,我就不多寫實做怎麼做了</div><div class="line">template&lt;typename CmpObj&gt;</div><div class="line">void sort(const CmpObj* objList, int length, ComparerStr&lt;CmpObj&gt; cmp);</div></pre></td></tr></table></figure>
+<p>在還沒有C++11 using的年頭，很顯然的要不就是學這種類java的做法丟class進去，要不就是用很恐怖的函數指標方式來處理這種問題。除了C Programmer以外，我想應該不會有太多正常人喜歡用函數指標，於是大家就開始使用boost::function以及旗下一大套東西來「表達」一個function</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">boost::function&lt;int(void*, void*)&gt; comparer;</div></pre></td></tr></table></figure>
+<p>但是很不幸的是，雖然C++提供template的技術，卻沒辦法讓你產生一個「template化的template」，所以事實上boost的做法並沒有辦法讓你提供comparer用的型別。</p>
+<p>上面的做法其實都有兩個很類似的問題，其中後者是相依于前者的，也就是：</p>
+<ul>
+<li>我必須把一個僅僅使用一次的comparer額外定義在一個很遙遠的地方，然後才能引用他，而非「他被用到的地方」</li>
+<li>要是這個comparer還需要根據一個外部變數來工作，那就死了</li>
+</ul>
+<p>#後來參戰的Obj-C<br>然後Obj-C開始有類似的技術 叫做Block<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">//由於id可以吃任何東西，以及由於obj-c語言特性，這個其實連template都用不上</div><div class="line">typedef int* (^comparer_block)(id, id);</div><div class="line">-(void) sort:(NSArray*) objects andComparer:(comparer_block) comparer;</div></pre></td></tr></table></figure></p>
+<p>這個我們就不深究了，畢竟這邊以C++ lambda為主。不過請記住， <strong>其實Obj-C的block就是Lambda</strong> </p>
+<p>#C++11終於出現的Lambda</p>
+<p>我們先拿一個簡單的東西作例子，就拿Bjarne Stroustrup自家的C++11 FAQ舉的例子吧</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//預設的sort法</div><div class="line">std::sort(v.begin(), v.end());</div><div class="line">//用我們自己決定的comparer來sort</div><div class="line">std::sort(v.begin(), v.end(), [](int a, int b) &#123; return abs(a)&lt;abs(b); &#125;);</div></pre></td></tr></table></figure>
+<p>這邊定義了一個新的sort方法，用新的Comparer來定義Sort的順序，從以default改為絕對值。在我們搞清楚怎麼把lambda寫入函式簽名以前，我們先看看這語法上代表的什麼意義</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">//-&gt;bool是可以省略的，這個相當於指定回傳型別</div><div class="line">[](int a, int b)-&gt;bool &#123; return abs(a) &lt; abs(b);&#125;</div></pre></td></tr></table></figure>
+<p>這邊一共分三個部分，[]等等會提到是什麼意思，而且在這例子裡面其實並沒有用到。中間則是很明顯的他需要兩個參數，都是int，而且是pass by value，最後則是隱式的傳回bool，沒有在裡面宣告。</p>
+<p>接下來的問題就是，如果我們要求一個特定簽名的lambda，那這個要怎麼寫？以前的函數指標可能可以寫成這樣<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">typedef int(*CMP)(void*, void*);</div><div class="line">//然後我們可以要求下面兩種之一的寫法</div><div class="line">void sort(void* itemArray, int length, int(*CMP)(void*, void*));</div><div class="line">void sort(void* itemArray, int length, CMP cmp);</div></pre></td></tr></table></figure></p>
+<p>在C++11要使用Lambda的場合則是用C++11新的std::function來當作參數來傳遞。另外，雖然上面提到的code很多明明有用到C++11卻可以再沒有–std=c++11的flag下編譯過關， <strong><em>可是下面這組code沒–std=c++11會死，請把它加入g++的參數裡面</em></strong> 。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">//這也沒有真正的sort 說說而已 XD</div><div class="line">template&lt;typename CmpObj&gt;</div><div class="line">void sort(std::vector&lt;CmpObj&gt; objList, std::function&lt;int(CmpObj&amp;, CmpObj&amp;)&gt; func) &#123;</div><div class="line">	CmpObj a, b;</div><div class="line">	a = objList[0];</div><div class="line">	b = objList[1];</div><div class="line">	printf(&quot;return : %d&quot;, func(a, b));</div><div class="line">&#125;</div><div class="line"></div><div class="line">int main(int argc, char *argv[]) &#123;</div><div class="line">	int a = 1;</div><div class="line">	int b = 2;</div><div class="line">	std::vector&lt;int&gt; list;</div><div class="line">	list.push_back(a);</div><div class="line">	list.push_back(b);</div><div class="line">  //這個&lt;int&gt;恐怕免不了，g++似乎無法正確推導lambda裡面的template parameter</div><div class="line">	sort&lt;int&gt;(list, [](int x, int y)&#123; printf(&quot;%d, %d\n&quot;, x, y); return 1;&#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>OK，這邊先淺嚐即止，剩下的我們留到下一篇討論。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2014/01/17/talking-about-the-c-11-lambda/" data-id="cj3b76vob000ahzsi3qkydbqk" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/01/20/talking-about-the-c-11-lambda-2/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          淺談C++11 Lambda (2)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/01/15/no-modern-design-modern-c/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">不再Modern的Modern C++ Design... :)</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/04/09/how-to-use-cmake-with-git-to-easily-use-external-library/">如何利用CMake跟git來輕易的使用外部Library</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/python-trick-burst-attack-test/">Python Trick : Burst Attack Test</a>
+          </li>
+        
+          <li>
+            <a href="/2016/02/03/most-vexing-parsingc/">Most Vexing Parsing(C++)</a>
+          </li>
+        
+          <li>
+            <a href="/2015/08/23/markdown-text-color-support/">Markdown文字色彩支援</a>
+          </li>
+        
+          <li>
+            <a href="/2015/08/16/starry-sky/">Starry Sky</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

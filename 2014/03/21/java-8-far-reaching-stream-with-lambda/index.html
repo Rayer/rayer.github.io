@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java 8 : 影響深遠的Stream, Lambda以及Functional Interfaces | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在幾天之前Java SE 8 SDK跟著JRE8一起發布了，然後JavaFX8在數個小時以後也跟著一起公開。Java8按照Oracle的說法帶來了相當巨大的革新，而OpenJDK8也很快的跟上了腳步。中間其實還有個小插曲，原本Java SE 8的GM版本在去年九月就已經要發布了，結果因為幾個安全漏洞以至於被迫延期到今年三月才發表。 Java8的衝擊其實算是還好，不過裡面有兩點算是特別吸引了目光，這">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 8 : 影響深遠的Stream, Lambda以及Functional Interfaces">
+<meta property="og:url" content="http://yoursite.com/2014/03/21/java-8-far-reaching-stream-with-lambda/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="在幾天之前Java SE 8 SDK跟著JRE8一起發布了，然後JavaFX8在數個小時以後也跟著一起公開。Java8按照Oracle的說法帶來了相當巨大的革新，而OpenJDK8也很快的跟上了腳步。中間其實還有個小插曲，原本Java SE 8的GM版本在去年九月就已經要發布了，結果因為幾個安全漏洞以至於被迫延期到今年三月才發表。 Java8的衝擊其實算是還好，不過裡面有兩點算是特別吸引了目光，這">
+<meta property="og:updated_time" content="2017-05-29T22:29:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 8 : 影響深遠的Stream, Lambda以及Functional Interfaces">
+<meta name="twitter:description" content="在幾天之前Java SE 8 SDK跟著JRE8一起發布了，然後JavaFX8在數個小時以後也跟著一起公開。Java8按照Oracle的說法帶來了相當巨大的革新，而OpenJDK8也很快的跟上了腳步。中間其實還有個小插曲，原本Java SE 8的GM版本在去年九月就已經要發布了，結果因為幾個安全漏洞以至於被迫延期到今年三月才發表。 Java8的衝擊其實算是還好，不過裡面有兩點算是特別吸引了目光，這">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java-8-far-reaching-stream-with-lambda" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/03/21/java-8-far-reaching-stream-with-lambda/" class="article-date">
+  <time datetime="2014-03-20T21:53:00.000Z" itemprop="datePublished">2014-03-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java 8 : 影響深遠的Stream, Lambda以及Functional Interfaces
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在幾天之前Java SE 8 SDK跟著JRE8一起發布了，然後JavaFX8在數個小時以後也跟著一起公開。Java8按照Oracle的說法帶來了相當巨大的<a href="http://www.infoworld.com/d/application-development/love-and-hate-java-8-223200" target="_blank" rel="external">革新</a>，而<a href="http://openjdk.java.net/projects/jdk8/" target="_blank" rel="external">OpenJDK8</a>也很快的跟上了腳步。中間其實還有個小插曲，原本Java SE 8的GM版本在去年九月就已經要發布了，結果因為幾個安全漏洞以至於被迫延期到今年三月才發表。</p>
+<p>Java8的衝擊其實算是還好，不過裡面有兩點算是特別吸引了目光，這兩點分別是Stream(跟我們知道的istream/ostream毫無關係)跟Lambda，我們來看看這兩個亮點分別是什麼樣子。</p>
+<p>##Lambda<br>Lambda其實是一個在Java7就該出場的東西了，只是由於某些不知道該稱為<a href="http://blog.orfjackal.net/2013/07/lambda-expressions-backported-to-java-7.html" target="_blank" rel="external">政治因素還是排程因素</a>，直到Java8被Stream(下面會提到)火燒屁股了才端出來。</p>
+<p>Lambda本身來講是一個相當簡單的技術，他已經在Scala跟Groovy實作出來很久了(<a href="http://www.csdn.net/article/2013-08-05/2816449-Love-and-hate-for-Java8" target="_blank" rel="external">有人</a>說其實根本是從scala直接搬過來的)。不過從我專案看起來的話…這個java跟groovy基本上是屬於互相抄襲的狀態(別戰我XD 我知道他們兩個之間的關係)。這個Lambda我是覺得應用影響最深遠的部分是跟下面會提到的Stream的整合，這兩個加起來根本就是…(Scala跟Groovy：哥們早就這樣跑好幾年了)</p>
+<p>如果寫C/C++很熟的話，應該寫Java的時候會注意到其實Java並沒有Function Pointer這種東西。Function Pointer在C/C++的地方主要就是告訴這段code:<em><em>當我有ooxx的時候，我要用什麼函數來處理ooxx</em></em>。Java並沒有這種東西，他必須要去new一個class，利用裡面定義好的class method來做這種行為。最明顯的的例子就是sort跟comparer之間的關係。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">```</div><div class="line"></div><div class="line"></div><div class="line">##Stream</div><div class="line">Stream跟我們熟知的java.io類別裡面的stream是完全無關的東西。這個東西的主要目的是為了強化在Java裡面相當不足的Collections(這東西在Java 1.5用generic大修過一次，不過顯然修的不是很好)。這算是一種新的概念，不過這概念的確跟Java IO裡面的Stream相當類似，不過Java的collection Stream提供了一些性質跟特徵</div><div class="line"></div><div class="line">1. Stream只能操作一次，就好像檔案ifstream你讀取內容結束後就只能.close()而不能拿這個stream再去開一個檔案，你只能在重新new一個出來。</div><div class="line">2. 他提供了許多循序單位操作的東西，以這次增加的例子來說有forEach, filter, map, reduce, min, max, sorted, distinct, limit....等等（嗯，有沒有注意到好像跟Groovy/scala提供的有點像？）</div><div class="line">3. 他可以combine Lambda(很重要，可是沒必要說三次)</div></pre></td></tr></table></figure>
+<p>List<something> some = getVeryBigListFromSomewhere();<br>//在之前我們如果要對這個list作拷貝動作的話<br>List<something> oldie = list.getStream().collect(Collection.toList());</something></something></p>
+<p>//但是我們現在有效能更高的Collection<br>List<something> some1 = list.getStream().collect(Collection.toList());</something></p>
+<p>//甚至可以用parallels的方式，分段List來增加效能<br>List<something> some2 = list.getStream().collect(Collection.toList());;<br>```</something></p>
+<p>##Lambda</p>
+<p>##Encore stage : Functional Interfaces</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2014/03/21/java-8-far-reaching-stream-with-lambda/" data-id="cj3b76vot000jhzsijpkznp37" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/03/30/set-up-a-wordpress-on-the-vps-services/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          在VPS上架設一個WordPress服務 -- 以CentOS為例子
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/03/15/adult-toys-vpn-on-vps/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">大人的玩具 : VPN on VPS</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/04/09/how-to-use-cmake-with-git-to-easily-use-external-library/">如何利用CMake跟git來輕易的使用外部Library</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/python-trick-burst-attack-test/">Python Trick : Burst Attack Test</a>
+          </li>
+        
+          <li>
+            <a href="/2016/02/03/most-vexing-parsingc/">Most Vexing Parsing(C++)</a>
+          </li>
+        
+          <li>
+            <a href="/2015/08/23/markdown-text-color-support/">Markdown文字色彩支援</a>
+          </li>
+        
+          <li>
+            <a href="/2015/08/16/starry-sky/">Starry Sky</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
