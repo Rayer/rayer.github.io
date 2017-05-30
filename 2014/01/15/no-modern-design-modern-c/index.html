@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>不再Modern的Modern C++ Design... :) | Hex Fantastic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="寫在前面，我沒有任何貶低這本書的意思。這本書畢竟已經十幾年了，但是仍然是在C++技術領域中的經典之作。不過，在C++11出現的現在，這本在一些地方顯然是有點過時，所以每當我發現裡面有一些目前C++11已經可以cover掉的tech，我會在這裡做些補充。 ##STATIC_CHECK (replaced by C++11 static_assert() )會發現這個其實是有點意外，因為這東西其實不太">
+<meta property="og:type" content="article">
+<meta property="og:title" content="不再Modern的Modern C++ Design... :)">
+<meta property="og:url" content="https://rayer.github.com/2014/01/15/no-modern-design-modern-c/index.html">
+<meta property="og:site_name" content="Hex Fantastic">
+<meta property="og:description" content="寫在前面，我沒有任何貶低這本書的意思。這本書畢竟已經十幾年了，但是仍然是在C++技術領域中的經典之作。不過，在C++11出現的現在，這本在一些地方顯然是有點過時，所以每當我發現裡面有一些目前C++11已經可以cover掉的tech，我會在這裡做些補充。 ##STATIC_CHECK (replaced by C++11 static_assert() )會發現這個其實是有點意外，因為這東西其實不太">
+<meta property="og:updated_time" content="2017-05-29T22:29:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="不再Modern的Modern C++ Design... :)">
+<meta name="twitter:description" content="寫在前面，我沒有任何貶低這本書的意思。這本書畢竟已經十幾年了，但是仍然是在C++技術領域中的經典之作。不過，在C++11出現的現在，這本在一些地方顯然是有點過時，所以每當我發現裡面有一些目前C++11已經可以cover掉的tech，我會在這裡做些補充。 ##STATIC_CHECK (replaced by C++11 static_assert() )會發現這個其實是有點意外，因為這東西其實不太">
+  
+    <link rel="alternate" href="/atom.xml" title="Hex Fantastic" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hex Fantastic</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">這世界有點無聊，找點架吵吧!</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://rayer.github.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-no-modern-design-modern-c" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/01/15/no-modern-design-modern-c/" class="article-date">
+  <time datetime="2014-01-14T23:42:00.000Z" itemprop="datePublished">2014-01-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      不再Modern的Modern C++ Design... :)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>寫在前面，我沒有任何貶低這本書的意思。這本書畢竟已經十幾年了，但是仍然是在C++技術領域中的經典之作。不過，在C++11出現的現在，這本在一些地方顯然是有點過時，所以每當我發現裡面有一些目前C++11已經可以cover掉的tech，我會在這裡做些補充。</p>
+<p>##STATIC_CHECK (replaced by C++11 static_assert() )<br>會發現這個其實是有點意外，因為這東西其實不太容易發現。我們先看看Loki版本的STATIC_CHECK長什麼樣子<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">define</span> STATIC_CHECK(expr) &#123; char unnamed[(expr) ? 1 : 0]; &#125;</span></div></pre></td></tr></table></figure></p>
+<p>這個容許你能夠在編譯期檢查一些東西。這東西建立在一個前提下：char[1]是可以合法編譯過關，而char[0]則會造成編譯錯誤，所以他有能力在compile time檢查硬生生的把compiling過程擋下來。以Modern C++ Design自己舉的例子來講<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> TO, <span class="keyword">typename</span> FROM&gt;</div><div class="line"><span class="function">TO <span class="title">safe_reinterpret_cast</span><span class="params">(FROM from)</span> </span>&#123;</div><div class="line">        STATIC_CHECK(<span class="keyword">sizeof</span>(TO) &gt;= <span class="keyword">sizeof</span>(FROM));</div><div class="line">        <span class="keyword">return</span> <span class="keyword">reinterpret_cast</span>&lt;TO&gt;(from);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>這個template其實極其簡單，就是如果你試圖把FROM轉成TO，他會先檢查TO是否是個足夠大，至少要足以容納FROM的大小，簡單的說，假設你的TO是char，FROM是double，他就會invoke出STATIC_CHECK，讓STATIC_CHECK編譯錯誤，因為試圖做一個char array大小為0。</p>
+<p>不過這段Code因為規格變更，有 <strong>很多</strong> 地方不再正確，我們一個個的看一下。</p>
+<p>首先，你會發現char[0]其實已經在C99合法化了，至於[0]的用途請參照<a href="http://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html" target="_blank" rel="external">這裡</a>，所以char[0]不再會造成編譯錯誤。另外，reinterpret_cast在C++11下已經會做出大小的檢查，已經不再允許把大的資料結構硬轉成小的資料結構了。</p>
+<p>最後一點，也是最重要的是，C++11引入了<code>static_assert(bool willAssert, const char* assertMessage)</code>，使得這種做法不再必要。不過，我們有很多舊有的code，該怎麼辦呢？</p>
+<p>在不支援C++11(但是因為C99所以可以合法宣告0長度array的場合)<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//既然0不會報錯，-1總會死了吧？</span></div><div class="line"><span class="meta">#<span class="meta-keyword">define</span> STATIC_CHECK(expr) &#123; char unnamed[(expr) ? 1 : -1]; &#125;</span></div></pre></td></tr></table></figure></p>
+<p>支援C++11的場合<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">define</span> STATIC_CHECK(expr) &#123; static_assert(expr, <span class="meta-string">"Static Assert is invoked!"</span>); &#125;</span></div></pre></td></tr></table></figure></p>
+<p>當然，新的code請都用static_assert來取代STATIC_CHECK</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://rayer.github.com/2014/01/15/no-modern-design-modern-c/" data-id="cj3b8bo1y0008djsizlj83w23" class="article-share-link">Partager</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/01/17/talking-about-the-c-11-lambda/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Récent</strong>
+      <div class="article-nav-title">
+        
+          淺談C++11 Lambda (1)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/01/15/talk-about-why-mac-gradually-eating-away-at-pc-market/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ancien</strong>
+      <div class="article-nav-title">聊聊Mac為什麼逐漸蠶食PC市場</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Articles récents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2016/02/03/most-vexing-parsingc/">Most Vexing Parsing(C++)</a>
+          </li>
+        
+          <li>
+            <a href="/2015/08/23/markdown-text-color-support/">Markdown文字色彩支援</a>
+          </li>
+        
+          <li>
+            <a href="/2015/07/26/create-your-own-pgp-digital-signature/">創造一個自己的PGP電子簽章</a>
+          </li>
+        
+          <li>
+            <a href="/2015/06/15/sourceforge-bundled-third-party-software-causes-serious-disputes/">SourceForge綑綁第三方軟體引發嚴重爭議</a>
+          </li>
+        
+          <li>
+            <a href="/2015/04/12/oauth-with-android/">舊文回收:OAuth with Android</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Rayer<br>
+      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

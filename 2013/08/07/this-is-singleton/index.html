@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>This is SINGLETON! | Hex Fantastic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Singleton… 說真的，這可能可以榮登史上最常見被濫用的Pattern，沒有之一。它本身撰寫並不困難，使用直覺（只是使用上實在又臭又長了一點），在C++裡面就更簡單了，隨便一個class套個12 class Balabala {    public:        void doSomething();};typedef Loki::SingletonHolder SingleBala; v">
+<meta property="og:type" content="article">
+<meta property="og:title" content="This is SINGLETON!">
+<meta property="og:url" content="https://rayer.github.com/2013/08/07/this-is-singleton/index.html">
+<meta property="og:site_name" content="Hex Fantastic">
+<meta property="og:description" content="Singleton… 說真的，這可能可以榮登史上最常見被濫用的Pattern，沒有之一。它本身撰寫並不困難，使用直覺（只是使用上實在又臭又長了一點），在C++裡面就更簡單了，隨便一個class套個12 class Balabala {    public:        void doSomething();};typedef Loki::SingletonHolder SingleBala; v">
+<meta property="og:updated_time" content="2017-05-29T22:29:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="This is SINGLETON!">
+<meta name="twitter:description" content="Singleton… 說真的，這可能可以榮登史上最常見被濫用的Pattern，沒有之一。它本身撰寫並不困難，使用直覺（只是使用上實在又臭又長了一點），在C++裡面就更簡單了，隨便一個class套個12 class Balabala {    public:        void doSomething();};typedef Loki::SingletonHolder SingleBala; v">
+  
+    <link rel="alternate" href="/atom.xml" title="Hex Fantastic" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hex Fantastic</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">這世界有點無聊，找點架吵吧!</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://rayer.github.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-this-is-singleton" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/08/07/this-is-singleton/" class="article-date">
+  <time datetime="2013-08-06T18:29:00.000Z" itemprop="datePublished">2013-08-07</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      This is SINGLETON!
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Singleton…</p>
+<p>說真的，這可能可以榮登史上最常見被濫用的Pattern，沒有之一。它本身撰寫並不困難，使用直覺（只是使用上實在又臭又長了一點），在C++裡面就更簡單了，隨便一個class套個<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div></pre></td></tr></table></figure></p>
+<p>class Balabala {<br>    public:<br>        void doSomething();<br>};<br>typedef Loki::SingletonHolder<balabala> SingleBala;</balabala></p>
+<p>void test() {<br>    SingleBala::instance().doSomething();<br>};<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">甚至要撰寫一個最基本的Singleton也是簡單到爆炸</div></pre></td></tr></table></figure></p>
+<p>class Balabala {<br>    private:<br>        static Balabala* defInst;<br>    public:<br>        static inline Balabala&amp; instance() {<br>            if(defInst == null)<br>                defInst = new Balabala();</p>
+<pre><code>    return *defInst;
+}
+</code></pre><p>};<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">當然，Loki的SingletonHolder裡面做了很多有趣的事情，有興趣的人請自己參考一下[這裡](http://sourcecodebrowser.com/asc/1.16.3.0/_singleton_8h_source.html)。當然，請先稍微念一下Modern C++ Design，不然可能連第一個開頭宣告的```CreationPolicy```都不知道是幹嘛的。不過，即使是很初步的大略看了一下，都看得出來Andrei Alexandrescu在設計這個東西的時候，考慮了生命週期以及保留了其他new/delete方法選擇上的彈性。</div><div class="line"></div><div class="line">事實上，也由於```Loki::SingletonHolder&lt;T&gt;```的關係，這個東西在許多系統裡面被濫用到一種莫名其妙的地步， ***幾乎所有希望能夠被在全域存取的物件*** 都會有人想把它寫成Singleton。更糟糕的是，如果你試圖阻止他的話，他會用更糟的static或者毫無章法的在precompiled header內extern去做這種行為。</div></pre></td></tr></table></figure></p>
+<p>//in Precompile.pch<br>extern SingleFooService FOO;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">![](https://dl.dropboxusercontent.com/u/3992354/double_facepalm.jpg)</div><div class="line"></div><div class="line">所以，當你有足夠的知識去判斷 ***「這個不該用Singleton」*** 的時候，請很明確地順便跟他說這東西 ***「不該被在不受控管的情況下全域存取」*** ，甚至 ***「根本不該做成全域存取，應該以參考的方式傳入」*** 。很多時候，明明只需要一個String，可是因為貪圖方便不去改member function，直接在裡面呼叫衛星砲Singleton把String傳下來，結果就是把相依性搞得亂七八糟。</div><div class="line"></div><div class="line">有個作者(可以google一下WashuHibiki)做了一個一針見血的評論 : *Not really, most of the use cases for singletons revolve around: &quot;I want to access X, but its not &apos;OO&apos; to use a global, so I&apos;ll dress it up in a class and call it &apos;OO&apos;!&quot;.* 「恩..大多數的Singleton的使用情況，都是在於『我要要存取X，但是使用全域實在不是OO的風格，所以我把X給變裝裝在一個class下，這就是OO了!』」</div><div class="line"></div><div class="line">Singleton的優點我想應該不用說太多，每個人用Singleton一定都是因為他有優勢所以才會去用他。可是，Singleton有很多侷限，很多人卻對這些侷限一無所知而照樣用下去。Singleton有幾個比較明顯的缺點</div><div class="line"></div><div class="line">- 它會讓整個相依性爛成一鍋粥。</div><div class="line">- 它由於本身特性使然，使的它一旦被使用下去就很難去擴充。一旦決策錯誤，大多數的Singleton設計上都很難讓人補救。</div><div class="line">- 也是由於它本身特性使然，它對於threading的處理有很多潛在的問題，尤其是當它有context的時候。</div><div class="line">- 它在很多情況下沒辦法掌握先後順序。舉個最簡單的例子，假設它需要init，而你在foo::instance()的當下壓根不知道她有沒有被init過，你得做個旗標去控制它。然而，並不是所有的地方都可以讓Singleton有正確的context做init的。</div><div class="line"></div><div class="line">這些缺點都是在他被 ***正確*** 使用的時候會碰到的問題，更不用講它被 ***不正確*** 使用的時候會有多少問題。```Loki::SingletonHolder&lt;class&gt;```實在是方便到爆炸，以至於大家什麼class都想往裡面包。我來舉幾個我看過的慘劇</div><div class="line"></div><div class="line">- 某人先宣告了一個```typedef Loki::SingletonHolder&lt;FOO&gt; singleFoo;``` 另外一個人在不同的.h裡面宣告了```typedef Loki::SingletonHolder&lt;FOO&gt; fooSingle```，然後某人開始抱怨為什麼singleFoo會自己改東西，明明沒有code呼叫他</div><div class="line">- 某些情況下的```singleFoo::instance().xxx()```會炸掉，問題幾乎無法重現。後來才發現炸掉的沒有```.init()```，而他一點把握都沒有到底在系統的什麼地方對他作```singleFoo::instance().init(context)```才能正確的把singleFoo init起來，因為他根本沒把握哪個地方會是第一次執行singleFoo的地方。</div><div class="line">- 這個比較偏向於笑話，有人把有state的class包成singleton，比方說DX的```beginDraw()```, ```endDraw()```, 你很多操作一定要放在這兩者之間....可以想想有stack一路call下去會怎樣</div><div class="line">- 這也是個笑話，設計不良的singleton跑在multi thread環境下debug一個難以重現的錯誤debug了一個月</div><div class="line"></div><div class="line">其實先撇掉這些令人噴飯的使用例子，其實大多數Singleton都有一些小撇步來避開這些問題。通常來講，我們要有一個認知： ***Singleton就是Global，不要再催眠自己它不是不是Global了!*** Global的缺點Singleton一個都不會少，我們要用Global的方法去思考這些東西的必要性。</div><div class="line"></div><div class="line">首先，我們要盡量降低Singleton的數量。最簡單的方式就是讓系統整個Singleton剩下一個。比方說我們可能有以下的範例</div></pre></td></tr></table></figure></p>
+<p>typedef Loki::SingletonHolder<txmanager> SingleTxManager;<br>typedef Loki::SingletonHolder<bandmanager> SingleBandManager;<br>typedef Loki::SingletonHolder<channelmanager> SingleChannelManager;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">我們只允許系統存在一個Singleton，稱為SystemManager</div></pre></td></tr></table></figure></channelmanager></bandmanager></txmanager></p>
+<p>class SystemManager {<br>private:<br>    TxManager<em> mTxManager;<br>    BandManager</em> mBandManager;<br>    ChannelManager<em> mChannelManager;<br>public:<br>    TxManager</em> getTxManager();<br>    BandManager<em> getBandManager();<br>    ChannelManager</em> getChannelManager();<br>};</p>
+<p>typedef Loki::SingletonHolder<systemmanager> SingleSystem;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">這是最簡單的一步，而且優點非常的明顯。其中一個很明顯的地方在於，當系統需要第二組TxManager的時候，第一種做法會讓整個系統毫無辦法的只能整個大改，但是第二種做法卻可以這樣做</div></pre></td></tr></table></figure></systemmanager></p>
+<p>enum TxMgrType {<br>    TX_ORIGINAL,<br>    TX_EXTENDED<br>};</p>
+<p>TxManager* getTxManager(TxMgrType type = TX_ORIGINAL);<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">這樣就可以輕易的轉換過去，沒有參數的getTxManager會拿到原來的，有傳入TX_EXTENDED的則可以拿到新的。當然，這只是個緩衝跟拖時間的方法，趕快把系統過渡到有兩個TxManager的語法吧... 而且，SystemManager基本上需要考慮的threading issue可以降到最低，因為整個System的Context看起來都是init以後就可以frozen，所以整個系統設計起來將會非常簡單。最後，我們可以比較簡單地找到一個地方去把所有的class初始化。</div><div class="line"></div><div class="line">Singleton的Threading issue也是一個常常被討論的話題。因為這東西被存取的地方實在太多，可能性也太過於頻繁，所以我們必須用許許多多的mutex把很多部分給保護住。但是就有如所有的Semaphore-like的保護一樣，這東西會造成相當程度的設計問題以及死結。所以，為了因應這種問題，我們通常來講會在一些已知的高Threading issue Singleton做一些手腳，比方說把所有的context parameter分開等等...</div></pre></td></tr></table></figure></p>
+<p>class FooService {<br>private:<br>    typedef void(<em>FOO_CALLBACK)(void</em>);<br>    const int MAX_WORKING_THREAD = 20;<br>    boost::threadpool::pool s_ThreadPool(MAX_WORKING_THREAD);<br>public:<br>    int doSomething(FOO_CALLBACK callback);<br>};</p>
+<p>typedef Loki::SingletonHolder<fooservice> SingleFooService;<br>```</fooservice></p>
+<p>簡單的說，我們直接把Thread的事情自己收進來管理，再由一個Callback來把結果傳回去。Java在後期引進了一個概念叫做<a href="http://openhome.cc/Gossip/JavaGossip-V2/CallableFuture.htm" target="_blank" rel="external">Future</a>, <a href="http://www.boost.org/doc/libs/1_46_0/boost/thread/future.hpp" target="_blank" rel="external">C++也有</a>，這個對Threading設計算是非常重要的一個概念，可以大幅減化這方面的設計（也就是讓Singleton傳回一個boost::future，你需要的時候再跑起來就好）</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://rayer.github.com/2013/08/07/this-is-singleton/" data-id="cj3b8bo1j0002djsihu45bqnl" class="article-share-link">Partager</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/12/03/visual-studio-online/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Récent</strong>
+      <div class="article-nav-title">
+        
+          Visual Studio Online
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2013/07/18/suddenly-thought-of-that-old-joke/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ancien</strong>
+      <div class="article-nav-title">突然想到這個老掉牙的笑話</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Articles récents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2016/02/03/most-vexing-parsingc/">Most Vexing Parsing(C++)</a>
+          </li>
+        
+          <li>
+            <a href="/2015/08/23/markdown-text-color-support/">Markdown文字色彩支援</a>
+          </li>
+        
+          <li>
+            <a href="/2015/07/26/create-your-own-pgp-digital-signature/">創造一個自己的PGP電子簽章</a>
+          </li>
+        
+          <li>
+            <a href="/2015/06/15/sourceforge-bundled-third-party-software-causes-serious-disputes/">SourceForge綑綁第三方軟體引發嚴重爭議</a>
+          </li>
+        
+          <li>
+            <a href="/2015/04/12/oauth-with-android/">舊文回收:OAuth with Android</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Rayer<br>
+      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
