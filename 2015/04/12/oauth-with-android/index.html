@@ -11,7 +11,7 @@
 <meta property="og:url" content="http://yoursite.com/2015/04/12/oauth-with-android/index.html">
 <meta property="og:site_name" content="Hex Fantastic">
 <meta property="og:description" content="這篇是我兩三年前寫在Levitation的blogspot，由於排版很爛，所以回收到這裏重新用Markdown寫一次 ###淺談OAuth in Android – 以Plurk為例子OAuth是目前比較熱門的認證機制之一，他有個最大的好處就在於完全不需要在client端輸入賬號密碼，這部分完全會由web端完成。不過，他機制非常的複雜，有些地方做的讓人覺得很龜毛，所以我們在這篇只要淺談就好，其他的">
-<meta property="og:updated_time" content="2017-05-29T22:29:26.000Z">
+<meta property="og:updated_time" content="2017-05-30T06:58:17.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="舊文回收:OAuth with Android">
 <meta name="twitter:description" content="這篇是我兩三年前寫在Levitation的blogspot，由於排版很爛，所以回收到這裏重新用Markdown寫一次 ###淺談OAuth in Android – 以Plurk為例子OAuth是目前比較熱門的認證機制之一，他有個最大的好處就在於完全不需要在client端輸入賬號密碼，這部分完全會由web端完成。不過，他機制非常的複雜，有些地方做的讓人覺得很龜毛，所以我們在這篇只要淺談就好，其他的">
@@ -56,9 +56,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -103,23 +103,24 @@
 <p>這幾個步驟其實相當的繁瑣，尤其是對網站要求每次都要做一個全面性的Parameter Sign的動作，裡面牽涉的東西對一個初學者來講真是煩人到爆炸。當然，就會有人會寫一組library來解決這問題:我們今天介紹的就是oauth-signpost library。</p>
 <p>基本的取得jar，放進project，設定buildpath這些基礎到爆的東西我們就不討論了。首先，我們要先去Plurk申請一組API Key來作為我們的開發用途。所以我們就有了API Key/Secret了。接下來，回到Plurk API介紹的頁面，他提供了幾個網址供OAuth使用。基本上這些分別是幹嘛的我們就不予深究了，我們只要知道她是要怎麼用。</p>
 <p>signpost我們會用到根OAuth有關的一共有兩個部分：OAuthConsumer代表的是我們APP端的所有資料，包含Access Token等等（不過她好像沒幫你存，你要自己存），而OAuthProvider則是代表網站的OAuth認證部分。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">static final String PLURK_REQUEST_URL = &quot;http://www.plurk.com/OAuth/request_token&quot;;</div><div class="line">static final String PLURK_AUTHORIZATION_URL = &quot;http://www.plurk.com/m/authorize&quot;;</div><div class="line">static final String PLURK_ACCESS_URL = &quot;http://www.plurk.com/OAuth/access_token&quot;;</div><div class="line">static final String PLURK_CALLBACK_URL = &quot;myplurk:///&quot;;</div><div class="line">static final String PLURK_CONSUMER_KEY = &quot;你的API Key&quot;;</div><div class="line">static final String PLURK_CONSUMER_SECRET = &quot;你的API Secret&quot;;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> String PLURK_REQUEST_URL = <span class="string">"http://www.plurk.com/OAuth/request_token"</span>;</div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> String PLURK_AUTHORIZATION_URL = <span class="string">"http://www.plurk.com/m/authorize"</span>;</div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> String PLURK_ACCESS_URL = <span class="string">"http://www.plurk.com/OAuth/access_token"</span>;</div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> String PLURK_CALLBACK_URL = <span class="string">"myplurk:///"</span>;</div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> String PLURK_CONSUMER_KEY = <span class="string">"你的API Key"</span>;</div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> String PLURK_CONSUMER_SECRET = <span class="string">"你的API Secret"</span>;</div></pre></td></tr></table></figure>
 <p>我們先把這些東西設定變數，等等會用到。接下來我們設定Provider跟Consumer</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mainConsumer = new DefaultOAuthConsumer(PLURK_CONSUMER_KEY, PLURK_CONSUMER_SECRET);</div><div class="line">mainProvider = new DefaultOAuthProvider(PLURK_REQUEST_URL, PLURK_ACCESS_URL, PLURK_AUTHORIZATION_URL);</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mainConsumer = <span class="keyword">new</span> DefaultOAuthConsumer(PLURK_CONSUMER_KEY, PLURK_CONSUMER_SECRET);</div><div class="line">mainProvider = <span class="keyword">new</span> DefaultOAuthProvider(PLURK_REQUEST_URL, PLURK_ACCESS_URL, PLURK_AUTHORIZATION_URL);</div></pre></td></tr></table></figure>
 <p>ok，那所有東西差不多就完成了。我們要讓使用者認證的時候，只要開一個url，載入provider提供的url :</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">String url = mainProvider.retrieveRequestToken(mainConsumer, PLURK_CALLBACK_URL);</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">String url = mainProvider.retrieveRequestToken(mainConsumer, PLURK_CALLBACK_URL);</div></pre></td></tr></table></figure>
 <p>利用webview打開這個以後，把webview設定一個WebViewClient，然後override它的link click</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">private class AuthClient extends WebViewClient &#123;</div><div class="line"> </div><div class="line"> </div><div class="line">  @Override</div><div class="line"> public void onPageStarted(WebView view, String url, Bitmap favicon) &#123;</div><div class="line">  super.onPageStarted(view, url, favicon);</div><div class="line"> &#125;</div><div class="line">  @Override</div><div class="line"> public void onPageFinished(WebView view, String url) &#123;</div><div class="line">  super.onPageFinished(view, url);</div><div class="line"> &#125;</div><div class="line">  @Override</div><div class="line"> public boolean shouldOverrideUrlLoading(WebView view, String urlString) &#123;</div><div class="line"> </div><div class="line"> Log.d(&quot;SubPlurkV2&quot;, &quot;url : &quot; + urlString);</div><div class="line"> if(urlString.contains(&quot;subplurkv2&quot;)) &#123;</div><div class="line"> Uri url = Uri.parse(urlString);</div><div class="line"> String verifier = url.getQueryParameter(&quot;oauth_verifier&quot;);</div><div class="line"> try &#123;</div><div class="line"> SystemManager.getInst().getAuthManager().aquireAccessToken(verifier);</div><div class="line"> &#125; catch (Exception e) &#123;</div><div class="line"> // TODO Auto-generated catch block</div><div class="line"> e.printStackTrace();</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> finish();</div><div class="line"> &#125;</div><div class="line">  return super.shouldOverrideUrlLoading(view, urlString);</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
-<p>然後我們可以取得verifier，利用這個取得Access Token<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mainProvider.retrieveAccessToken(mainConsumer, verifier);</div><div class="line">Log.d(&quot;SubPlurkV2&quot;, &quot;Token = &quot; + mainConsumer.getToken() + &quot; and secret = &quot; + mainConsumer.getTokenSecret());</div></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">AuthClient</span> <span class="keyword">extends</span> <span class="title">WebViewClient</span> </span>&#123;</div><div class="line"> </div><div class="line"> </div><div class="line">  <span class="meta">@Override</span></div><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPageStarted</span><span class="params">(WebView view, String url, Bitmap favicon)</span> </span>&#123;</div><div class="line">  <span class="keyword">super</span>.onPageStarted(view, url, favicon);</div><div class="line"> &#125;</div><div class="line">  <span class="meta">@Override</span></div><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPageFinished</span><span class="params">(WebView view, String url)</span> </span>&#123;</div><div class="line">  <span class="keyword">super</span>.onPageFinished(view, url);</div><div class="line"> &#125;</div><div class="line">  <span class="meta">@Override</span></div><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">shouldOverrideUrlLoading</span><span class="params">(WebView view, String urlString)</span> </span>&#123;</div><div class="line"> </div><div class="line"> Log.d(<span class="string">"SubPlurkV2"</span>, <span class="string">"url : "</span> + urlString);</div><div class="line"> <span class="keyword">if</span>(urlString.contains(<span class="string">"subplurkv2"</span>)) &#123;</div><div class="line"> Uri url = Uri.parse(urlString);</div><div class="line"> String verifier = url.getQueryParameter(<span class="string">"oauth_verifier"</span>);</div><div class="line"> <span class="keyword">try</span> &#123;</div><div class="line"> SystemManager.getInst().getAuthManager().aquireAccessToken(verifier);</div><div class="line"> &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line"> <span class="comment">// TODO Auto-generated catch block</span></div><div class="line"> e.printStackTrace();</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> finish();</div><div class="line"> &#125;</div><div class="line">  <span class="keyword">return</span> <span class="keyword">super</span>.shouldOverrideUrlLoading(view, urlString);</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>然後我們可以取得verifier，利用這個取得Access Token</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mainProvider.retrieveAccessToken(mainConsumer, verifier);</div><div class="line">Log.d(<span class="string">"SubPlurkV2"</span>, <span class="string">"Token = "</span> + mainConsumer.getToken() + <span class="string">" and secret = "</span> + mainConsumer.getTokenSecret());</div></pre></td></tr></table></figure>
 <p>把這祖Token記錄起來，以後會用到。最後，我們來試試看最簡單地拿取時間軸吧</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mainConsumer.setAccessToken(&quot;U5GNYyH6wVGS&quot;, &quot;aCtJ9XVgNTeIpigq3qxsLi70Sv0HbA6h&quot;);</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">URL url = new URL(&quot;http://www.plurk.com/APP/Timeline/getPlurks&quot;);</div><div class="line">HttpURLConnection request = (HttpURLConnection) url.openConnection();</div><div class="line">request.setDoOutput(true);</div><div class="line">request.setRequestMethod(&quot;POST&quot;);</div><div class="line">mainConsumer.sign(request);</div><div class="line">request.connect();</div><div class="line">String context = StreamUtil.InputStreamToString(request.getInputStream());</div><div class="line">Log.d(&quot;SubPlurkV2&quot;, &quot;&quot; + context);</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mainConsumer.setAccessToken(<span class="string">"U5GNYyH6wVGS"</span>, <span class="string">"aCtJ9XVgNTeIpigq3qxsLi70Sv0HbA6h"</span>);</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">URL url = <span class="keyword">new</span> URL(<span class="string">"http://www.plurk.com/APP/Timeline/getPlurks"</span>);</div><div class="line">HttpURLConnection request = (HttpURLConnection) url.openConnection();</div><div class="line">request.setDoOutput(<span class="keyword">true</span>);</div><div class="line">request.setRequestMethod(<span class="string">"POST"</span>);</div><div class="line">mainConsumer.sign(request);</div><div class="line">request.connect();</div><div class="line">String context = StreamUtil.InputStreamToString(request.getInputStream());</div><div class="line">Log.d(<span class="string">"SubPlurkV2"</span>, <span class="string">""</span> + context);</div></pre></td></tr></table></figure>
 <p>have fun! 參考plunk api list繼續實做其他的api吧!</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/04/12/oauth-with-android/" data-id="cj3b7m8jk000w5osios2mp9ba" class="article-share-link">Partager</a>
+      <a data-url="http://yoursite.com/2015/04/12/oauth-with-android/" data-id="cj3b7opkl000t9msijjpwk5vf" class="article-share-link">Share</a>
       
       
     </footer>
@@ -129,7 +130,7 @@
 <nav id="article-nav">
   
     <a href="/2015/06/15/sourceforge-bundled-third-party-software-causes-serious-disputes/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Récent</strong>
+      <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
           SourceForge綑綁第三方軟體引發嚴重爭議
@@ -139,7 +140,7 @@
   
   
     <a href="/2015/03/30/redmine-settings/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Ancien</strong>
+      <strong class="article-nav-caption">Older</strong>
       <div class="article-nav-title">Redmine設定(Digital Ocean, Docker)</div>
     </a>
   
@@ -172,7 +173,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Articles récents</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
         
@@ -209,7 +210,7 @@
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2017 Rayer<br>
-      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>
