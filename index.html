@@ -103,7 +103,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2016/02/03/most-vexing-parsingc/" data-id="cj3bh77nr000x2qsizqqqe1tk" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2016/02/03/most-vexing-parsingc/" data-id="cj3bhgryx000xgxsi0s7lo9le" class="article-share-link">Share</a>
       
       
     </footer>
@@ -143,7 +143,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2015/08/23/markdown-text-color-support/" data-id="cj3bh77nn000w2qsi6xydk16p" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2015/08/23/markdown-text-color-support/" data-id="cj3bhgryt000wgxsirrppndl2" class="article-share-link">Share</a>
       
       
     </footer>
@@ -153,7 +153,7 @@
 
 
   
-    <article id="post-create-your-own-pgp-digital-signature" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="draft-create-your-own-pgp-digital-signature" class="article article-type-draft" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2015/07/26/create-your-own-pgp-digital-signature/" class="article-date">
   <time datetime="2015-07-26T04:46:00.000Z" itemprop="datePublished">2015-07-26</time>
@@ -175,15 +175,17 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>##為什麼要電子簽章</p>
-<p>電子簽章是用來確認這封信真的是你發的。以目前的電子郵件來講，尤其是企業內部，我們有時候會碰到以下這種</p>
-<p>##建立PGP電子簽章</p>
-<p>指令其實滿簡單的，就是<code>gpg --gen-key</code>。不過強烈建議不要在遠端server做這件事情，尤其是沒啥人用的遠端server(比方說自己租用的VPS)。當然，真的要做也不是不行，下面會有一些註解。</p>
+        <h2 id="為什麼要電子簽章"><a href="#為什麼要電子簽章" class="headerlink" title="為什麼要電子簽章"></a>為什麼要電子簽章</h2><p>電子簽章是用來確認這封信真的是你發的。以目前的電子郵件來講，尤其是企業內部，我們有時候會碰到以下這種</p>
+<h2 id="建立PGP電子簽章"><a href="#建立PGP電子簽章" class="headerlink" title="建立PGP電子簽章"></a>建立PGP電子簽章</h2><p>指令其實滿簡單的，就是<code>gpg --gen-key</code>。不過強烈建議不要在遠端server做這件事情，尤其是沒啥人用的遠端server(比方說自己租用的VPS)。當然，真的要做也不是不行，下面會有一些註解。</p>
+<p>整個過程滿簡單的，利用<code>gpg --gen-key</code>，會問你的名字跟信箱，一把key就出來了</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">➜  ~ gpg --gen-key</div><div class="line">gpg (GnuPG) 2.1.21; Copyright (C) 2017 Free Software Foundation, Inc.</div><div class="line">This is free software: you are free to change and redistribute it.</div><div class="line">There is NO WARRANTY, to the extent permitted by law.</div><div class="line"></div><div class="line">Note: Use "gpg2 --full-generate-key" for a full featured key generation dialog.</div><div class="line"></div><div class="line">GnuPG needs to construct a user ID to identify your key.</div><div class="line"></div><div class="line">Real name: Rayer Tung</div><div class="line">Email address: foo@gmail.com</div><div class="line">You selected this USER-ID:</div><div class="line">    "Rayer Tung &lt;foo@gmail.com&gt;"</div><div class="line"></div><div class="line">Change (N)ame, (E)mail, or (O)kay/(Q)uit? o</div><div class="line">We need to generate a lot of random bytes. It is a good idea to perform</div><div class="line">some other action (type on the keyboard, move the mouse, utilize the</div><div class="line">disks) during the prime generation; this gives the random number</div><div class="line">generator a better chance to gain enough entropy.</div><div class="line"></div><div class="line">gpg: /Users/rayer/.gnupg/trustdb.gpg: trustdb created</div><div class="line">gpg: key 575CA1D5A94BF504 marked as ultimately trusted</div><div class="line">gpg: directory '/Users/rayer/.gnupg/openpgp-revocs.d' created</div><div class="line">gpg: revocation certificate stored as '/Users/rayer/.gnupg/openpgp-revocs.d/A9C5FFEF8112F3327540A032575CA1D5A94BF504.rev'</div><div class="line">public and secret key created and signed.</div></pre></td></tr></table></figure>
+<p>所以就可以看到key的儲存目錄了。</p>
+<h2 id="怎麼使用這把key"><a href="#怎麼使用這把key" class="headerlink" title="怎麼使用這把key"></a>怎麼使用這把key</h2><p>就好像你隨便買個鎖沒有任何意義一樣，一把剛產生的key-pair是沒有任何意義的。你必須要在公開領域宣告你的public key，這樣別人才能用public key去認證一篇聲稱是你發的文章是否是被你的private key所加密的（進而達成所謂的<strong>不可否認性</strong>）。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2015/07/26/create-your-own-pgp-digital-signature/" data-id="cj3bh77nm000v2qsijx4gsj1n" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2015/07/26/create-your-own-pgp-digital-signature/" data-id="cj3bhgryr000tgxsi95rq4pwk" class="article-share-link">Share</a>
       
       
     </footer>
@@ -233,7 +235,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2015/06/15/sourceforge-bundled-third-party-software-causes-serious-disputes/" data-id="cj3bh77nj000u2qsij3q1vnu9" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2015/06/15/sourceforge-bundled-third-party-software-causes-serious-disputes/" data-id="cj3bhgrys000vgxsi567u00ym" class="article-share-link">Share</a>
       
       
     </footer>
@@ -296,7 +298,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2015/04/12/oauth-with-android/" data-id="cj3bh77nh000t2qsinf1rplmt" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2015/04/12/oauth-with-android/" data-id="cj3bhgrys000ugxsimqved7fd" class="article-share-link">Share</a>
       
       
     </footer>
@@ -344,7 +346,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2015/03/30/redmine-settings/" data-id="cj3bh77ng000s2qsipoisuguj" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2015/03/30/redmine-settings/" data-id="cj3bhgryq000sgxsi9gmt3emg" class="article-share-link">Share</a>
       
       
     </footer>
@@ -388,7 +390,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2014/12/02/for-some-stupid-memories/" data-id="cj3bh77ne000r2qsisfpsx80d" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2014/12/02/for-some-stupid-memories/" data-id="cj3bhgryp000rgxsisz342tfb" class="article-share-link">Share</a>
       
       
     </footer>
@@ -431,7 +433,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2014/09/19/echo-worm/" data-id="cj3bh77nc000q2qsiqzzg4iol" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2014/09/19/echo-worm/" data-id="cj3bhgryn000qgxsix8nudq72" class="article-share-link">Share</a>
       
       
     </footer>
@@ -562,7 +564,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2014/06/26/coder-said-coder-wants/" data-id="cj3bh77nb000p2qsirz0fmefy" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2014/06/26/coder-said-coder-wants/" data-id="cj3bhgrym000pgxsiv1ds0d8u" class="article-share-link">Share</a>
       
       
     </footer>
@@ -601,7 +603,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2014/06/09/why-are-threadstop-of-java-should-not-be-used/" data-id="cj3bh77n7000o2qsihz82s2a6" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2014/06/09/why-are-threadstop-of-java-should-not-be-used/" data-id="cj3bhgryk000ogxsiu1ut566r" class="article-share-link">Share</a>
       
       
     </footer>
