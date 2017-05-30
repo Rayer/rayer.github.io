@@ -68,147 +68,6 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-talking-about-the-c-11-lambda-3" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2014/01/20/talking-about-the-c-11-lambda-3/" class="article-date">
-  <time datetime="2014-01-20T02:19:00.000Z" itemprop="datePublished">2014-01-20</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2014/01/20/talking-about-the-c-11-lambda-3/">淺談C++11 Lambda (3)</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>不過Lambda也是有侷限的。</p>
-<p>廢話少說，我們來複習一下世界上最低效最基礎的泡沫排序法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">void sort(std::vector&lt;int&gt;&amp; raw) &#123;</div><div class="line">	int n = raw.size();</div><div class="line">	int temp;</div><div class="line">	for (int i = n - 1; i &gt; 0; i--)</div><div class="line">	&#123;</div><div class="line">		for (int j = 0; j &lt;= i - 1; j++)</div><div class="line">		&#123;</div><div class="line">			if (raw[j] &gt; raw[j + 1])</div><div class="line">			&#123;</div><div class="line">				temp = raw[j];</div><div class="line">				raw[j] = raw[j + 1];</div><div class="line">				raw[j + 1] = temp;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">int main(int argc, char *argv[]) &#123;</div><div class="line">	//requires C++11</div><div class="line">	std::vector&lt;int&gt; array = &#123;15, 22, 11, 13, 72, 19&#125;;</div><div class="line">	sort(array);</div><div class="line">	</div><div class="line">	for(int i : array)</div><div class="line">		std::cout &lt;&lt; i &lt;&lt; &quot; &quot;;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>這code能吐槽的地方很多，不過我們先不管 XD。這sort我們需要至少兩種加強：</p>
-<ol>
-<li>他要能接受所有型別</li>
-<li>他要能自定比較子(comparer, 決定A B哪個大哪個小的邏輯)</li>
-</ol>
-<p>我們先假設所有人對於template都很熟了，第一個需求可以很簡單的用template完成 </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line">void sort(std::vector&lt;T&gt;&amp; raw) &#123;</div><div class="line">	int n = raw.size();</div><div class="line">	T temp;</div><div class="line">	for (int i = n - 1; i &gt; 0; i--)</div><div class="line">	&#123;</div><div class="line">		for (int j = 0; j &lt;= i - 1; j++)</div><div class="line">		&#123;</div><div class="line">			if (raw[j] &gt; raw[j + 1])</div><div class="line">			&#123;</div><div class="line">				temp = raw[j];</div><div class="line">				raw[j] = raw[j + 1];</div><div class="line">				raw[j + 1] = temp;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>這個我想對於任何稍微懂一點點template的人來說，都不困難，而這個使用也不需要額外的引數參考，可以直接套進去</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">std::vector&lt;int&gt; array = &#123;15, 22, 11, 13, 72, 19&#125;;</div><div class="line">sort(array); //不用寫成sort&lt;int&gt;(array);</div></pre></td></tr></table></figure>
-<p>接下來就是刺激的部分了。我們需要一個Camparer來加入戰場，我們可以很輕易地寫出來他的簽名</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line">void sort(std::vector&lt;T&gt;&amp; raw, std::function&lt;bool(T&amp;, T&amp;)&gt; comparer);</div></pre></td></tr></table></figure>
-<p>這邊乍看之下是沒太大問題，但是當使用的時候問題就來了：我們需要一個default的comparer，這個comparer只需要<code>return A &gt; B;</code>即可。要是A, B所屬的class沒有定義operator&gt;(), 反正錯誤訊息會提示你說他們無從比對。ok, 所以看起來我們只要按照C++11的做法做一個default lambda來當作預設參數…</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line">auto defComparer = [](T&amp; A, T&amp;B)-&gt;bool&#123; return A &gt; B; &#125;;</div><div class="line"></div><div class="line">/*</div><div class="line">其實他真正的型別應該是長這樣，只是我們通常用C++11 auto呼籠過去省得麻煩而已 : </div><div class="line">template&lt;typename T&gt;</div><div class="line">std::function&lt;bool(T&amp;, T&amp;)&gt; defaultComparer = [](T&amp; a, T&amp; b)-&gt;bool&#123; return a &gt; b; &#125;;</div><div class="line">*/</div><div class="line"></div><div class="line">template&lt;typename T&gt;</div><div class="line">void sort(std::vector&lt;T&gt;&amp; raw, std::function&lt;bool(T&amp;, T&amp;)&gt; comparer = defaultComparer);</div></pre></td></tr></table></figure>
-<p>鐺鐺，編譯器發出了警告，把這行code擋了下來：對不起，lambda不能為template，阿哈哈哈你看看你!<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sort_example.cpp:6:29: error: variable &apos;defaultComparer&apos; declared as a template</div><div class="line">std::function&lt;bool(T&amp;, T&amp;)&gt; defaultComparer = [](T&amp; a, T&amp; b)-&gt;bool&#123; return a &gt; b; &#125;;</div><div class="line">                            ^</div></pre></td></tr></table></figure></p>
-<p>在C++11中，Lambda的實作是無法template化的。也許我們會想到利用<a href="http://blog.monkeypotion.net/gameprog/beginner/exploring-the-field-of-policy-based-class-design" target="_blank" rel="external">Policy</a>來實作這種情況，可是很不幸的是… function就是function你去哪生個繼承出來？</p>
-<p>比較普遍的做法是，使用overload來解決這個問題，所以code看起來會像是這樣 : </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div></pre></td><td class="code"><pre><div class="line">#include &lt;iostream&gt;</div><div class="line">#include &lt;vector&gt;</div><div class="line"></div><div class="line">template&lt;typename T&gt;</div><div class="line">bool defaultComparer(const T&amp; a, const T&amp; b) &#123;</div><div class="line">	return a &gt; b;</div><div class="line">&#125;</div><div class="line"></div><div class="line">template&lt;typename T&gt;</div><div class="line">void sort(std::vector&lt;T&gt;&amp; raw) &#123;</div><div class="line">	int n = raw.size();</div><div class="line">	T temp;</div><div class="line">	for (int i = n - 1; i &gt; 0; i--)</div><div class="line">	&#123;</div><div class="line">		for (int j = 0; j &lt;= i - 1; j++)</div><div class="line">		&#123;</div><div class="line">			if (raw[j] &gt; raw[j + 1])</div><div class="line">			&#123;</div><div class="line">				temp = raw[j];</div><div class="line">				raw[j] = raw[j + 1];</div><div class="line">				raw[j + 1] = temp;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">template&lt;typename T&gt;</div><div class="line">void sort(std::vector&lt;T&gt;&amp; raw, std::function&lt;bool(const T&amp;, const T&amp;)&gt; comparer) &#123;</div><div class="line">	int n = raw.size();</div><div class="line">		T temp;</div><div class="line">		for (int i = n - 1; i &gt; 0; i--)</div><div class="line">		&#123;</div><div class="line">			for (int j = 0; j &lt;= i - 1; j++)</div><div class="line">			&#123;</div><div class="line">				if (comparer(raw[j], raw[j + 1]))</div><div class="line">				&#123;</div><div class="line">					temp = raw[j];</div><div class="line">					raw[j] = raw[j + 1];</div><div class="line">					raw[j + 1] = temp;</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">class TestObject &#123;</div><div class="line">	int a;</div><div class="line">	int b;</div><div class="line">	public:</div><div class="line">	TestObject(int a, int b) : a(a), b(b)&#123;</div><div class="line">		</div><div class="line">	&#125;</div><div class="line">	TestObject() = default;</div><div class="line">	bool operator&gt;(const TestObject&amp; obj) const &#123;</div><div class="line">		return this-&gt;getValue() &gt; obj.getValue();</div><div class="line">	&#125;</div><div class="line">	int getValue() const &#123;</div><div class="line">		return a * b;</div><div class="line">	&#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">int main(int argc, char *argv[]) &#123;</div><div class="line">	//requires C++11</div><div class="line">	std::vector&lt;int&gt; array1 = &#123;15, 22, 11, 13, 72, 19&#125;;</div><div class="line">	//吃沒有comparer的sort, 注意這個sort不需要sort&lt;int&gt; 而且int, double float等等都吃</div><div class="line">	//只要系統有定義&gt;的都吃</div><div class="line">	sort(array1);</div><div class="line">	</div><div class="line">	for(int i : array1)</div><div class="line">		std::cout &lt;&lt; i &lt;&lt; &quot; &quot;;</div><div class="line">	</div><div class="line">	std::cout &lt;&lt; std::endl;</div><div class="line">	</div><div class="line"></div><div class="line">			</div><div class="line">	std::vector&lt;TestObject&gt; array2 = &#123;TestObject(1, 4), TestObject(2, 3), TestObject(0, 4), TestObject(3, 3), TestObject(9, 1)&#125;;</div><div class="line">	</div><div class="line">	//印出排序前的Array2</div><div class="line">	for(TestObject a : array2) </div><div class="line">		std::cout &lt;&lt; a.getValue() &lt;&lt; &quot; &quot;;</div><div class="line">	std::cout &lt;&lt; std::endl;</div><div class="line">	</div><div class="line">	//使用有comparer的sort，注意這得指定型別，不過可以試試看她吃不吃沒comparer的預設版本 XD</div><div class="line">	sort&lt;TestObject&gt;(array2, [](const TestObject&amp; a, const TestObject&amp; b)-&gt;bool&#123; return a.getValue() &gt; b.getValue();&#125;);</div><div class="line">	//印出排序後的Array2</div><div class="line">	for(TestObject a : array2) </div><div class="line">		std::cout &lt;&lt; a.getValue() &lt;&lt; &quot; &quot;;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>這算一種過渡性的做法吧，哎 :3 (本文仍然會繼續修改）</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2014/01/20/talking-about-the-c-11-lambda-3/" data-id="cj3bhgrxg000dgxsieoyjrji8" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-let-your-stdvectoror-something-else-compatible-with-stream-operator" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2014/01/20/let-your-stdvectoror-something-else-compatible-with-stream-operator/" class="article-date">
-  <time datetime="2014-01-19T23:55:00.000Z" itemprop="datePublished">2014-01-20</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2014/01/20/let-your-stdvectoror-something-else-compatible-with-stream-operator/">Let your std::vector(or something else) compatible with stream operator &lt;&lt;</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Not a quite secret, just have some operator overload trick.</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">char</span>&gt;&amp; <span class="keyword">operator</span>&lt;&lt;(<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">char</span>&gt;&amp; target, <span class="keyword">const</span> <span class="keyword">char</span>* word) &#123;</div><div class="line">	target.insert(target.end(), word, word + <span class="built_in">std</span>::<span class="built_in">strlen</span>(word));</div><div class="line">	<span class="keyword">return</span> target;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">char</span>&gt;&amp; <span class="keyword">operator</span>&lt;&lt;(<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">char</span>&gt;&amp; target, <span class="keyword">char</span> word) &#123;</div><div class="line">	target.push_back(word);</div><div class="line">	<span class="keyword">return</span> target;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">char</span>&gt;&amp; <span class="keyword">operator</span>&lt;&lt;(<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">char</span>&gt;&amp; target, <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; word) &#123;</div><div class="line">	<span class="keyword">return</span> (target &lt;&lt; word.c_str());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>This method have several benefit, first, <code>std::vector</code> can be inserted in templated class, to replace any stream : </p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> ContinerType&gt;</div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">SomethingFooFooFoo</span> &#123;</span></div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">somethingBalabala</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; source)</span> </span>&#123;</div><div class="line">  	ContainerType container;</div><div class="line">    container &lt;&lt; source;</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="comment">//it works</span></div><div class="line"><span class="built_in">std</span>::<span class="function"><span class="built_in">string</span> <span class="title">aString</span><span class="params">(<span class="string">"I am a string"</span>)</span></span>;</div><div class="line"></div><div class="line">SomethingFooFooFoo&lt;<span class="built_in">std</span>::iostream&gt; something;</div><div class="line">something.somethingBalabala(aString); <span class="comment">//Works</span></div><div class="line"></div><div class="line">SomethingFooFooFoo&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&gt; somethingElse;</div><div class="line">somethingElse.somethingBalabala(aString); <span class="comment">//also works</span></div></pre></td></tr></table></figure>
-<p>It can load up data into container, with controlled type. If you wish, you can even load any byte data into it(using first two implementations). Unloading a vector is quite easy, just use </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">const signed char* dumpData = (const signed char*)vectorContainer.data();</div></pre></td></tr></table></figure>
-<p>It’s easy, but there is 2 important highlight and ignoring these will easily mess up your code:</p>
-<ol>
-<li>This data have the same life cycle with the vector container, if the vector is destoryed, this data will no longer valid.</li>
-<li>This data should use <code>const</code> to get the data! missing <code>const</code> will directly changes data in vector, and cause unexpected side effect, be advised!</li>
-</ol>
-<p>For sake of safely, you should get this data via memcpy, or you know what you are doing. in general case, put both <code>dumpData</code> and <code>vectorContainer</code> in the same scope is a good idea, and it is common sense that you should not pass dumpData with pointer to outside of the scope.</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2014/01/20/let-your-stdvectoror-something-else-compatible-with-stream-operator/" data-id="cj3bhgrxe000cgxsip7pyffbg" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-talking-about-the-c-11-lambda-2" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2014/01/20/talking-about-the-c-11-lambda-2/" class="article-date">
-  <time datetime="2014-01-19T19:20:00.000Z" itemprop="datePublished">2014-01-20</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2014/01/20/talking-about-the-c-11-lambda-2/">淺談C++11 Lambda (2)</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>(這是一個placeholder 主要是講述C++11 lambda的語法)<br>(這篇還沒寫，但是3已經寫好了 所以…..囧)</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2014/01/20/talking-about-the-c-11-lambda-2/" data-id="cj3bhgrxc000bgxsin59olkh1" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
     <article id="post-talking-about-the-c-11-lambda" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2014/01/17/talking-about-the-c-11-lambda/" class="article-date">
@@ -260,7 +119,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2014/01/17/talking-about-the-c-11-lambda/" data-id="cj3bhgrxa000agxsipu08cehi" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2014/01/17/talking-about-the-c-11-lambda/" data-id="cj3bltoo3000es3siubjxu0wm" class="article-share-link">Share</a>
       
       
     </footer>
@@ -306,7 +165,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2014/01/15/no-modern-design-modern-c/" data-id="cj3bhgrx50008gxsi8tlkmzml" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2014/01/15/no-modern-design-modern-c/" data-id="cj3bltony000bs3sijzz6b7xw" class="article-share-link">Share</a>
       
       
     </footer>
@@ -352,7 +211,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2014/01/15/talk-about-why-mac-gradually-eating-away-at-pc-market/" data-id="cj3bhgrx90009gxsio3u822kd" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2014/01/15/talk-about-why-mac-gradually-eating-away-at-pc-market/" data-id="cj3bltoo0000cs3sisqv0agd3" class="article-share-link">Share</a>
       
       
     </footer>
@@ -414,7 +273,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2014/01/08/talking-about-the-four-c-style-casting/" data-id="cj3bhgrww0006gxsiq7jilelo" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2014/01/08/talking-about-the-four-c-style-casting/" data-id="cj3bltonv000as3si93xuzju5" class="article-share-link">Share</a>
       
       
     </footer>
@@ -477,7 +336,7 @@ return 0;
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2014/01/01/fibonacci-sequence-of-three-kinds-of-writing-in-c/" data-id="cj3bhgrwy0007gxsi5t2il3zc" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2014/01/01/fibonacci-sequence-of-three-kinds-of-writing-in-c/" data-id="cj3bltonu0009s3sibocqw3vy" class="article-share-link">Share</a>
       
       
     </footer>
@@ -537,7 +396,7 @@ return 0;
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2013/12/26/the-path-to-scheduled-process-singleton/" data-id="cj3bhgrwu0005gxsidv3qeg6c" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2013/12/26/the-path-to-scheduled-process-singleton/" data-id="cj3bltonr0008s3siub2fqufk" class="article-share-link">Share</a>
       
       
     </footer>
@@ -579,7 +438,139 @@ return 0;
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://rayer.github.com/2013/12/19/explicit-protocols/" data-id="cj3bhgrwq0004gxsi9l11wvvy" class="article-share-link">Share</a>
+      <a data-url="https://rayer.github.com/2013/12/19/explicit-protocols/" data-id="cj3bltonq0007s3si7yl70thc" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-visual-studio-online" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/12/03/visual-studio-online/" class="article-date">
+  <time datetime="2013-12-03T05:23:00.000Z" itemprop="datePublished">2013-12-03</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/12/03/visual-studio-online/">Visual Studio Online</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="http://www.windowsazure.com/zh-tw/pricing/details/visual-studio-online/" target="_blank" rel="external">Visual Studio Online</a>我到了剛剛才搞懂那是啥東西 囧</p>
+<p>簡單的說，這並不是一個<strong>“基於HTML5，以及網頁技術，可以讓你只要開瀏覽器就能管理編輯專案”</strong>的東西，而是比較類似GitHub(同時他的主要對手也是GitHub, 嗚呼)，而且比GitHub更加深入的整合的一個雲端專案代管系統。他比GitHub高檔的地方在於他同時結合了CI(不過看起來要價不少)以及與Visual Studio無縫的整合(這聽起來好像廢話)，甚至提供了Eclipse Plugin讓你可以不用Visual Studio也能協同開發。這服務是Windows Azure的一部分，所以可以跟現有的Windows Azure Credit Quota共用。</p>
+<p>有點我倒是想說，昨天我才註冊了上去，今天就有小姐打電話來問了，這一天是想問出什麼使用感想阿 XD。另外…MSTW用的節費電話(看號碼應該是Skype?)品質實在堪慮，這樣的客服電話讓客人聽一句漏兩句是不行的 囧興</p>
+<p>價格可以參考我剛post的pricing，不過我待過的幾家公司似乎只有一家用Visual Studio當solution，以coder的世界來講，除非是.net開發者，不然這東西看起來似乎不是很討好阿(遠目)</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://rayer.github.com/2013/12/03/visual-studio-online/" data-id="cj3bltonp0006s3sirrvjfwey" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-this-is-singleton" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/08/07/this-is-singleton/" class="article-date">
+  <time datetime="2013-08-06T18:29:00.000Z" itemprop="datePublished">2013-08-07</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/08/07/this-is-singleton/">This is SINGLETON!</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Singleton…</p>
+<p>說真的，這可能可以榮登史上最常見被濫用的Pattern，沒有之一。它本身撰寫並不困難，使用直覺（只是使用上實在又臭又長了一點），在C++裡面就更簡單了，隨便一個class套個<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div></pre></td></tr></table></figure></p>
+<p>class Balabala {<br>    public:<br>        void doSomething();<br>};<br>typedef Loki::SingletonHolder<balabala> SingleBala;</balabala></p>
+<p>void test() {<br>    SingleBala::instance().doSomething();<br>};<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">甚至要撰寫一個最基本的Singleton也是簡單到爆炸</div></pre></td></tr></table></figure></p>
+<p>class Balabala {<br>    private:<br>        static Balabala* defInst;<br>    public:<br>        static inline Balabala&amp; instance() {<br>            if(defInst == null)<br>                defInst = new Balabala();</p>
+<pre><code>    return *defInst;
+}
+</code></pre><p>};<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">當然，Loki的SingletonHolder裡面做了很多有趣的事情，有興趣的人請自己參考一下[這裡](http://sourcecodebrowser.com/asc/1.16.3.0/_singleton_8h_source.html)。當然，請先稍微念一下Modern C++ Design，不然可能連第一個開頭宣告的```CreationPolicy```都不知道是幹嘛的。不過，即使是很初步的大略看了一下，都看得出來Andrei Alexandrescu在設計這個東西的時候，考慮了生命週期以及保留了其他new/delete方法選擇上的彈性。</div><div class="line"></div><div class="line">事實上，也由於```Loki::SingletonHolder&lt;T&gt;```的關係，這個東西在許多系統裡面被濫用到一種莫名其妙的地步， ***幾乎所有希望能夠被在全域存取的物件*** 都會有人想把它寫成Singleton。更糟糕的是，如果你試圖阻止他的話，他會用更糟的static或者毫無章法的在precompiled header內extern去做這種行為。</div></pre></td></tr></table></figure></p>
+<p>//in Precompile.pch<br>extern SingleFooService FOO;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">![](https://dl.dropboxusercontent.com/u/3992354/double_facepalm.jpg)</div><div class="line"></div><div class="line">所以，當你有足夠的知識去判斷 ***「這個不該用Singleton」*** 的時候，請很明確地順便跟他說這東西 ***「不該被在不受控管的情況下全域存取」*** ，甚至 ***「根本不該做成全域存取，應該以參考的方式傳入」*** 。很多時候，明明只需要一個String，可是因為貪圖方便不去改member function，直接在裡面呼叫衛星砲Singleton把String傳下來，結果就是把相依性搞得亂七八糟。</div><div class="line"></div><div class="line">有個作者(可以google一下WashuHibiki)做了一個一針見血的評論 : *Not really, most of the use cases for singletons revolve around: &quot;I want to access X, but its not &apos;OO&apos; to use a global, so I&apos;ll dress it up in a class and call it &apos;OO&apos;!&quot;.* 「恩..大多數的Singleton的使用情況，都是在於『我要要存取X，但是使用全域實在不是OO的風格，所以我把X給變裝裝在一個class下，這就是OO了!』」</div><div class="line"></div><div class="line">Singleton的優點我想應該不用說太多，每個人用Singleton一定都是因為他有優勢所以才會去用他。可是，Singleton有很多侷限，很多人卻對這些侷限一無所知而照樣用下去。Singleton有幾個比較明顯的缺點</div><div class="line"></div><div class="line">- 它會讓整個相依性爛成一鍋粥。</div><div class="line">- 它由於本身特性使然，使的它一旦被使用下去就很難去擴充。一旦決策錯誤，大多數的Singleton設計上都很難讓人補救。</div><div class="line">- 也是由於它本身特性使然，它對於threading的處理有很多潛在的問題，尤其是當它有context的時候。</div><div class="line">- 它在很多情況下沒辦法掌握先後順序。舉個最簡單的例子，假設它需要init，而你在foo::instance()的當下壓根不知道她有沒有被init過，你得做個旗標去控制它。然而，並不是所有的地方都可以讓Singleton有正確的context做init的。</div><div class="line"></div><div class="line">這些缺點都是在他被 ***正確*** 使用的時候會碰到的問題，更不用講它被 ***不正確*** 使用的時候會有多少問題。```Loki::SingletonHolder&lt;class&gt;```實在是方便到爆炸，以至於大家什麼class都想往裡面包。我來舉幾個我看過的慘劇</div><div class="line"></div><div class="line">- 某人先宣告了一個```typedef Loki::SingletonHolder&lt;FOO&gt; singleFoo;``` 另外一個人在不同的.h裡面宣告了```typedef Loki::SingletonHolder&lt;FOO&gt; fooSingle```，然後某人開始抱怨為什麼singleFoo會自己改東西，明明沒有code呼叫他</div><div class="line">- 某些情況下的```singleFoo::instance().xxx()```會炸掉，問題幾乎無法重現。後來才發現炸掉的沒有```.init()```，而他一點把握都沒有到底在系統的什麼地方對他作```singleFoo::instance().init(context)```才能正確的把singleFoo init起來，因為他根本沒把握哪個地方會是第一次執行singleFoo的地方。</div><div class="line">- 這個比較偏向於笑話，有人把有state的class包成singleton，比方說DX的```beginDraw()```, ```endDraw()```, 你很多操作一定要放在這兩者之間....可以想想有stack一路call下去會怎樣</div><div class="line">- 這也是個笑話，設計不良的singleton跑在multi thread環境下debug一個難以重現的錯誤debug了一個月</div><div class="line"></div><div class="line">其實先撇掉這些令人噴飯的使用例子，其實大多數Singleton都有一些小撇步來避開這些問題。通常來講，我們要有一個認知： ***Singleton就是Global，不要再催眠自己它不是不是Global了!*** Global的缺點Singleton一個都不會少，我們要用Global的方法去思考這些東西的必要性。</div><div class="line"></div><div class="line">首先，我們要盡量降低Singleton的數量。最簡單的方式就是讓系統整個Singleton剩下一個。比方說我們可能有以下的範例</div></pre></td></tr></table></figure></p>
+<p>typedef Loki::SingletonHolder<txmanager> SingleTxManager;<br>typedef Loki::SingletonHolder<bandmanager> SingleBandManager;<br>typedef Loki::SingletonHolder<channelmanager> SingleChannelManager;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">我們只允許系統存在一個Singleton，稱為SystemManager</div></pre></td></tr></table></figure></channelmanager></bandmanager></txmanager></p>
+<p>class SystemManager {<br>private:<br>    TxManager<em> mTxManager;<br>    BandManager</em> mBandManager;<br>    ChannelManager<em> mChannelManager;<br>public:<br>    TxManager</em> getTxManager();<br>    BandManager<em> getBandManager();<br>    ChannelManager</em> getChannelManager();<br>};</p>
+<p>typedef Loki::SingletonHolder<systemmanager> SingleSystem;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">這是最簡單的一步，而且優點非常的明顯。其中一個很明顯的地方在於，當系統需要第二組TxManager的時候，第一種做法會讓整個系統毫無辦法的只能整個大改，但是第二種做法卻可以這樣做</div></pre></td></tr></table></figure></systemmanager></p>
+<p>enum TxMgrType {<br>    TX_ORIGINAL,<br>    TX_EXTENDED<br>};</p>
+<p>TxManager* getTxManager(TxMgrType type = TX_ORIGINAL);<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">這樣就可以輕易的轉換過去，沒有參數的getTxManager會拿到原來的，有傳入TX_EXTENDED的則可以拿到新的。當然，這只是個緩衝跟拖時間的方法，趕快把系統過渡到有兩個TxManager的語法吧... 而且，SystemManager基本上需要考慮的threading issue可以降到最低，因為整個System的Context看起來都是init以後就可以frozen，所以整個系統設計起來將會非常簡單。最後，我們可以比較簡單地找到一個地方去把所有的class初始化。</div><div class="line"></div><div class="line">Singleton的Threading issue也是一個常常被討論的話題。因為這東西被存取的地方實在太多，可能性也太過於頻繁，所以我們必須用許許多多的mutex把很多部分給保護住。但是就有如所有的Semaphore-like的保護一樣，這東西會造成相當程度的設計問題以及死結。所以，為了因應這種問題，我們通常來講會在一些已知的高Threading issue Singleton做一些手腳，比方說把所有的context parameter分開等等...</div></pre></td></tr></table></figure></p>
+<p>class FooService {<br>private:<br>    typedef void(<em>FOO_CALLBACK)(void</em>);<br>    const int MAX_WORKING_THREAD = 20;<br>    boost::threadpool::pool s_ThreadPool(MAX_WORKING_THREAD);<br>public:<br>    int doSomething(FOO_CALLBACK callback);<br>};</p>
+<p>typedef Loki::SingletonHolder<fooservice> SingleFooService;<br>```</fooservice></p>
+<p>簡單的說，我們直接把Thread的事情自己收進來管理，再由一個Callback來把結果傳回去。Java在後期引進了一個概念叫做<a href="http://openhome.cc/Gossip/JavaGossip-V2/CallableFuture.htm" target="_blank" rel="external">Future</a>, <a href="http://www.boost.org/doc/libs/1_46_0/boost/thread/future.hpp" target="_blank" rel="external">C++也有</a>，這個對Threading設計算是非常重要的一個概念，可以大幅減化這方面的設計（也就是讓Singleton傳回一個boost::future，你需要的時候再跑起來就好）</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://rayer.github.com/2013/08/07/this-is-singleton/" data-id="cj3bltonk0005s3si3pd7usjz" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-suddenly-thought-of-that-old-joke" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/07/18/suddenly-thought-of-that-old-joke/" class="article-date">
+  <time datetime="2013-07-18T00:13:00.000Z" itemprop="datePublished">2013-07-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/07/18/suddenly-thought-of-that-old-joke/">突然想到這個老掉牙的笑話</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>某天差點被自己害死</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">sid = setsid();</div><div class="line">printf(&quot;Starting daemon, sid = %d\n&quot;, sid);</div><div class="line"></div><div class="line">printf(&quot;Disabling each standard file pipes... \n&quot;);</div><div class="line">int FilePipe[3] = &#123;STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO&#125;;</div><div class="line">for(int i = 0; i &lt; sizeof(FilePipe)/sizeof(int); ++i)</div><div class="line">	close(FilePipe[i]);</div><div class="line">printf(&quot;Done\n&quot;);</div></pre></td></tr></table></figure>
+<p>恩….誰看出問題在哪了？單單從log上看看起來很像是這個for loop永遠跑不完 XD</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://rayer.github.com/2013/07/18/suddenly-thought-of-that-old-joke/" data-id="cj3bltona0002s3si4yomj8d5" class="article-share-link">Share</a>
       
       
     </footer>
@@ -610,7 +601,7 @@ return 0;
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">八月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">四月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">十二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">六月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">四月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">十二月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">七月 2013</a></li></ul>
     </div>
   </div>
 
@@ -631,15 +622,15 @@ return 0;
           </li>
         
           <li>
-            <a href="/2015/07/26/create-your-own-pgp-digital-signature/">創造一個自己的PGP電子簽章</a>
-          </li>
-        
-          <li>
             <a href="/2015/06/15/sourceforge-bundled-third-party-software-causes-serious-disputes/">SourceForge綑綁第三方軟體引發嚴重爭議</a>
           </li>
         
           <li>
             <a href="/2015/04/12/oauth-with-android/">舊文回收:OAuth with Android</a>
+          </li>
+        
+          <li>
+            <a href="/2015/03/30/redmine-settings/">Redmine設定(Digital Ocean, Docker)</a>
           </li>
         
       </ul>
