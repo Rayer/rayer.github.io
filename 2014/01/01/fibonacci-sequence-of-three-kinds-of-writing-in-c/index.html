@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Fibonacci數列的三種寫法 in C++ | Hex Fantastic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="剛剛生病閒著，突然想到連續數列通常在C++有三種表達方法，包含template偏特化，遞迴以及傳統迴圈，於是就拿Fibonacci來作範例寫一組來玩玩看。 這組code展示了這三種寫法。人家說遞迴好寫不是沒有理由的，但是能活著撐過高order的只有迴圈 – 其他都會有call depth爆炸的問題 =P 有興趣的可以玩玩看 ###Template &amp;amp; Specialization  最顯為">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fibonacci數列的三種寫法 in C++">
+<meta property="og:url" content="http://yoursite.com/2014/01/01/fibonacci-sequence-of-three-kinds-of-writing-in-c/index.html">
+<meta property="og:site_name" content="Hex Fantastic">
+<meta property="og:description" content="剛剛生病閒著，突然想到連續數列通常在C++有三種表達方法，包含template偏特化，遞迴以及傳統迴圈，於是就拿Fibonacci來作範例寫一組來玩玩看。 這組code展示了這三種寫法。人家說遞迴好寫不是沒有理由的，但是能活著撐過高order的只有迴圈 – 其他都會有call depth爆炸的問題 =P 有興趣的可以玩玩看 ###Template &amp;amp; Specialization  最顯為">
+<meta property="og:updated_time" content="2017-05-29T22:29:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Fibonacci數列的三種寫法 in C++">
+<meta name="twitter:description" content="剛剛生病閒著，突然想到連續數列通常在C++有三種表達方法，包含template偏特化，遞迴以及傳統迴圈，於是就拿Fibonacci來作範例寫一組來玩玩看。 這組code展示了這三種寫法。人家說遞迴好寫不是沒有理由的，但是能活著撐過高order的只有迴圈 – 其他都會有call depth爆炸的問題 =P 有興趣的可以玩玩看 ###Template &amp;amp; Specialization  最顯為">
+  
+    <link rel="alternate" href="/atom.xml" title="Hex Fantastic" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hex Fantastic</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">這世界有點無聊，找點架吵吧!</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-fibonacci-sequence-of-three-kinds-of-writing-in-c" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/01/01/fibonacci-sequence-of-three-kinds-of-writing-in-c/" class="article-date">
+  <time datetime="2013-12-31T23:33:00.000Z" itemprop="datePublished">2014-01-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Fibonacci數列的三種寫法 in C++
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>剛剛生病閒著，突然想到連續數列通常在C++有三種表達方法，包含template偏特化，遞迴以及傳統迴圈，於是就拿Fibonacci來作範例寫一組來玩玩看。</p>
+<p>這組code展示了這三種寫法。人家說遞迴好寫不是沒有理由的，但是能活著撐過高order的只有迴圈 – 其他都會有call depth爆炸的問題 =P 有興趣的可以玩玩看</p>
+<p>###Template &amp; Specialization</p>
+<ul>
+<li>最顯為人知的特點就是他是編譯期計算。然而，這算是優點也算是缺點，因為template的模板參數必須是型別或者const – 這很合理，我們不可能依賴runtime產生的數據去讓這東西編譯期產生object。優點來講，就是幾乎所有計算的功都在編譯期完成，以下面的範例來講，這幾乎等於是 <figure class="highlight plain"><figcaption><span><< 6765 << endl;```。基本上，很適合建表，但是很占記憶體資源也得很小心的把runtime資料切開。</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">+ 另外其實他邏輯跟寫法都跟Recursive差不多，滿容易變換的，老實講扣掉除錯中的錯誤訊息以外，也滿容易理解的。</div><div class="line">+ 所以同樣的會發生一些call depth方面的問題，不過是炸在不夠力的編譯器上而非runtime。</div><div class="line"></div><div class="line">###Functional Recursive</div><div class="line">+ 看下面的例子就知道這超直覺的，基本上遞迴算是很多數列問題最直觀最直覺的解答。</div><div class="line">+ 但是Call Depth是個很大的問題，以VC6來講，這東西沒辦法處理超過8x以上，而G++似乎也差不多是類似的數字就會炸掉。</div><div class="line">+ 效能普遍很拉蒙，簡單的代價啊（遠目）</div><div class="line"></div><div class="line">###Classic Loop</div><div class="line">+ 基本上這恐怕是三者之中最複雜最難寫的一種</div><div class="line">+ 可是卻是唯一可以活過call depth陷阱的一種做法，下面的20改成100，只有Classic Loop可以活下來</div><div class="line"></div><div class="line">-------------------------</div><div class="line">不過，還是先來個動手玩吧...</div></pre></td></tr></table></figure></li>
+</ul>
+<p>#include <iostream></iostream></p>
+<p>template<int order=""><br>long fibonacci() { return fibonacci<order-1>() + fibonacci<order-2>();}</order-2></order-1></int></p>
+<p>template&lt;&gt;<br>long fibonacci<0>() { return 0; }</0></p>
+<p>template&lt;&gt;<br>long fibonacci<1>() { return 1; }</1></p>
+<p>long fibonacci_rec(int order) {<br>    if(order == 0)<br>        return 0;<br>    if(order == 1)<br>        return 1;<br>    return fibonacci_rec(order - 1) + fibonacci_rec(order - 2);<br>}</p>
+<p>long fibonacci_classic(int order) {<br>    if(order == 0)<br>        return 0;<br>    if(order == 1)<br>        return 1;</p>
+<pre><code>long past2 = 0, past1 = 1, ret = 0;
+for(int i = 0; i &lt; order - 1; ++i) {
+    ret = past2 + past1;
+    past2 = past1;
+    past1 = ret;
+}
+return ret;
+</code></pre><p>}</p>
+<p>using namespace std;<br>int main(int argc, char *argv[]) {</p>
+<pre><code>cout &lt;&lt; fibonacci&lt;20&gt;() &lt;&lt; endl;
+cout &lt;&lt; fibonacci_rec(20) &lt;&lt; endl;
+cout &lt;&lt; fibonacci_classic(20) &lt;&lt; endl;
+
+return 0;
+</code></pre><p>}<br>```</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2014/01/01/fibonacci-sequence-of-three-kinds-of-writing-in-c/" data-id="cj3b7hvmu0006z7sisktewrhg" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/01/08/talking-about-the-four-c-style-casting/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          淺談C++ Style的四種casting
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2013/12/26/the-path-to-scheduled-process-singleton/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">The path to Scheduled Process Singleton</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2016/02/03/most-vexing-parsingc/">Most Vexing Parsing(C++)</a>
+          </li>
+        
+          <li>
+            <a href="/2015/08/23/markdown-text-color-support/">Markdown文字色彩支援</a>
+          </li>
+        
+          <li>
+            <a href="/2015/07/26/create-your-own-pgp-digital-signature/">創造一個自己的PGP電子簽章</a>
+          </li>
+        
+          <li>
+            <a href="/2015/06/15/sourceforge-bundled-third-party-software-causes-serious-disputes/">SourceForge綑綁第三方軟體引發嚴重爭議</a>
+          </li>
+        
+          <li>
+            <a href="/2015/04/12/oauth-with-android/">舊文回收:OAuth with Android</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Rayer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>在VPS上架設一個WordPress服務 -- 以CentOS為例子 | Hex Fantastic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="有人說過，有玩具，就要試著去玩弄它（？）。既然我們有了一台VPS，那當然不玩玩個網站說不過去。要架起一個WordPress可以說簡單，也可以說困難，端看你是怎麼架的，以及需不需要額外架設一個前端DNS Server。不過，我們都先以最簡單的方式來做 ##下載必須元件要架起WordPress的話至少需要幾個東西，包含了Apache HTTP Server(其實是可以用nginx或者lighttpd代">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在VPS上架設一個WordPress服務 -- 以CentOS為例子">
+<meta property="og:url" content="http://yoursite.com/2014/03/30/set-up-a-wordpress-on-the-vps-services/index.html">
+<meta property="og:site_name" content="Hex Fantastic">
+<meta property="og:description" content="有人說過，有玩具，就要試著去玩弄它（？）。既然我們有了一台VPS，那當然不玩玩個網站說不過去。要架起一個WordPress可以說簡單，也可以說困難，端看你是怎麼架的，以及需不需要額外架設一個前端DNS Server。不過，我們都先以最簡單的方式來做 ##下載必須元件要架起WordPress的話至少需要幾個東西，包含了Apache HTTP Server(其實是可以用nginx或者lighttpd代">
+<meta property="og:updated_time" content="2017-05-29T22:29:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在VPS上架設一個WordPress服務 -- 以CentOS為例子">
+<meta name="twitter:description" content="有人說過，有玩具，就要試著去玩弄它（？）。既然我們有了一台VPS，那當然不玩玩個網站說不過去。要架起一個WordPress可以說簡單，也可以說困難，端看你是怎麼架的，以及需不需要額外架設一個前端DNS Server。不過，我們都先以最簡單的方式來做 ##下載必須元件要架起WordPress的話至少需要幾個東西，包含了Apache HTTP Server(其實是可以用nginx或者lighttpd代">
+  
+    <link rel="alternate" href="/atom.xml" title="Hex Fantastic" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hex Fantastic</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">這世界有點無聊，找點架吵吧!</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-set-up-a-wordpress-on-the-vps-services" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/03/30/set-up-a-wordpress-on-the-vps-services/" class="article-date">
+  <time datetime="2014-03-29T22:49:00.000Z" itemprop="datePublished">2014-03-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      在VPS上架設一個WordPress服務 -- 以CentOS為例子
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>有人說過，有玩具，就要試著去玩弄它（？）。既然我們有了一台VPS，那當然不玩玩個網站說不過去。要架起一個WordPress可以說簡單，也可以說困難，端看你是怎麼架的，以及需不需要額外架設一個前端DNS Server。不過，我們都先以最簡單的方式來做</p>
+<p>##下載必須元件<br>要架起WordPress的話至少需要幾個東西，包含了Apache HTTP Server(其實是可以用<a href="http://nginx.org" target="_blank" rel="external">nginx</a>或者<a href="http://www.lighttpd.net" target="_blank" rel="external">lighttpd</a>代替，不過這邊統一方便用httpd), mysql以及php. 最簡單的安裝法大概就像這樣</p>
+<pre><code>yum -y install httpd php php-mysql mysql mysql-server php-gd
+</code></pre><p>雖然不是必須，但是我會建議一起裝下去，等等會用到的:ftp, vsftpd</p>
+<pre><code>yum -y install ftp vsftpd
+</code></pre><p>-y可以拿掉，這個選項的意思就是再問你yes or no的時候一路幫你Y到底，如果你想觀賞或者研究一下怎麼跑的話，我會建議拿掉來仔細看看。安裝完畢以後，記得要設定開機時啟動服務 :</p>
+<pre><code>chkconfig httpd on
+chkconfig mysql on
+#如果有裝vsftpd的話
+chkconfig vsftpd on
+</code></pre><p>當然，別忘了還要下載WordPress(<a href="http://tw.wordpress.org/wordpress-3.8.1-zh_TW.tar.gz" target="_blank" rel="external">中文版</a> <a href="https://wordpress.org/download/" target="_blank" rel="external">英文版</a>)。他語系是可以改的，不過不是那麼直覺，所以建議選擇你要的語言直接下載就好。我會建議你用wget來做這件事情，比方說</p>
+<pre><code>cd ~
+wget http://tw.wordpress.org/wordpress-3.8.1-zh_TW.tar.gz
+tar -zxvf wordpress-3.8.1-zh_TW.tar.gz
+</code></pre><p>好啦，我想我們該下載的東西都下載完畢了，接下來該開始設定了</p>
+<p>##設定mysql<br>WordPress需要一個mysql 的帳號密碼來儲存所有的post，所以我們要先給wordpress一個完整的帳號密碼</p>
+<pre><code>mysqladmin -u root -p &apos;&lt;你的密碼&gt;&apos;
+</code></pre><p>接下來就是登入mysql去給wordpress一個帳號密碼了，我傾向于這樣做：</p>
+<pre><code>mysql -u root -p
+&lt;會要求你輸入密碼&gt;
+#建立一個要用的wordpress資料庫
+create database wordpressdb;
+#建立wordpress帳號
+create user wordpress@localhost;
+#給予這個帳號密碼, 基本上由於我們限定他只能local登入，所以密碼不用太要求。
+#如果你想給予強度高一點的密碼也是可以的，反正後面都會要你輸入。
+set password for wordpressuser@localhost= password(&quot;wordpress&quot;);
+#給予這個wordpress操作wordpress資料庫的權限
+grant all privileges on wordpressdb.* to wordpress@localhost identified by &apos;wordpress&apos;;
+flush privileges;
+</code></pre><p>這樣mysql暫時算是搞定了。</p>
+<p>##設定httpd<br>除非你打算做子域名，不然普通來講你的網頁應該會直接連到/var/www/html/www下的index.html。我們就直接先把wordpress給放到那裡去。基本上，這邊問題最大的應該就是權限問題，等等多半會卡在這問題上打轉。</p>
+<p>首先，先把整個wordpress資料夾移到/var/www/html取代掉裡面本來的www</p>
+<pre><code>cd ~
+sudo rm /var/www/html/www
+sudo mv wordpress /var/www/html/www
+</code></pre><p>為了讓整個wordpress能夠被apache有權限讀取，有很多種不同的做法。group/owner是一種做法，不過因為後來還有一個ftp更新也會跟著加入戰局，所以我會建議直接改動權限。為了安全起見，我們所有的檔案都應該被設定為766(rwxrw-rw-)而所有在wordpress的目錄都被設為777(目錄一定要是有x屬性否則無法進入)。</p>
+<pre><code>cd /var/www/html
+chmod 777 www
+cd www
+chmod -R 766 .
+find . -type d -exec chmod 777 {} \;
+</code></pre><p>ok，理論上這樣應該設定算是完成一段落了，我們可以開始連上網域看看。如果出現之前的頁面的話，請重新讀取一次應該就可以了。</p>
+<p>##WordPress設定</p>
+<p>WordPress有引以自豪的五分鐘設定，所以應該不用過於著墨在這塊。他會要求你填入mysql帳號密碼，如果我們按照前面這定的話，資料庫就會是wordpressdb，帳號跟密碼就都會是wordpress。</p>
+<p>另外，如果顯示有任何開啟檔案讀取寫入失敗的話，請用root去看<code>/var/log/httpd/error_log</code>這檔案需要root才能看得到，這會很詳細的跟你說哪個檔案讀取不良。如果你想要測試看看apache是不是能順利讀取某個檔案的話，最簡單的方法就是</p>
+<pre><code>sudo -u apache cat &lt;你的檔案&gt;
+</code></pre><p>後面當然就是你要看的檔案名稱。這樣就能確定apache(也就是httpd)是不是的確無法順利開啟該檔案了，這些可能的問題包括了目錄沒有w跟x權限，父目錄一路往上有權限設定錯誤等等，請往上看httpd設定這一個小節。</p>
+<p>##FTP設定<br>WordPress本身使用了FTP來做更新以及許多安裝的動作，當在做update以及某些安裝的時候(plugin, theme…等等)，他會要求你提供一個ftp帳號來作業。事實上這個ftp帳號並不是架起一個ftp server那麼簡單，你必須讓它使用你提供的帳號密碼的時候，能讓他正確的登入wordpress所在目錄(以我們這裡的例子來說，就是/var/www/html/www)。在我們這個例子裡面，我們會使用vsftpd來做ftp daemon。</p>
+<p>###vsftpd的設定<br>前面假設已經yum install過vsftpd了，我們開啟他的設定檔案讓他能work。其實要改的地方不太多，大概就這幾個</p>
+<pre><code>#把匿名登入關掉。很奇怪的是這預設是打開的，因為opensource精神嗎（汗
+#請不要以為mark掉這行就是關掉，它mark掉就是預設值(開)
+anonymous_enable=NO
+#把它chroot起來
+#關於什麼是chroot?請參考http://fanqiang.chinaunix.net/a1/b5/20010416/134954.html
+#這個也很重要，不知道為什麼預設是關的，因為opensource精神嗎（汗
+chroot_local_user=YES
+#這兩行是沒有的，請自己加。主要就是指定ftp的根目錄。
+#當然，我們還沒有ftphome，所以我們等等要建一個
+local_root=/ftphome/$USER
+user_sub_token=$USER
+</code></pre><p>好，所以我們現在要讓wordpress能登入ftp，所以我們要幫她加一組帳號</p>
+<pre><code>sudo useradd wordpress
+sudo passwd wordpress
+&lt;自己輸入密碼&gt;
+</code></pre><p>在這邊要講解一個概念。ftp雖然可以使用系統的帳號密碼來認證，不過整個ftp的使用者就是”ftp”。也就是說，你只要使用ftp登入這系統，你對於這個系統而言就是”ftp”這個使用者。即使wordpress用自己的帳號密碼去登入ftp，他也只能寫”ftp使用者”能夠讀寫的權限，而不是”wordpress”使用者的。</p>
+<p>當然，我們就要幫”ftp”這個使用者做一個家了。</p>
+<pre><code>cd /
+sudo mkdir ftphome
+#其實chown ftp.ftp ftphome也可以
+chown ftp ftphome
+chgrp ftp ftphome
+cd ftphome
+</code></pre><p>根據我們在vsftpd.conf裡面的設定，我們會發現如果我們用wordpress登入的話，ftp的root應該是/ftphome/wordpress。這個應該要指向/var/www/html/www才對，所以我們要做一個symbolic link</p>
+<pre><code>sudo ln -s wordpress /var/www/html/www
+</code></pre><p>還記得我前面提過的嗎</p>
+<blockquote>
+<p>group/owner是一種做法，不過因為後來還有一個ftp更新也會跟著加入戰局，所以我會建議直接改動權限。</p>
+</blockquote>
+<p>所以這樣的設定可以確保ftp能讀寫www這目錄，可以用ftp試試看!</p>
+<p>###用ftp試試看吧</p>
+<pre><code>ftp localhost
+wordpress
+&lt;你設的密碼&gt;
+</code></pre><p>如果ok的話，恭喜，這應該設定就沒問題了。往後wordpress需要的ftp update/install等等都可以靠這組帳號密碼搞定</p>
+<p>##最大上傳限制</p>
+<p>預設的php上傳是2M，其實很多theme都不止這個大小，所以會報錯。所以我們得修給一下/etc/php.ini</p>
+<pre><code>sudo vim /etc/php.ini
+#找到下面這個把它改大
+; Maximum allowed size for uploaded files.
+; http://www.php.net/manual/en/ini.core.php#ini.upload-max-filesize
+upload_max_filesize = 16M
+</code></pre><p>我是把它改到16M啦 不過通常來講8M應該就夠了。</p>
+<p>恭喜，這大概就是一整個空的VPS上設定一個wordpress的歷程。感覺是不是比虛擬主機的cPanel複雜一點（汗）。不過，我想裝完一整個流程，應該可以對Linux的運作更熟悉一點了</p>
+<p>Disqus修好了，他們修得挺快的 XD</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2014/03/30/set-up-a-wordpress-on-the-vps-services/" data-id="cj3b7hvnh000jz7si2bnxyzxp" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/04/08/centos-a-ipython-notebook-last-server/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          在CentOS上架一個IPython Notebook server
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/03/21/java-8-far-reaching-stream-with-lambda/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Java 8 : 影響深遠的Stream, Lambda以及Functional Interfaces</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2016/02/03/most-vexing-parsingc/">Most Vexing Parsing(C++)</a>
+          </li>
+        
+          <li>
+            <a href="/2015/08/23/markdown-text-color-support/">Markdown文字色彩支援</a>
+          </li>
+        
+          <li>
+            <a href="/2015/07/26/create-your-own-pgp-digital-signature/">創造一個自己的PGP電子簽章</a>
+          </li>
+        
+          <li>
+            <a href="/2015/06/15/sourceforge-bundled-third-party-software-causes-serious-disputes/">SourceForge綑綁第三方軟體引發嚴重爭議</a>
+          </li>
+        
+          <li>
+            <a href="/2015/04/12/oauth-with-android/">舊文回收:OAuth with Android</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Rayer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

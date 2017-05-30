@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>The path to Scheduled Process Singleton | Hex Fantastic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="我們來看看怎麼改造一個Singleton讓它成為thread-safe。 ##本來的Singleton我們先複習一下一個基本的Singleton應該是長什麼樣子123456789101112131415161718class Singleton &amp;#123;private:    static Singleton* s_defInst;    Singleton() = delete;    Si">
+<meta property="og:type" content="article">
+<meta property="og:title" content="The path to Scheduled Process Singleton">
+<meta property="og:url" content="http://yoursite.com/2013/12/26/the-path-to-scheduled-process-singleton/index.html">
+<meta property="og:site_name" content="Hex Fantastic">
+<meta property="og:description" content="我們來看看怎麼改造一個Singleton讓它成為thread-safe。 ##本來的Singleton我們先複習一下一個基本的Singleton應該是長什麼樣子123456789101112131415161718class Singleton &amp;#123;private:    static Singleton* s_defInst;    Singleton() = delete;    Si">
+<meta property="og:updated_time" content="2017-05-29T22:29:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The path to Scheduled Process Singleton">
+<meta name="twitter:description" content="我們來看看怎麼改造一個Singleton讓它成為thread-safe。 ##本來的Singleton我們先複習一下一個基本的Singleton應該是長什麼樣子123456789101112131415161718class Singleton &amp;#123;private:    static Singleton* s_defInst;    Singleton() = delete;    Si">
+  
+    <link rel="alternate" href="/atom.xml" title="Hex Fantastic" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hex Fantastic</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">這世界有點無聊，找點架吵吧!</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-the-path-to-scheduled-process-singleton" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/12/26/the-path-to-scheduled-process-singleton/" class="article-date">
+  <time datetime="2013-12-26T00:56:00.000Z" itemprop="datePublished">2013-12-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      The path to Scheduled Process Singleton
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>我們來看看怎麼改造一個Singleton讓它成為thread-safe。</p>
+<p>##本來的Singleton<br>我們先複習一下一個基本的Singleton應該是長什麼樣子<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">class Singleton &#123;</div><div class="line">private:</div><div class="line">    static Singleton* s_defInst;</div><div class="line">    Singleton() = delete;</div><div class="line">    Singleton&amp; Singleton(const Singleton&amp;) = delete;</div><div class="line">    Singleton&amp; operator=(const Singleton&amp;) = delete;</div><div class="line">   </div><div class="line">public:</div><div class="line">    //還記得為什麼是Singleton&amp;而不是Singleton*嗎?</div><div class="line">    static Singleton&amp; getInst() &#123;</div><div class="line">        if(s_defInst == nullptr)</div><div class="line">            s_defInst = new Singleton();</div><div class="line">        return *s_defInst;	</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    void methodA();</div><div class="line">    RTValue methodB();</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>所以，我們使用Singleton的時候看起來會像是這樣<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Singleton::getInst().methodA();</div></pre></td></tr></table></figure></p>
+<p>##我們希望這個Singleton能怎樣呢<br>目前來說，所以我們會希望有一個東西可以傳回一個「thread safe」的handle，這東西完全跟拿::getInst()擁有完全相同的界面，唯一的不同就是他會「排程」丟進Singleton讓他去一個個的做，或者讓它可以「僅鎖定共用資料，但是不會lock thread local」的方法來跑。</p>
+<p>所以我們現在至少可以看出這東西會幾個Policy : </p>
+<pre><code>1. 我們要能選擇multi thread的「策略」，可以讓他queue，也可以讓他選擇regular，甚至可以指定thread pool
+2. 我們要能選擇single的生成方法以及原則(其實這不就是Modern C++ Design第一章的例子嗎)
+3. 如果可能的話，Singleton自己有一個骨架，而實作跟界面要能當作Policy傳進來。
+</code></pre><p>而讓他看起來應該至少要像是這樣<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ISingletonMethods* s = Singleton::getProxy();</div></pre></td></tr></table></figure></p>
+<p>或者更進一步，我們應該要有能力選擇要得到一個blocked或者non-blocked的proxy<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">ISingletonMethods* blocked = Singleton::getProxy&lt;blocked&gt;();</div><div class="line">ISingletonMethods* unblocked = Singleton::getProxy&lt;unblocked&gt;();</div><div class="line"></div><div class="line">//blocked就像普通Singleton，會block自己的這個thread在得到結果</div><div class="line">blocked-&gt;methodA();</div><div class="line"></div><div class="line">//unblocked會讓你直接回傳...雖然我們現在還沒想到要怎麼傳比較漂亮</div><div class="line">//但是沒關係，我們後面會想到方法的 XD</div><div class="line">boost::tuple&lt;int, IRetNotifyHandle&gt; ret = unblocked-&gt;methodA();</div></pre></td></tr></table></figure></p>
+<p>##「提供功能的界面以及實作」<br>很明顯的，如果要讓getProxy()跟getInst()一樣的功能的話，他們必須要有一個共通的界面才可以。當然，爽的話寫死也不會有什麼問題，但是我想這不是一個好的coder該做的事情 =P</p>
+<p>假設，我們現在有兩個method，分別是<code>void methodA();</code>跟<code>RetValue methodB();</code>，那很明顯我們將會需要一個界面來宣告這個，兩個實作這個<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">class ISingletonMethod &#123;</div><div class="line">    public:</div><div class="line">    void methodA() = 0;</div><div class="line">    RetValue methodB() = 0;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">class SingletonMethodImpl : public ISingletonMethod &#123;</div><div class="line">    public:</div><div class="line">    void methodA() &#123; printf(&quot;This is methodA Impl!&quot;); &#125;</div><div class="line">    RetValue methodB &#123; return RetValue(); &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">class SingletonMethodProxy : public ISingletonMethod &#123;</div><div class="line">    public:</div><div class="line">    void methodA() &#123; /*還沒有能決定這邊要queue呢 還是thread呢*/ &#125;</div><div class="line">    RetValue methodB() &#123; /*這邊更麻煩，我們甚至還不知道該怎麼拿ret value*/ &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>##決定multi thread策略的Proxy<br>現在我們有界面了，我們也定義出來這些東西了，所以我們可以讓Singleton看起來像是這樣 – 目前來講，我們恐怕只能讓<code>getProxy()</code>傳回指標，這有點尷尬呢</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyInterface, typename _TyImpl&gt;</div><div class="line">class Singleton : public _TyImpl &#123;</div><div class="line">private:</div><div class="line">    static Singleton* s_defInst;</div><div class="line">    Singleton() = delete;</div><div class="line">    Singleton&amp; Singleton(const Singleton&amp;) = delete;</div><div class="line">    Singleton&amp; operator=(const Singleton&amp;) = delete;</div><div class="line">   </div><div class="line">public:</div><div class="line">    //還記得為什麼是Singleton&amp;而不是Singleton*嗎?</div><div class="line">    static Singleton&amp; getInst() &#123;</div><div class="line">        if(s_defInst == nullptr)</div><div class="line">            s_defInst = new Singleton();</div><div class="line">        return *s_defInst;	</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    static _TyInterface* getProxy() &#123;</div><div class="line">       /*看來我們的主戰場就在這裡了。*/</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    //這兩個沒了，改用繼承的方式繼承過來</div><div class="line">    //void methodA();</div><div class="line">    //RTValue methodB();</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>這Proxy該怎麼寫呢？目前來看，Proxy至少要能做到轉發給impl，所以這別無選擇，一定不是繼承，而是template。我們先寫一個什麼都不做的Proxy試試看</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyInterface, typename _TyImpl&gt;</div><div class="line">class Proxy : public _TyInterface &#123;</div><div class="line">/*糟糕 中間要轉發一狗票_TyInterface的東西該怎麼寫？*/</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>很明顯，這種寫法會卡在Proxy無法正確的在編譯期產生正確的Proxy實作。我們可能會希望Proxy「經由某個管理步驟」以後完美的轉發給實作，看起來template展開後會很像是這樣<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">class SingletonMethodProxy : public ISingleton &#123;</div><div class="line">	SingletonMethodImpl _impl;</div><div class="line">  void methodA() &#123; doSomething(); _impl-&gt;methodA(); &#125;</div><div class="line">  RetValue methodB() &#123;doSomething(); return _impl-&gt;methodB(); &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>問題來了，methodA(), methodB()的Proxy實作我們無法順利地在template裡面轉發給_impl，使用者沒辦法如同呼叫Singleton::getInst().methodA()般的對Proxy做一樣的事情。</p>
+<p>這個問題其實困擾了我一陣子，不過後來發現這可以經由override <code>operator-&gt;()</code>跟<code>operator.()</code>來解決一部份，這個code看起來會很像下面這樣…<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyImpl&gt;</div><div class="line">class Proxy : public _TyImpl &#123;</div><div class="line">private:</div><div class="line">    _TyImpl&amp; _impl;</div><div class="line">    void doSomething();</div><div class="line">public:</div><div class="line">    Proxy(_TyImpl&amp; impl) : _impl(_TyImpl) &#123; &#125;</div><div class="line">    _TyImpl&amp; operator.() &#123; doSomething(); return _impl; &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>這看起來很ok 但是有個問題：operator.是不被允許overload的，我們必須要overload operator-&gt;。overload operator-&gt;會產生另外一個很有趣（但是還算可以接受的）問題，我們先看看整個proxy應該要長什麼樣子<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyImpl&gt;</div><div class="line">class Proxy &#123;</div><div class="line">	_TyImpl* _impl;</div><div class="line">	void doSomething() &#123; cout &lt;&lt; &quot;DoSomething&quot; &lt;&lt; endl; &#125;</div><div class="line">	public:</div><div class="line">	Proxy(_TyImpl* impl = nullptr) : _impl(impl) &#123;</div><div class="line">		if(_impl == nullptr)</div><div class="line">			_impl = new _TyImpl();</div><div class="line">	&#125;</div><div class="line">	_TyImpl* operator-&gt;() &#123; doSomething(); return _impl; &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>這會產生一個問題，就是這做法其實相當不直覺，有點像smart pointer的做法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Proxy&lt;SingletonMethodImpl&gt;* proxy1 = new Proxy&lt;SingletonMethodImpl&gt;;</div><div class="line">proxy1-&gt;methodA(); //compile time error!</div><div class="line">(*proxy1)-&gt;methodA(); //ok, but WTF??</div><div class="line"></div><div class="line">Proxy&lt;SingletonMethodImpl&gt; proxy2;</div><div class="line">proxy2-&gt;methodA(); //ok, pass, 但是真的很不直覺，很像smart pointer的做法。、</div></pre></td></tr></table></figure></p>
+<p>暫時解決了轉發的問題以後，現在要開始解決最難纏的排程的問題。這個其實可以借由Lambda相當清楚地解決一部份，不過仍然相當的抽象。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyImpl&gt;</div><div class="line">_TyImpl* Proxy&lt;_TyImpl&gt;::operator-&gt;() &#123;</div><div class="line">    /*所以我們這邊要做什麼來排程呢？*/</div><div class="line">    return _impl; //這邊都把處理權交出去了....</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>首先，很明顯的我們不可能直接return _impl了，我們必須要回一個proxy(proxy裡面的proxy，有沒有那麼拗口？)，這個proxy的proxy需要能被cast成_TyImpl，所以大概會長這樣<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">template&lt;typename _TyImpl&gt; </div><div class="line">class PProxy &#123;</div><div class="line">	operator _TyImpl*();</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2013/12/26/the-path-to-scheduled-process-singleton/" data-id="cj3b7hvmp0005z7simstcq3fd" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/01/01/fibonacci-sequence-of-three-kinds-of-writing-in-c/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Fibonacci數列的三種寫法 in C++
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2013/12/19/explicit-protocols/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Implicit Protocols</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2016/02/03/most-vexing-parsingc/">Most Vexing Parsing(C++)</a>
+          </li>
+        
+          <li>
+            <a href="/2015/08/23/markdown-text-color-support/">Markdown文字色彩支援</a>
+          </li>
+        
+          <li>
+            <a href="/2015/07/26/create-your-own-pgp-digital-signature/">創造一個自己的PGP電子簽章</a>
+          </li>
+        
+          <li>
+            <a href="/2015/06/15/sourceforge-bundled-third-party-software-causes-serious-disputes/">SourceForge綑綁第三方軟體引發嚴重爭議</a>
+          </li>
+        
+          <li>
+            <a href="/2015/04/12/oauth-with-android/">舊文回收:OAuth with Android</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Rayer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
