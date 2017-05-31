@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>在CMake裡面使用Google Test | Hex Fantastic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="之前想在CMake專案裡面使用，似乎很少有人提到如何把Google Test跟CMake很好的整合起來，所以寫了一篇簡單的心得來做個紀錄。 首先取得Google Test我個人的習慣是把目錄分成這幾個目錄，我拿我現在正在寫的一個小專案來做例子： 12345678910.├── CMakeLists.txt├── README.md├── deps│   └── googletest├── main">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在CMake裡面使用Google Test">
+<meta property="og:url" content="https://rayer.github.com/2017/05/31/在CMake裡面使用Google-Test/index.html">
+<meta property="og:site_name" content="Hex Fantastic">
+<meta property="og:description" content="之前想在CMake專案裡面使用，似乎很少有人提到如何把Google Test跟CMake很好的整合起來，所以寫了一篇簡單的心得來做個紀錄。 首先取得Google Test我個人的習慣是把目錄分成這幾個目錄，我拿我現在正在寫的一個小專案來做例子： 12345678910.├── CMakeLists.txt├── README.md├── deps│   └── googletest├── main">
+<meta property="og:updated_time" content="2017-05-31T14:57:57.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在CMake裡面使用Google Test">
+<meta name="twitter:description" content="之前想在CMake專案裡面使用，似乎很少有人提到如何把Google Test跟CMake很好的整合起來，所以寫了一篇簡單的心得來做個紀錄。 首先取得Google Test我個人的習慣是把目錄分成這幾個目錄，我拿我現在正在寫的一個小專案來做例子： 12345678910.├── CMakeLists.txt├── README.md├── deps│   └── googletest├── main">
+  
+    <link rel="alternate" href="/atom.xml" title="Hex Fantastic" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hex Fantastic</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">這世界有點無聊，找點架吵吧!</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://rayer.github.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-在CMake裡面使用Google-Test" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/05/31/在CMake裡面使用Google-Test/" class="article-date">
+  <time datetime="2017-05-31T14:57:22.000Z" itemprop="datePublished">2017-05-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      在CMake裡面使用Google Test
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>之前想在CMake專案裡面使用，似乎很少有人提到如何把Google Test跟CMake很好的整合起來，所以寫了一篇簡單的心得來做個紀錄。</p>
+<h2 id="首先取得Google-Test"><a href="#首先取得Google-Test" class="headerlink" title="首先取得Google Test"></a>首先取得Google Test</h2><p>我個人的習慣是把目錄分成這幾個目錄，我拿我現在正在寫的一個小專案來做例子：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">.</div><div class="line">├── CMakeLists.txt</div><div class="line">├── README.md</div><div class="line">├── deps</div><div class="line">│   └── googletest</div><div class="line">├── main.cpp</div><div class="line">├── src</div><div class="line">│   └── IHost.h</div><div class="line">└── <span class="built_in">test</span></div><div class="line">    └── twitter_basic.cpp</div></pre></td></tr></table></figure>
+<p>其中deps專門用來放3rd party dependency。我個人是不太建議使用<strong>系統安裝</strong>來裝這種那麼小的東西，而且這會造成別人使用這個project的麻煩。</p>
+<p>我自己是習慣使用<code>git submodule</code>來裝這種git專案就能拿到的東西，所以取得方法會像是這樣 : </p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">➜  Octo git:(master) ✗ <span class="built_in">cd</span> dep</div><div class="line">➜  dep git:(master) ✗ git submodule add git@github.com:google/googletest.git</div><div class="line">Cloning into <span class="string">'/Users/rayer/Develop/Octo/dep/googletest'</span>...</div><div class="line">remote: Counting objects: 7670, done.</div><div class="line">remote: Compressing objects: 100% (12/12), done.</div><div class="line">remote: Total 7670 (delta 3), reused 7 (delta 2), pack-reused 7654</div><div class="line">Receiving objects: 100% (7670/7670), 2.61 MiB | 356.00 KiB/s, done.</div><div class="line">Resolving deltas: 100% (5686/5686), done.</div></pre></td></tr></table></figure>
+<p>這樣deps底下就會有googletest這個子目錄了。其他人clone你的專案的時候，記得在<code>README.md</code>提醒一下對方要先<code>git submodule init</code>來取得所有的submodule。</p>
+<p>當然取得google test的source code方法不只一種，你可以直接在deps裡面下<code>git clone</code>，或者直接download source code硬解到底下，結果應該差不多。</p>
+<h2 id="CMake裡面的設定"><a href="#CMake裡面的設定" class="headerlink" title="CMake裡面的設定"></a>CMake裡面的設定</h2><p>Google Test完整支援CMake，所以整個構造會很簡單。其中下面的test/twitter_basic.cpp就是你寫你<code>TEST</code> <code>TEST_F</code> <code>TEST_P</code>的位置，請自己建立一個檔案。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 可加可不加，在這個範例不影響</span></div><div class="line"><span class="keyword">enable_testing</span>()</div><div class="line"></div><div class="line"><span class="comment"># 把google test整個cmake managed dir全部加進來</span></div><div class="line"><span class="keyword">add_subdirectory</span>(deps/googletest)</div><div class="line"></div><div class="line"><span class="comment"># 宣告include目錄有google test，通常順便連googlemock一起加入</span></div><div class="line"><span class="keyword">include_directories</span>(deps/googletest/googletest/<span class="keyword">include</span>)</div><div class="line"><span class="keyword">include_directories</span>(deps/googletest/googlemock/<span class="keyword">include</span>)</div><div class="line"></div><div class="line"><span class="comment"># 測試的主體。main宣告google test已經幫你宣告好了，直接用就是，就是gtest_main.cc</span></div><div class="line"><span class="keyword">add_executable</span>(twitter_test deps/googletest/googletest/src/gtest_main.cc test/twitter_basic.cpp)</div><div class="line"><span class="comment"># Link gtest library</span></div><div class="line"><span class="keyword">target_link_libraries</span>(twitter_test gtest)</div></pre></td></tr></table></figure>
+<p>這樣基本上就能跑了，看起來會像這樣：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">Running main() from gtest_main.cc</div><div class="line">[==========] Running 1 <span class="built_in">test</span> from 1 <span class="built_in">test</span> case.</div><div class="line">[----------] Global <span class="built_in">test</span> environment <span class="built_in">set</span>-up.</div><div class="line">[----------] 1 <span class="built_in">test</span> from SANITY</div><div class="line">[ RUN      ] SANITY.sanity</div><div class="line">[       OK ] SANITY.sanity (0 ms)</div><div class="line">[----------] 1 <span class="built_in">test</span> from SANITY (0 ms total)</div><div class="line"></div><div class="line">[----------] Global <span class="built_in">test</span> environment tear-down</div><div class="line">[==========] 1 <span class="built_in">test</span> from 1 <span class="built_in">test</span> <span class="keyword">case</span> ran. (0 ms total)</div><div class="line">[  PASSED  ] 1 test.</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://rayer.github.com/2017/05/31/在CMake裡面使用Google-Test/" data-id="cj3d49luz000xj3sicw8k71xr" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/02/03/most-vexing-parsingc/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Most Vexing Parsing(C++)</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">八月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">四月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">三月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">十二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">六月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">四月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">三月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">一月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">十二月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">八月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">七月 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/05/31/在CMake裡面使用Google-Test/">在CMake裡面使用Google Test</a>
+          </li>
+        
+          <li>
+            <a href="/2016/02/03/most-vexing-parsingc/">Most Vexing Parsing(C++)</a>
+          </li>
+        
+          <li>
+            <a href="/2015/08/23/markdown-text-color-support/">Markdown文字色彩支援</a>
+          </li>
+        
+          <li>
+            <a href="/2015/06/15/sourceforge-bundled-third-party-software-causes-serious-disputes/">SourceForge綑綁第三方軟體引發嚴重爭議</a>
+          </li>
+        
+          <li>
+            <a href="/2015/04/12/oauth-with-android/">舊文回收:OAuth with Android</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Rayer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

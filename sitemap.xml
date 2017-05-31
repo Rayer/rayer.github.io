@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://rayer.github.com/2017/05/31/%E5%9C%A8CMake%E8%A3%A1%E9%9D%A2%E4%BD%BF%E7%94%A8Google-Test/</loc>
+    
+    <lastmod>2017-05-31T14:57:57.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://rayer.github.com/2016/02/03/most-vexing-parsingc/</loc>
     
     <lastmod>2017-05-30T07:33:52.000Z</lastmod>
@@ -26,13 +33,6 @@
     <loc>https://rayer.github.com/2015/08/23/markdown-text-color-support/</loc>
     
     <lastmod>2017-05-30T06:56:19.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://rayer.github.com/2013/12/19/explicit-protocols/</loc>
-    
-    <lastmod>2017-05-29T22:29:26.000Z</lastmod>
     
   </url>
   
@@ -72,14 +72,14 @@
   </url>
   
   <url>
-    <loc>https://rayer.github.com/2014/01/20/let-your-stdvectoror-something-else-compatible-with-stream-operator/</loc>
+    <loc>https://rayer.github.com/2014/01/17/talking-about-the-c-11-lambda/</loc>
     
     <lastmod>2017-05-29T22:29:26.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://rayer.github.com/2014/01/17/talking-about-the-c-11-lambda/</loc>
+    <loc>https://rayer.github.com/2014/01/20/let-your-stdvectoror-something-else-compatible-with-stream-operator/</loc>
     
     <lastmod>2017-05-29T22:29:26.000Z</lastmod>
     
@@ -100,6 +100,13 @@
   </url>
   
   <url>
+    <loc>https://rayer.github.com/2014/01/22/c-11-ways-to-obtain-high-accuracy-of-time/</loc>
+    
+    <lastmod>2017-05-29T22:29:26.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://rayer.github.com/2014/01/23/recycle-from-past-game-loop-update-in-c/</loc>
     
     <lastmod>2017-05-29T22:29:26.000Z</lastmod>
@@ -114,7 +121,7 @@
   </url>
   
   <url>
-    <loc>https://rayer.github.com/2014/02/01/constructor-call-another-constructor-w-c-11/</loc>
+    <loc>https://rayer.github.com/2014/03/15/adult-toys-vpn-on-vps/</loc>
     
     <lastmod>2017-05-29T22:29:26.000Z</lastmod>
     
@@ -128,7 +135,7 @@
   </url>
   
   <url>
-    <loc>https://rayer.github.com/2014/03/15/adult-toys-vpn-on-vps/</loc>
+    <loc>https://rayer.github.com/2014/03/30/set-up-a-wordpress-on-the-vps-services/</loc>
     
     <lastmod>2017-05-29T22:29:26.000Z</lastmod>
     
@@ -142,7 +149,7 @@
   </url>
   
   <url>
-    <loc>https://rayer.github.com/2014/03/30/set-up-a-wordpress-on-the-vps-services/</loc>
+    <loc>https://rayer.github.com/2014/04/23/translation-chat-wars-1/</loc>
     
     <lastmod>2017-05-29T22:29:26.000Z</lastmod>
     
@@ -157,13 +164,6 @@
   
   <url>
     <loc>https://rayer.github.com/2013/07/18/suddenly-thought-of-that-old-joke/</loc>
-    
-    <lastmod>2017-05-29T22:29:26.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://rayer.github.com/2014/04/23/translation-chat-wars-1/</loc>
     
     <lastmod>2017-05-29T22:29:26.000Z</lastmod>
     
@@ -191,7 +191,7 @@
   </url>
   
   <url>
-    <loc>https://rayer.github.com/2013/08/07/this-is-singleton/</loc>
+    <loc>https://rayer.github.com/2013/12/03/visual-studio-online/</loc>
     
     <lastmod>2017-05-29T22:29:26.000Z</lastmod>
     
@@ -205,14 +205,21 @@
   </url>
   
   <url>
-    <loc>https://rayer.github.com/2013/12/03/visual-studio-online/</loc>
+    <loc>https://rayer.github.com/2013/08/07/this-is-singleton/</loc>
     
     <lastmod>2017-05-29T22:29:26.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://rayer.github.com/2014/01/22/c-11-ways-to-obtain-high-accuracy-of-time/</loc>
+    <loc>https://rayer.github.com/2013/12/19/explicit-protocols/</loc>
+    
+    <lastmod>2017-05-29T22:29:26.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://rayer.github.com/2014/02/01/constructor-call-another-constructor-w-c-11/</loc>
     
     <lastmod>2017-05-29T22:29:26.000Z</lastmod>
     
